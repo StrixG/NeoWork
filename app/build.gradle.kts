@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.fragment)
     implementation(libs.constraintlayout)
     implementation(libs.bundles.navigation)
+    implementation(libs.workmanager)
 
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
