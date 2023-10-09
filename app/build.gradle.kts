@@ -1,7 +1,13 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.ksp)
+}
+
+val secrets = Properties().apply {
+    load(rootProject.file("secrets.properties").inputStream())
 }
 
 android {
@@ -16,6 +22,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "API_KEY", "\"${secrets.getProperty("API_KEY", "")}\"")
     }
 
     buildTypes {
@@ -28,6 +36,7 @@ android {
         }
     }
     buildFeatures {
+        buildConfig = true
         viewBinding = true
     }
     compileOptions {
@@ -50,6 +59,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.bundles.navigation)
     implementation(libs.workmanager)
+    implementation(libs.datastore)
 
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
