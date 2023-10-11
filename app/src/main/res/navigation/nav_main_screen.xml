@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_main_screen"
+    app:startDestination="@id/post_feed_fragment">
+
+    <fragment
+        android:id="@+id/post_feed_fragment"
+        android:name="com.obrekht.neowork.posts.ui.feed.PostFeedFragment"
+        android:label="fragment_post_feed"
+        tools:layout="@layout/fragment_post_feed" />
+
+    <dialog
+        android:id="@+id/suggest_auth_dialog"
+        android:name="com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment"
+        android:label="SuggestAuth" />
+
+    <dialog
+        android:id="@+id/remove_confirmation_dialog"
+        android:name="com.obrekht.neowork.posts.ui.removeconfirmation.RemoveConfirmationDialogFragment"
+        android:label="RemoveConfirmation">
+        <argument
+            android:name="elementId"
+            app:argType="long" />
+        <argument
+            android:name="elementType"
+            app:argType="com.obrekht.neowork.posts.ui.removeconfirmation.RemoveElementType" />
+    </dialog>
+</navigation>

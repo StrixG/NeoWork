@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/main_fragment">
+
+    <fragment
+        android:id="@+id/main_fragment"
+        android:name="com.obrekht.neowork.core.ui.MainFragment"
+        tools:layout="@layout/fragment_main" />
+
+    <fragment
+        android:id="@+id/sign_up_fragment"
+        android:name="com.obrekht.neowork.auth.ui.signup.SignUpFragment"
+        android:label="sign_up_fragment"
+        tools:layout="@layout/fragment_sign_up" />
+
+    <fragment
+        android:id="@+id/login_fragment"
+        android:name="com.obrekht.neowork.auth.ui.login.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" />
+
+    <dialog
+        android:id="@+id/suggest_auth_dialog"
+        android:name="com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment"
+        android:label="SuggestAuth" />
+
+    <dialog
+        android:id="@+id/remove_confirmation_dialog"
+        android:name="com.obrekht.neowork.posts.ui.removeconfirmation.RemoveConfirmationDialogFragment"
+        android:label="RemoveConfirmation">
+        <argument
+            android:name="elementId"
+            app:argType="long" />
+        <argument
+            android:name="elementType"
+            app:argType="com.obrekht.neowork.posts.ui.removeconfirmation.RemoveElementType" />
+    </dialog>
+
+    <action
+        android:id="@+id/action_openLogIn"
+        app:destination="@id/login_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"
+        app:popUpTo="@id/login_fragment" />
+
+    <action
+        android:id="@+id/action_openSignUp"
+        app:destination="@id/sign_up_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"
+        app:popUpTo="@id/sign_up_fragment" />
+</navigation>

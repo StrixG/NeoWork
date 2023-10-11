@@ -3,7 +3,10 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.navigation.safeargs)
+    alias(libs.plugins.hilt)
 }
 
 val secrets = Properties().apply {
@@ -24,6 +27,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "API_KEY", "\"${secrets.getProperty("API_KEY", "")}\"")
+        buildConfigField("String", "BASE_URL", "\"http://94.228.125.136:8080\"")
     }
 
     buildTypes {
@@ -39,12 +43,19 @@ android {
         buildConfig = true
         viewBinding = true
     }
+    androidResources {
+        generateLocaleConfig = true
+    }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs += listOf(
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        )
     }
 }
 
@@ -56,21 +67,29 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.fragment)
+    implementation(libs.lifecycle.viewmodel)
     implementation(libs.constraintlayout)
+    implementation(libs.swiperefreshlayout)
     implementation(libs.bundles.navigation)
     implementation(libs.workmanager)
     implementation(libs.datastore)
+    implementation(libs.paging)
+    implementation(libs.imagepicker)
 
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
 
     implementation(platform(libs.okhttp.bom))
     implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
     implementation(libs.bundles.retrofit)
+    implementation(libs.coil)
 
     implementation(libs.bundles.hilt)
     ksp(libs.hilt.compiler)
     ksp(libs.jetpack.hilt.compiler)
+
+    coreLibraryDesugaring(libs.desugar)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

@@ -3,6 +3,7 @@ android-plugin = "8.1.2"
 kotlin = "1.9.10"
 kotlin-ksp = "1.9.10-1.0.13"
 
+desugar = "2.0.3"
 coroutines = "1.7.3"
 serialization = "1.6.0"
 jetpack-core = "1.12.0"
@@ -10,12 +11,18 @@ appcompat = "1.6.1"
 material = "1.10.0"
 activity = "1.8.0"
 fragment = "1.6.1"
+lifecycle = "2.6.2"
 navigation = "2.7.4"
 workmanager = "2.8.1"
+datastore = "1.0.0"
 constraintlayout = "2.1.4"
+swiperefreshlayout = "1.2.0-alpha01"
+paging = "3.2.1"
+imagepicker = "2.1"
 room = "2.5.2"
 okhttp-bom = "4.10.0"
 retrofit = "2.10.0-SNAPSHOT"
+coil = "2.4.0"
 hilt = "2.48.1"
 jetpack-hilt = "1.0.0"
 
@@ -25,6 +32,7 @@ junit-ext = "1.1.5"
 espresso-core = "3.5.1"
 
 [libraries]
+desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 jetpack-core = { module = "androidx.core:core-ktx", version.ref = "jetpack-core" }
@@ -32,10 +40,15 @@ appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat"
 material = { module = "com.google.android.material:material", version.ref = "material" }
 activity = { module = "androidx.activity:activity-ktx", version.ref = "activity" }
 fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
 workmanager = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager" }
+datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
+paging = { module = "androidx.paging:paging-runtime", version.ref = "paging" }
+imagepicker = { module = "com.github.dhaval2404:imagepicker", version.ref = "imagepicker" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
@@ -45,6 +58,7 @@ okhttp = { module = "com.squareup.okhttp3:okhttp" }
 okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
+coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 hilt = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
 jetpack-hilt-navigation = { module = "androidx.hilt:hilt-navigation-fragment", version.ref = "jetpack-hilt" }
@@ -59,10 +73,13 @@ espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref =
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-plugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
+navigation-safeargs = { id = "androidx.navigation.safeargs", version.ref = "navigation" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 [bundles]
 navigation = ["navigation.fragment", "navigation.ui"]
-room = ["room.runtime", "room.ktx"]
+room = ["room.runtime", "room.ktx", "room.paging"]
 retrofit = ["retrofit", "retrofit-kotlinx-serialization"]
 hilt = ["hilt", "jetpack.hilt.navigation", "jetpack.hilt.work"]

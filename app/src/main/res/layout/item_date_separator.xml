@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/date_separator_padding">
+
+    <TextView
+        android:id="@+id/date_text"
+        style="@style/TextAppearance.Material3.LabelLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bg_date_separator"
+        android:padding="@dimen/date_separator_padding"
+        android:textColor="?attr/colorOnSurface"
+        tools:text="Today" />
+
+</FrameLayout>
