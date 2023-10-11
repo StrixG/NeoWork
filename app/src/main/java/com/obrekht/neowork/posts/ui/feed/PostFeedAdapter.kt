@@ -8,6 +8,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import coil.transform.CircleCropTransformation
 import com.obrekht.neowork.R
 import com.obrekht.neowork.databinding.ItemDateSeparatorBinding
 import com.obrekht.neowork.databinding.ItemPostBinding
@@ -135,6 +136,7 @@ class PostViewHolder(
             if (post.authorAvatar != null) {
                 avatar.load(post.authorAvatar) {
                     placeholder(R.drawable.avatar_placeholder)
+                    transformations(CircleCropTransformation())
                 }
             }
 
