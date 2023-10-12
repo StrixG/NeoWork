@@ -19,6 +19,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
+
+    - name: Decode secrets.properties
+      env:
+        SECRETS: ${{ secrets.SECRETS }}
+      run: echo $SECRETS > ./secrets.properties
     
     - name: Build with Gradle
       run: |
