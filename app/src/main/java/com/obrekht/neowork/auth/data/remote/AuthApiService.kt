@@ -22,9 +22,9 @@ interface AuthApiService {
     @Multipart
     @POST("users/registration")
     suspend fun signUp(
-        @Part login: RequestBody,
-        @Part pass: RequestBody,
-        @Part name: RequestBody,
+        @Part("login") login: RequestBody,
+        @Part("pass") pass: RequestBody,
+        @Part("name") name: RequestBody,
         @Part file: MultipartBody.Part?
     ): Response<AuthState>
 }

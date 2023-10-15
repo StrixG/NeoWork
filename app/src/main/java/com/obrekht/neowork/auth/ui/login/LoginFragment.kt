@@ -9,6 +9,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.obrekht.neowork.R
@@ -16,6 +17,7 @@ import com.obrekht.neowork.auth.ui.navigateToSignUp
 import com.obrekht.neowork.databinding.FragmentLoginBinding
 import com.obrekht.neowork.utils.hideKeyboard
 import com.obrekht.neowork.utils.repeatOnStarted
+import com.obrekht.neowork.utils.setInsetsListener
 import com.obrekht.neowork.utils.viewBinding
 import com.obrekht.neowork.utils.viewLifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,7 +43,19 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
+            view.setInsetsListener { insets ->
+                setPadding(
+                    paddingLeft,
+                    paddingTop,
+                    paddingRight,
+                    insets.bottom
+                )
+            }
+
             formEditTextList = listOf(usernameEditText, passwordEditText)
+
+            appBar.statusBarForeground =
+                MaterialShapeDrawable.createWithElevationOverlay(requireContext())
 
             toolbar.setNavigationOnClickListener {
                 findNavController().navigateUp()

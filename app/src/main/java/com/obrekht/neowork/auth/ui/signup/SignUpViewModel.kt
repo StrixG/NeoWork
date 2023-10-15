@@ -56,25 +56,20 @@ class SignUpViewModel @Inject constructor(
     fun validateFormData(
         name: String,
         username: String,
-        password: String,
-        passwordConfirmation: String
+        password: String
     ) {
 
-        if (name.isEmpty()) {
+        if (name.isBlank()) {
             _uiState.update {
                 it.copy(formState = SignUpFormState(nameError = NameError.Empty))
             }
-        } else if (username.isEmpty()) {
+        } else if (username.isBlank()) {
             _uiState.update {
                 it.copy(formState = SignUpFormState(usernameError = UsernameError.Empty))
             }
-        } else if (password.isEmpty()) {
+        } else if (password.isBlank()) {
             _uiState.update {
                 it.copy(formState = SignUpFormState(passwordError = PasswordError.Empty))
-            }
-        } else if (password != passwordConfirmation) {
-            _uiState.update {
-                it.copy(formState = SignUpFormState(passwordConfirmationError = PasswordConfirmationError.DoNotMatch))
             }
         } else {
             _uiState.update {

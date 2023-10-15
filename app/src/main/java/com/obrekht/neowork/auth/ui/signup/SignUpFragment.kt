@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.github.dhaval2404.imagepicker.constant.ImageProvider
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.obrekht.neowork.R
@@ -22,6 +23,7 @@ import com.obrekht.neowork.auth.ui.navigateToLogIn
 import com.obrekht.neowork.databinding.FragmentSignUpBinding
 import com.obrekht.neowork.utils.hideKeyboard
 import com.obrekht.neowork.utils.repeatOnStarted
+import com.obrekht.neowork.utils.setInsetsListener
 import com.obrekht.neowork.utils.viewBinding
 import com.obrekht.neowork.utils.viewLifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,11 +65,22 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
+            view.setInsetsListener { insets ->
+                setPadding(
+                    paddingLeft,
+                    paddingTop,
+                    paddingRight,
+                    insets.bottom
+                )
+            }
+
+            appBar.statusBarForeground =
+                MaterialShapeDrawable.createWithElevationOverlay(requireContext())
+
             formEditTextList = listOf(
                 nameEditText,
                 usernameEditText,
-                passwordEditText,
-                passwordConfirmationEditText
+                passwordEditText
             )
 
             toolbar.setNavigationOnClickListener {
@@ -92,13 +105,12 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
                 viewModel.validateFormData(
                     nameEditText.text.toString(),
                     usernameEditText.text.toString(),
-                    passwordEditText.text.toString(),
-                    passwordConfirmationEditText.text.toString()
+                    passwordEditText.text.toString()
                 )
             }
 
             formEditTextList.forEach { it.doAfterTextChanged(textChangedAction) }
-            passwordConfirmationEditText.setOnEditorActionListener { _, actionId, _ ->
+            passwordEditText.setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     signUp()
                 }
@@ -142,12 +154,6 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
                             else -> null
                         }
 
-                        passwordConfirmationTextField.error =
-                            when (state.formState.passwordConfirmationError) {
-                                PasswordConfirmationError.DoNotMatch -> getString(R.string.error_passwords_do_not_match)
-                                else -> null
-                            }
-
                         state.result?.let { result ->
                             progressBar.hide()
 
@@ -156,6 +162,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
                                 is SignUpResult.Error -> {
                                     setInteractionsActive(true)
 
+                                    result.error.printStackTrace()
                                     showErrorSnackbar(R.string.error_unknown)
                                 }
                             }
