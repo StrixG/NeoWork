@@ -10,4 +10,10 @@
     <dimen name="sign_up_edit_button_size">32dp</dimen>
     <dimen name="margin_auth_button">8dp</dimen>
     <dimen name="post_list_bottom_padding">96dp</dimen>
+    <dimen name="comment_avatar_size">32dp</dimen>
+    <dimen name="icon_button_min_size">24dp</dimen>
+    <dimen name="comment_option_height">64dp</dimen>
+    <dimen name="comment_input_height">48dp</dimen>
+    <dimen name="comment_input_padding">12dp</dimen>
+    <dimen name="max_input_field_width">384dp</dimen>
 </resources>

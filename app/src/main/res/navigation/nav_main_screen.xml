@@ -17,14 +17,13 @@
         android:label="SuggestAuth" />
 
     <dialog
-        android:id="@+id/remove_confirmation_dialog"
-        android:name="com.obrekht.neowork.posts.ui.removeconfirmation.RemoveConfirmationDialogFragment"
-        android:label="RemoveConfirmation">
+        android:id="@+id/delete_confirmation_dialog"
+        android:name="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment">
         <argument
             android:name="elementId"
             app:argType="long" />
         <argument
             android:name="elementType"
-            app:argType="com.obrekht.neowork.posts.ui.removeconfirmation.RemoveElementType" />
+            app:argType="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType" />
     </dialog>
 </navigation>

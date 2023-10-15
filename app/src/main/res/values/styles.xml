@@ -6,4 +6,30 @@
         <item name="iconSize">@dimen/menu_button_size</item>
         <item name="icon">@drawable/ic_menu</item>
     </style>
+
+    <style name="Widget.App.PostButton" parent="Widget.Material3.Button.TextButton.Icon">
+        <item name="cornerRadius">24dp</item>
+        <item name="android:minWidth">@dimen/icon_button_min_size</item>
+    </style>
+
+    <style name="Widget.App.PostButton.Like">
+        <item name="icon">@drawable/ic_like</item>
+    </style>
+
+    <style name="Widget.App.PostButton.Share">
+        <item name="icon">@drawable/ic_share</item>
+    </style>
+
+    <style name="Widget.App.CommentButton" parent="Widget.Material3.Button.TextButton.Icon">
+        <item name="android:minWidth">@dimen/icon_button_min_size</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="Widget.App.CommentButton.Like">
+        <item name="icon">@drawable/ic_like</item>
+    </style>
 </resources>

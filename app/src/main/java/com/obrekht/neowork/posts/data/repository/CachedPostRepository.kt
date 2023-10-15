@@ -13,8 +13,8 @@ import com.obrekht.neowork.media.model.Media
 import com.obrekht.neowork.media.model.MediaUpload
 import com.obrekht.neowork.posts.data.local.PostDatabase
 import com.obrekht.neowork.posts.data.local.dao.PostDao
-import com.obrekht.neowork.posts.data.local.entity.LikeOwnerEntity
 import com.obrekht.neowork.posts.data.local.entity.PostData
+import com.obrekht.neowork.posts.data.local.entity.PostLikeOwnerEntity
 import com.obrekht.neowork.posts.data.local.entity.toEntityData
 import com.obrekht.neowork.posts.data.local.entity.toModel
 import com.obrekht.neowork.posts.data.remote.PostApiService
@@ -97,7 +97,7 @@ class CachedPostRepository @Inject constructor(
         val response = postApi.getById(postId)
         if (!response.isSuccessful) {
             if (response.code() == HttpURLConnection.HTTP_NOT_FOUND) {
-                postDao.removeById(postId)
+                postDao.deleteById(postId)
             }
             throw HttpException(response)
         }
@@ -114,7 +114,7 @@ class CachedPostRepository @Inject constructor(
         postDao.observeById(postId).map { it?.toModel() }
 
     override suspend fun likeById(postId: Long): Post = try {
-        postDao.like(LikeOwnerEntity(postId, loggedInUserId))
+        postDao.like(PostLikeOwnerEntity(postId, loggedInUserId))
 
         val response = postApi.likeById(postId)
         if (!response.isSuccessful) {
@@ -125,12 +125,12 @@ class CachedPostRepository @Inject constructor(
 
         post
     } catch (e: Exception) {
-        postDao.unlike(LikeOwnerEntity(postId, loggedInUserId))
+        postDao.unlike(PostLikeOwnerEntity(postId, loggedInUserId))
         throw e
     }
 
     override suspend fun unlikeById(postId: Long): Post = try {
-        postDao.unlike(LikeOwnerEntity(postId, loggedInUserId))
+        postDao.unlike(PostLikeOwnerEntity(postId, loggedInUserId))
 
         val response = postApi.unlikeById(postId)
         if (!response.isSuccessful) {
@@ -141,7 +141,7 @@ class CachedPostRepository @Inject constructor(
 
         post
     } catch (e: Exception) {
-        postDao.like(LikeOwnerEntity(postId, loggedInUserId))
+        postDao.like(PostLikeOwnerEntity(postId, loggedInUserId))
         throw e
     }
 
@@ -168,7 +168,7 @@ class CachedPostRepository @Inject constructor(
         var post: PostData? = null
         try {
             post = postDao.getById(postId)
-            postDao.removeById(postId)
+            postDao.deleteById(postId)
 
             val response = postApi.removeById(postId)
             if (!response.isSuccessful) {

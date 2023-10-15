@@ -61,7 +61,8 @@
                 app:errorEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_max="@dimen/max_input_field_width">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/username_edit_text"
@@ -85,7 +86,8 @@
                 app:errorEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/username_text_field">
+                app:layout_constraintTop_toBottomOf="@+id/username_text_field"
+                app:layout_constraintWidth_max="@dimen/max_input_field_width">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password_edit_text"
@@ -102,7 +104,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_log_in"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginHorizontal="@dimen/common_spacing"
@@ -111,6 +113,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/password_text_field"
+                app:layout_constraintWidth_max="@dimen/max_input_field_width"
                 tools:enabled="true" />
 
             <TextView
@@ -126,7 +129,7 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_sign_up"
                 style="?attr/materialButtonOutlinedStyle"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginHorizontal="@dimen/common_spacing"
@@ -136,6 +139,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sign_up_hint_hint"
+                app:layout_constraintWidth_max="@dimen/max_input_field_width"
                 tools:enabled="true" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

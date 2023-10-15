@@ -28,16 +28,56 @@
         android:label="SuggestAuth" />
 
     <dialog
-        android:id="@+id/remove_confirmation_dialog"
-        android:name="com.obrekht.neowork.posts.ui.removeconfirmation.RemoveConfirmationDialogFragment"
+        android:id="@+id/delete_confirmation_dialog"
+        android:name="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment"
         android:label="RemoveConfirmation">
         <argument
             android:name="elementId"
             app:argType="long" />
         <argument
             android:name="elementType"
-            app:argType="com.obrekht.neowork.posts.ui.removeconfirmation.RemoveElementType" />
+            app:argType="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType" />
     </dialog>
+
+    <navigation
+        android:id="@+id/post_graph"
+        app:startDestination="@id/post_fragment">
+        <argument
+            android:name="postId"
+            app:argType="long" />
+        <fragment
+            android:id="@+id/post_fragment"
+            android:name="com.obrekht.neowork.posts.ui.post.PostFragment"
+            android:label="@string/title_post"
+            tools:layout="@layout/fragment_post">
+            <argument
+                android:name="postId"
+                app:argType="long" />
+            <action
+                android:id="@+id/action_openCommentOptions"
+                app:destination="@id/comment_options" />
+        </fragment>
+        <dialog
+            android:id="@+id/comment_options"
+            android:name="com.obrekht.neowork.posts.ui.post.CommentOptionsDialogFragment"
+            android:label="CommentOptionsDialogFragment"
+            tools:layout="@layout/bottom_sheet_comment_options">
+            <argument
+                android:name="commentId"
+                app:argType="long" />
+            <argument
+                android:name="ownedByMe"
+                app:argType="boolean" />
+        </dialog>
+    </navigation>
+
+    <action
+        android:id="@+id/action_openPost"
+        app:destination="@id/post_graph"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
 
     <action
         android:id="@+id/action_openLogIn"

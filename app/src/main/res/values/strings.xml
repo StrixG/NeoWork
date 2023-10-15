@@ -11,7 +11,7 @@
     <string name="description_share">Share</string>
     <string name="description_post_menu">Post menu</string>
     <string name="menu_edit">Edit</string>
-    <string name="menu_remove">Remove</string>
+    <string name="menu_delete">Delete</string>
     <string name="time_just_now">Just now</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
@@ -23,8 +23,8 @@
     <string name="retry">Retry</string>
     <string name="no_posts">There are no posts yet.</string>
     <string name="error_loading">Something went wrong.</string>
-    <string name="error_liking">Failed to change like state.</string>
-    <string name="error_removing">Failed to remove.</string>
+    <string name="error_liking">Failed to toggle like.</string>
+    <string name="error_deleting">Failed to delete.</string>
     <string name="add_post_description">Add post</string>
     <string name="error_empty_username">Username cannot be empty</string>
     <string name="error_empty_password">Password cannot be empty</string>
@@ -41,8 +41,25 @@
     <string name="log_out_confirmation_message">Are you sure you want to log out?</string>
     <string name="log_out_confirmation_title">Log out</string>
     <string name="option_log_out">Log out</string>
-    <string name="remove_post_confirmation_title">Removing post</string>
-    <string name="remove_post_confirmation_message">Are you sure you want to remove the post?</string>
+    <string name="delete_post_confirmation_title">Confirmation</string>
+    <string name="delete_confirmation_message">Are you sure you want to delete it?</string>
     <string name="delete">Delete</string>
     <string name="new_posts">New posts (%1$d)</string>
+    <string name="edit_comment">Edit</string>
+    <string name="title_post">Post</string>
+    <string name="copy_comment">Copy comment</string>
+    <string name="comment_copied">Comment copied to your clipboard</string>
+    <string name="delete_comment">Delete</string>
+    <string name="link_log_in">Log in</string>
+    <string name="link_sign_up">Sign up</string>
+    <string name="comment_input_not_authenticated">Log in or sign up to post comments.</string>
+    <string name="comment">Comment</string>
+    <string name="send_comment">Send comment</string>
+    <string name="error_loading_post">Something went wrong. Unable to load the post.</string>
+    <string name="error_loading_comments">Something went wrong. Unable to load comments.</string>
+    <string name="error_liking_comment">Something went wrong. Failed to toggle like.</string>
+    <string name="error_sending_comment">Something went wrong. Failed to send the comment.</string>
+    <string name="error_deleting_comment">Something went wrong. Failed to delete the comment.</string>
+    <string name="likers">Likers</string>
+    <string name="menu_share">Share</string>
 </resources>

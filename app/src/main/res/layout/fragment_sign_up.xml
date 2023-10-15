@@ -83,11 +83,11 @@
                 android:layout_marginHorizontal="@dimen/common_spacing"
                 android:layout_marginTop="@dimen/common_spacing"
                 android:hint="@string/prompt_name"
-                android:maxWidth="256dp"
                 app:errorEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/avatar">
+                app:layout_constraintTop_toBottomOf="@id/avatar"
+                app:layout_constraintWidth_max="@dimen/max_input_field_width">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/name_edit_text"
@@ -109,7 +109,8 @@
                 app:errorEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/name_text_field">
+                app:layout_constraintTop_toBottomOf="@id/name_text_field"
+                app:layout_constraintWidth_max="@dimen/max_input_field_width">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/username_edit_text"
@@ -132,7 +133,8 @@
                 app:errorEnabled="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/username_text_field">
+                app:layout_constraintTop_toBottomOf="@+id/username_text_field"
+                app:layout_constraintWidth_max="@dimen/max_input_field_width">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password_edit_text"
@@ -147,7 +149,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_sign_up"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginHorizontal="@dimen/common_spacing"
@@ -156,6 +158,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/password_text_field"
+                app:layout_constraintWidth_max="@dimen/max_input_field_width"
                 tools:enabled="true" />
 
             <TextView
@@ -171,7 +174,7 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_log_in"
                 style="?attr/materialButtonOutlinedStyle"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginHorizontal="@dimen/common_spacing"
@@ -181,6 +184,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/log_in_hint"
+                app:layout_constraintWidth_max="@dimen/max_input_field_width"
                 tools:enabled="true" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

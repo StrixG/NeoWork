@@ -1,4 +1,4 @@
-package com.obrekht.neowork.posts.ui.removeconfirmation
+package com.obrekht.neowork.posts.ui.deleteconfirmation
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -10,8 +10,8 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.obrekht.neowork.R
 
-class RemoveConfirmationDialogFragment : DialogFragment() {
-    private val args: RemoveConfirmationDialogFragmentArgs by navArgs()
+class DeleteConfirmationDialogFragment : DialogFragment() {
+    private val args: DeleteConfirmationDialogFragmentArgs by navArgs()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val clickListener = DialogInterface.OnClickListener { _, which ->
@@ -24,8 +24,8 @@ class RemoveConfirmationDialogFragment : DialogFragment() {
         }
 
         return MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.remove_post_confirmation_title))
-            .setMessage(getString(R.string.remove_post_confirmation_message))
+            .setTitle(getString(R.string.delete_post_confirmation_title))
+            .setMessage(getString(R.string.delete_confirmation_message))
             .setNegativeButton(getString(R.string.cancel), clickListener)
             .setPositiveButton(getString(R.string.delete), clickListener).show()
     }
@@ -34,11 +34,11 @@ class RemoveConfirmationDialogFragment : DialogFragment() {
         const val RESULT_CLICKED_BUTTON = "clickedButton"
         const val RESULT_ELEMENT_ID = "elementId"
 
-        fun getRequestKey(elementType: RemoveElementType) = "removeConfirmation_$elementType"
+        fun getRequestKey(elementType: DeleteElementType) = "deleteConfirmation_$elementType"
     }
 }
 
-enum class RemoveElementType {
+enum class DeleteElementType {
     POST,
     COMMENT
 }

@@ -3,13 +3,12 @@ package com.obrekht.neowork.posts.data.local.entity
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.obrekht.neowork.posts.model.Post
-import java.time.Instant
 
 data class PostData(
     @Embedded
     val post: PostEntity,
     @Relation(
-        entity = LikeOwnerEntity::class,
+        entity = PostLikeOwnerEntity::class,
         parentColumn = "postId",
         entityColumn = "postId",
         projection = ["userId"]
@@ -26,15 +25,16 @@ data class PostData(
 
 fun PostData.toModel() = Post(
     post.postId, post.authorId, post.author, post.authorJob, post.authorAvatar, post.content,
-    Instant.ofEpochSecond(post.published), post.coords, post.link,
+    post.published, post.coords, post.link,
     mentionIds, post.mentionedMe, likeOwnerIds, post.likedByMe,
     post.attachment, emptyMap()
 )
 
 fun Post.toEntityData(isShown: Boolean = true) = PostData(
-    post = PostEntity(id, authorId, author, authorJob, authorAvatar, content,
-        published?.epochSecond ?: 0, coords, link,
-        mentionedMe, likedByMe, attachment, isShown),
+    post = PostEntity(
+        id, authorId, author, authorJob, authorAvatar, content,
+        published, coords, link, mentionedMe, likedByMe, attachment, isShown
+    ),
     likeOwnerIds = likeOwnerIds,
     mentionIds = mentionIds
 )

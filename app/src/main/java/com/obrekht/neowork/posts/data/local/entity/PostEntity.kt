@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.obrekht.neowork.core.model.Attachment
 import com.obrekht.neowork.posts.model.Coordinates
+import java.time.Instant
 
 @Entity("post")
 data class PostEntity(
@@ -15,7 +16,7 @@ data class PostEntity(
     val authorJob: String? = null,
     val authorAvatar: String? = null,
     val content: String,
-    val published: Long,
+    val published: Instant?,
     @Embedded
     val coords: Coordinates? = null,
     val link: String? = null,

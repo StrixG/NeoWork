@@ -91,8 +91,8 @@ class PostViewHolder(
                     true
                 }
 
-                R.id.remove -> {
-                    post?.let(interactionListener::onRemove)
+                R.id.delete -> {
+                    post?.let(interactionListener::onDelete)
                     true
                 }
 
@@ -130,7 +130,13 @@ class PostViewHolder(
             content.text = post.content
             refreshPublishedDate()
 
-            like.isChecked = post.likedByMe
+            like.setIconResource(
+                if (post.likedByMe) {
+                    R.drawable.ic_like
+                } else {
+                    R.drawable.ic_like_border
+                }
+            )
             like.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
 
             if (post.authorAvatar != null) {

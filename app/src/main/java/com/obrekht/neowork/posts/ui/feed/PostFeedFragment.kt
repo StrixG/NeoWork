@@ -20,10 +20,11 @@ import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
 import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
 import com.obrekht.neowork.databinding.FragmentPostFeedBinding
 import com.obrekht.neowork.posts.model.Post
-import com.obrekht.neowork.posts.ui.removeconfirmation.RemoveConfirmationDialogFragment
-import com.obrekht.neowork.posts.ui.removeconfirmation.RemoveElementType
+import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment
+import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType
+import com.obrekht.neowork.posts.ui.navigateToPost
 import com.obrekht.neowork.posts.ui.sharePost
-import com.obrekht.neowork.posts.ui.showRemoveConfirmation
+import com.obrekht.neowork.posts.ui.showDeleteConfirmation
 import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.viewBinding
 import com.obrekht.neowork.utils.viewLifecycleScope
@@ -54,7 +55,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
 
     private val interactionListener = object : PostInteractionListener {
         override fun onClick(post: Post) {
-
+            navigateToPost(post.id)
         }
 
         override fun onLike(post: Post) {
@@ -73,17 +74,17 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
 
         }
 
-        override fun onRemove(post: Post) {
+        override fun onDelete(post: Post) {
             if (viewModel.isLoggedIn) {
-                showRemoveConfirmation(post.id, RemoveElementType.POST)
+                showDeleteConfirmation(post.id, DeleteElementType.POST)
             }
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        with(RemoveConfirmationDialogFragment) {
+        with(DeleteConfirmationDialogFragment) {
             setFragmentResultListener(
-                getRequestKey(RemoveElementType.POST)
+                getRequestKey(DeleteElementType.POST)
             ) { _, bundle ->
                 val clickedButton = bundle.getInt(RESULT_CLICKED_BUTTON)
                 if (clickedButton == DialogInterface.BUTTON_POSITIVE) {
@@ -300,7 +301,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
             }
 
             is Event.ErrorRemovingPost -> {
-                showErrorSnackbar(R.string.error_removing) {
+                showErrorSnackbar(R.string.error_deleting) {
                     viewModel.removeById(event.postId)
                 }
             }

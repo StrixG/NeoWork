@@ -2,11 +2,17 @@ package com.obrekht.neowork.posts.ui
 
 import android.content.Intent
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import com.obrekht.neowork.NavGraphDirections
 import com.obrekht.neowork.R
+import com.obrekht.neowork.core.ui.findRootNavController
 import com.obrekht.neowork.posts.model.Post
-import com.obrekht.neowork.posts.ui.removeconfirmation.RemoveConfirmationDialogFragmentArgs
-import com.obrekht.neowork.posts.ui.removeconfirmation.RemoveElementType
+import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragmentArgs
+import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType
+
+fun Fragment.navigateToPost(postId: Long) {
+    val action = NavGraphDirections.actionOpenPost(postId)
+    findRootNavController().navigate(action)
+}
 
 fun Fragment.sharePost(post: Post) {
     val intent = Intent().apply {
@@ -19,9 +25,9 @@ fun Fragment.sharePost(post: Post) {
     startActivity(shareIntent)
 }
 
-fun Fragment.showRemoveConfirmation(elementId: Long, elementType: RemoveElementType) {
-    findNavController().navigate(
-        R.id.remove_confirmation_dialog,
-        RemoveConfirmationDialogFragmentArgs.Builder(elementId, elementType).build().toBundle()
+fun Fragment.showDeleteConfirmation(elementId: Long, elementType: DeleteElementType) {
+    findRootNavController().navigate(
+        R.id.delete_confirmation_dialog,
+        DeleteConfirmationDialogFragmentArgs.Builder(elementId, elementType).build().toBundle()
     )
 }

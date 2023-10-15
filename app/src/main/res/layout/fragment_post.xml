@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fitsSystemWindows="true"
+        app:layout_constraintBottom_toTopOf="@id/comment_input_container"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true"
+            app:liftOnScroll="true"
+            app:liftOnScrollTargetViewId="@id/nested_scroll_view">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_scrollFlags="scroll|enterAlways|snap"
+                app:menu="@menu/menu_post_details"
+                app:navigationIcon="@drawable/ic_arrow_back"
+                app:title="@string/title_post" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/nested_scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/common_spacing">
+
+                    <ImageView
+                        android:id="@+id/avatar"
+                        android:layout_width="@dimen/avatar_size"
+                        android:layout_height="@dimen/avatar_size"
+                        android:layout_marginStart="@dimen/common_spacing"
+                        android:layout_marginBottom="@dimen/common_spacing"
+                        android:contentDescription="@string/description_post_author_avatar"
+                        app:layout_constraintBottom_toBottomOf="@id/top_barrier"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:srcCompat="@drawable/avatar_placeholder" />
+
+                    <TextView
+                        android:id="@+id/author"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/common_spacing"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                        app:layout_constraintBottom_toTopOf="@+id/published"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/avatar"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        tools:text="@sample/posts.json/data/author" />
+
+                    <TextView
+                        android:id="@+id/published"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/common_spacing"
+                        android:layout_marginBottom="@dimen/common_spacing"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                        android:visibility="invisible"
+                        app:layout_constraintBottom_toBottomOf="@id/top_barrier"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/avatar"
+                        app:layout_constraintTop_toBottomOf="@id/author"
+                        tools:text="@sample/posts.json/data/published"
+                        tools:visibility="visible" />
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/top_barrier"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="avatar,published" />
+
+                    <TextView
+                        android:id="@+id/content"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/common_spacing"
+                        android:autoLink="web"
+                        android:ellipsize="end"
+                        android:maxLines="3"
+                        android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/top_barrier"
+                        tools:text="@sample/posts.json/data/content" />
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/content_barrier"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="content" />
+
+                    <include
+                        android:id="@+id/likers"
+                        layout="@layout/include_likers"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/common_spacing"
+                        android:layout_marginTop="@dimen/common_spacing"
+                        android:layout_marginBottom="@dimen/small_spacing"
+                        app:layout_constraintBottom_toBottomOf="@id/buttons_barrier"
+                        app:layout_constraintTop_toBottomOf="@id/content_barrier" />
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/buttons_barrier"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/common_spacing"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="likers" />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/common_spacing"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/buttons_barrier" />
+
+                    <TextView
+                        android:id="@+id/comments_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/common_spacing"
+                        android:layout_marginVertical="8dp"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
+                        app:layout_constraintBottom_toTopOf="@id/comment_list_view"
+                        app:layout_constraintTop_toBottomOf="@id/buttons_barrier"
+                        app:layout_constraintVertical_bias="0"
+                        tools:text="10 comments" />
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/comments_progress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:indeterminate="true"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/buttons_barrier"
+                        app:showAnimationBehavior="outward" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/comment_list_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:layout_constrainedHeight="true"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/comments_title"
+                        tools:itemCount="5"
+                        tools:listitem="@layout/item_comment" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.core.widget.NestedScrollView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/comment_input_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="?attr/colorSurfaceContainer"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/content_layout">
+
+        <TextView
+            android:id="@+id/comment_log_in_text"
+            style="@style/TextAppearance.Material3.BodyLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/common_spacing"
+            android:gravity="center"
+            android:minHeight="@dimen/comment_input_height"
+            android:text="@string/comment_input_not_authenticated"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/comment_edit_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:hint="@string/comment"
+            android:maxLines="5"
+            android:paddingHorizontal="@dimen/common_spacing"
+            android:paddingVertical="@dimen/comment_input_padding"
+            app:layout_constraintEnd_toStartOf="@id/button_send_comment"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:text="@tools:sample/lorem/random" />
+
+        <Button
+            android:id="@+id/button_send_comment"
+            style="?attr/materialIconButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/send_comment"
+            app:icon="@drawable/ic_send"
+            app:layout_constraintBottom_toBottomOf="@id/comment_edit_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/comment_edit_text" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/send_comment_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:hideAnimationBehavior="inward"
+            app:layout_constraintBottom_toBottomOf="@id/comment_edit_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:showAnimationBehavior="outward"
+            tools:visibility="visible" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_comment_input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="button_send_comment,comment_edit_text" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

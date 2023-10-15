@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 
 @Entity(
-    "like_owner",
+    "post_like_owner",
     foreignKeys = [ForeignKey(
         entity = PostEntity::class,
         parentColumns = ["postId"],
@@ -13,7 +13,7 @@ import androidx.room.ForeignKey
     )],
     primaryKeys = ["postId", "userId"]
 )
-data class LikeOwnerEntity(
+data class PostLikeOwnerEntity(
     val postId: Long,
     val userId: Long
 )

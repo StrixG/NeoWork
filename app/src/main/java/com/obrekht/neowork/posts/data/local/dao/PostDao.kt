@@ -7,10 +7,10 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
-import com.obrekht.neowork.posts.data.local.entity.LikeOwnerEntity
 import com.obrekht.neowork.posts.data.local.entity.MentionEntity
 import com.obrekht.neowork.posts.data.local.entity.PostData
 import com.obrekht.neowork.posts.data.local.entity.PostEntity
+import com.obrekht.neowork.posts.data.local.entity.PostLikeOwnerEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -59,42 +59,36 @@ interface PostDao {
     suspend fun update(post: PostEntity)
 
     @Query("DELETE FROM post")
-    suspend fun removeAll()
+    suspend fun deleteAll()
 
     @Delete
-    suspend fun remove(post: PostEntity)
+    suspend fun delete(post: PostEntity)
 
     @Query("DELETE FROM post WHERE postId = :id")
-    suspend fun removeById(id: Long)
+    suspend fun deleteById(id: Long)
 
     @Query("UPDATE post SET likedByMe = :isLiked WHERE postId = :postId")
     suspend fun setLikedByMe(postId: Long, isLiked: Boolean)
 
     @Transaction
     @Upsert
-    suspend fun like(likeOwner: LikeOwnerEntity) {
+    suspend fun like(likeOwner: PostLikeOwnerEntity) {
         setLikedByMe(likeOwner.postId, true)
     }
 
     @Transaction
     @Delete
-    suspend fun unlike(likeOwner: LikeOwnerEntity) {
+    suspend fun unlike(likeOwner: PostLikeOwnerEntity) {
         setLikedByMe(likeOwner.postId, false)
     }
 
     @Upsert
-    suspend fun upsertLikeOwner(likeOwner: LikeOwnerEntity)
-
-    @Upsert
-    suspend fun upsertLikeOwner(likeOwnerList: List<LikeOwnerEntity>)
-
-    @Upsert
-    suspend fun upsertMention(mention: MentionEntity)
+    suspend fun upsertLikeOwner(likeOwnerList: List<PostLikeOwnerEntity>)
 
     @Upsert
     suspend fun upsertMention(mentionList: List<MentionEntity>)
 
-    @Query("DELETE FROM like_owner WHERE postId = :postId")
+    @Query("DELETE FROM post_like_owner WHERE postId = :postId")
     suspend fun deletePostLikeOwners(postId: Long)
 
     @Query("DELETE FROM mention WHERE postId = :postId")
@@ -107,7 +101,7 @@ interface PostDao {
         deletePostLikeOwners(postId)
         deletePostMentions(postId)
         upsert(postData.post)
-        upsertLikeOwner(postData.likeOwnerIds.map { LikeOwnerEntity(postId, it) })
+        upsertLikeOwner(postData.likeOwnerIds.map { PostLikeOwnerEntity(postId, it) })
         upsertMention(postData.mentionIds.map { MentionEntity(postId, it) })
     }
 
