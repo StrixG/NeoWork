@@ -76,7 +76,7 @@ class CommentsAdapter(
                         placeholder(R.drawable.avatar_placeholder)
                         transformations(CircleCropTransformation())
                     }
-                }
+                } ?: avatar.setImageResource(R.drawable.avatar_placeholder)
             }
         }
     }
