@@ -104,7 +104,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             ) { _, bundle ->
                 val clickedButton = bundle.getInt(RESULT_CLICKED_BUTTON)
                 if (clickedButton == DialogInterface.BUTTON_POSITIVE) {
-                    viewModel.remove()
+                    viewModel.delete()
                 }
             }
         }
@@ -252,7 +252,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
 
             Event.ErrorRemovingPost -> {
                 showErrorSnackbar(R.string.error_deleting) {
-                    viewModel.remove()
+                    viewModel.delete()
                 }
             }
 

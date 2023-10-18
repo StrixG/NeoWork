@@ -117,7 +117,7 @@ class PostFeedViewModel @Inject constructor(
         }
     }
 
-    fun remove(post: Post) = deleteById(post.id)
+    fun delete(post: Post) = deleteById(post.id)
 
     fun scrollDone() {
         _uiState.update { it.copy(scrollDone = true) }

@@ -129,7 +129,7 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun remove() = viewModelScope.launch {
+    fun delete() = viewModelScope.launch {
         try {
             postRepository.deleteById(postId)
             _event.send(Event.PostDeleted)

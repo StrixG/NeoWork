@@ -180,7 +180,7 @@ class CachedPostRepository @Inject constructor(
         }
     }
 
-    override suspend fun remove(post: Post) = deleteById(post.id)
+    override suspend fun delete(post: Post) = deleteById(post.id)
 
     private suspend fun uploadMedia(upload: File): Media = try {
         val media = MultipartBody.Part.createFormData(
