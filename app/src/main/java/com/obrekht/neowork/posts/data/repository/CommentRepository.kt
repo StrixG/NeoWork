@@ -10,6 +10,6 @@ interface CommentRepository {
     suspend fun getComment(commentId: Long): Comment?
     suspend fun likeCommentById(commentId: Long): Comment
     suspend fun unlikeCommentById(commentId: Long): Comment
-    suspend fun saveComment(comment: Comment): Comment
+    suspend fun save(comment: Comment): Comment
     suspend fun deleteCommentById(commentId: Long)
 }

@@ -16,6 +16,7 @@ import com.obrekht.neowork.databinding.BottomSheetCommentOptionsBinding
 import com.obrekht.neowork.posts.model.Comment
 import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment
 import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType
+import com.obrekht.neowork.posts.ui.navigateToCommentEditor
 import com.obrekht.neowork.posts.ui.showDeleteConfirmation
 import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.viewBinding
@@ -86,7 +87,7 @@ class CommentOptionsDialogFragment :
                 adapter.addItems(
                     // Edit
                     CommentOption(R.drawable.ic_edit_24, R.string.edit_comment) {
-                        // TODO: Open comment editor
+                        navigateToCommentEditor(args.commentId)
                         dismiss()
                     },
                     // Delete

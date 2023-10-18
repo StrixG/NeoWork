@@ -8,8 +8,7 @@
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:layout_height="match_parent">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar"
@@ -40,23 +39,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingTop="@dimen/small_spacing"
                 android:paddingHorizontal="@dimen/small_spacing"
+                android:paddingTop="@dimen/small_spacing"
                 android:paddingBottom="@dimen/post_list_bottom_padding"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_post" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_add_post"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="@dimen/common_spacing"
-            android:layout_marginBottom="@dimen/common_spacing"
-            android:contentDescription="@string/add_post_description"
-            app:srcCompat="@drawable/ic_add" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/button_new_posts"
@@ -70,6 +59,16 @@
             app:icon="@drawable/ic_arrow_upward"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             tools:visibility="visible" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/button_add_post"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_marginEnd="@dimen/common_spacing"
+            android:layout_marginBottom="@dimen/common_spacing"
+            android:contentDescription="@string/add_post_description"
+            app:srcCompat="@drawable/ic_add" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

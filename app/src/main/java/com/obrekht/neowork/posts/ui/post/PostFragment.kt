@@ -13,6 +13,7 @@ import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
+import coil.size.Scale
 import coil.transform.CircleCropTransformation
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
@@ -21,12 +22,14 @@ import com.obrekht.neowork.auth.ui.navigateToLogIn
 import com.obrekht.neowork.auth.ui.navigateToSignUp
 import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
 import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
+import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.databinding.FragmentPostBinding
 import com.obrekht.neowork.posts.model.Comment
 import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment
 import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType
 import com.obrekht.neowork.posts.ui.feed.PostInteractionListener
+import com.obrekht.neowork.posts.ui.navigateToPostEditor
 import com.obrekht.neowork.posts.ui.sharePost
 import com.obrekht.neowork.posts.ui.showDeleteConfirmation
 import com.obrekht.neowork.utils.StringUtils
@@ -34,7 +37,7 @@ import com.obrekht.neowork.utils.TimeUtils
 import com.obrekht.neowork.utils.hideKeyboard
 import com.obrekht.neowork.utils.makeLinks
 import com.obrekht.neowork.utils.repeatOnStarted
-import com.obrekht.neowork.utils.setInsetsListener
+import com.obrekht.neowork.utils.setBarsInsetsListener
 import com.obrekht.neowork.utils.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.cancel
@@ -66,7 +69,9 @@ class PostFragment : Fragment(R.layout.fragment_post) {
         }
 
         override fun onEdit(post: Post) {
-
+            if (viewModel.isLoggedIn) {
+                navigateToPostEditor(post.id)
+            }
         }
 
         override fun onDelete(post: Post) {
@@ -114,7 +119,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
         }
 
         with(binding) {
-            commentInputContainer.setInsetsListener { insets ->
+            commentInputContainer.setBarsInsetsListener { insets ->
                 setPadding(
                     paddingLeft,
                     paddingTop,
@@ -314,7 +319,22 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                 }
             } ?: avatar.setImageResource(R.drawable.avatar_placeholder)
 
-            // TODO: Load attachment
+            post.attachment?.let {
+                image.isVisible = it.type == AttachmentType.IMAGE
+
+                when (it.type) {
+                    AttachmentType.IMAGE -> {
+                        image.load(it.url) {
+                            scale(Scale.FILL)
+                            crossfade(true)
+                        }
+                    }
+                    AttachmentType.VIDEO -> {}
+                    AttachmentType.AUDIO -> {}
+                }
+            } ?: {
+                image.isVisible = false
+            }
         }
 
         binding.content.maxLines = Int.MAX_VALUE

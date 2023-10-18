@@ -39,7 +39,7 @@ interface PostApiService {
     suspend fun save(@Body post: Post): Response<Post>
 
     @DELETE("posts/{id}")
-    suspend fun removeById(@Path("id") postId: Long): Response<Unit>
+    suspend fun deleteById(@Path("id") postId: Long): Response<Unit>
 
     @POST("posts/{id}/likes")
     suspend fun likeById(@Path("id") postId: Long): Response<Post>

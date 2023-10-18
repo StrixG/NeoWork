@@ -88,7 +88,7 @@ class CachedCommentRepository @Inject constructor(
         throw e
     }
 
-    override suspend fun saveComment(comment: Comment) = try {
+    override suspend fun save(comment: Comment) = try {
         val response = commentApi.save(comment.postId, comment)
         if (!response.isSuccessful) {
             throw HttpException(response)

@@ -17,7 +17,7 @@ import com.obrekht.neowork.auth.ui.navigateToSignUp
 import com.obrekht.neowork.databinding.FragmentLoginBinding
 import com.obrekht.neowork.utils.hideKeyboard
 import com.obrekht.neowork.utils.repeatOnStarted
-import com.obrekht.neowork.utils.setInsetsListener
+import com.obrekht.neowork.utils.setBarsInsetsListener
 import com.obrekht.neowork.utils.viewBinding
 import com.obrekht.neowork.utils.viewLifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,7 +43,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
-            view.setInsetsListener { insets ->
+            scrollView.setBarsInsetsListener { insets ->
                 setPadding(
                     paddingLeft,
                     paddingTop,

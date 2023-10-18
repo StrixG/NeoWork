@@ -23,6 +23,7 @@ import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment
 import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType
 import com.obrekht.neowork.posts.ui.navigateToPost
+import com.obrekht.neowork.posts.ui.navigateToPostEditor
 import com.obrekht.neowork.posts.ui.sharePost
 import com.obrekht.neowork.posts.ui.showDeleteConfirmation
 import com.obrekht.neowork.utils.repeatOnStarted
@@ -71,7 +72,11 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
         }
 
         override fun onEdit(post: Post) {
-
+            if (viewModel.isLoggedIn) {
+                navigateToPostEditor(post.id)
+            } else {
+                showSuggestAuthDialog()
+            }
         }
 
         override fun onDelete(post: Post) {
@@ -89,7 +94,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
                 val clickedButton = bundle.getInt(RESULT_CLICKED_BUTTON)
                 if (clickedButton == DialogInterface.BUTTON_POSITIVE) {
                     val postId = bundle.getLong(RESULT_ELEMENT_ID)
-                    viewModel.removeById(postId)
+                    viewModel.deleteById(postId)
                 }
             }
         }
@@ -188,7 +193,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
 
             buttonAddPost.setOnClickListener {
                 if (viewModel.isLoggedIn) {
-//                    navigateToPostEditor()
+                    navigateToPostEditor()
                 } else {
                     showSuggestAuthDialog()
                 }
@@ -302,7 +307,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
 
             is Event.ErrorRemovingPost -> {
                 showErrorSnackbar(R.string.error_deleting) {
-                    viewModel.removeById(event.postId)
+                    viewModel.deleteById(event.postId)
                 }
             }
         }

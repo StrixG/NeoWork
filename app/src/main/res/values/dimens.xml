@@ -16,4 +16,6 @@
     <dimen name="comment_input_height">48dp</dimen>
     <dimen name="comment_input_padding">12dp</dimen>
     <dimen name="max_input_field_width">384dp</dimen>
+    <dimen name="margin_remove_attachment_button">8dp</dimen>
+    <dimen name="max_image_height">512dp</dimen>
 </resources>

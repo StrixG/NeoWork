@@ -131,7 +131,7 @@ class PostViewModel @Inject constructor(
 
     fun remove() = viewModelScope.launch {
         try {
-            postRepository.removeById(postId)
+            postRepository.deleteById(postId)
             _event.send(Event.PostDeleted)
         } catch (e: Exception) {
             _event.send(Event.ErrorRemovingPost)
@@ -175,7 +175,7 @@ class PostViewModel @Inject constructor(
         _uiState.update { it.copy(isCommentSending = true) }
 
         runCatching {
-            commentRepository.saveComment(
+            commentRepository.save(
                 Comment(
                     id = 0,
                     postId = postId,

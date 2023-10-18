@@ -164,13 +164,13 @@ class CachedPostRepository @Inject constructor(
         throw e
     }
 
-    override suspend fun removeById(postId: Long) {
+    override suspend fun deleteById(postId: Long) {
         var post: PostData? = null
         try {
             post = postDao.getById(postId)
             postDao.deleteById(postId)
 
-            val response = postApi.removeById(postId)
+            val response = postApi.deleteById(postId)
             if (!response.isSuccessful) {
                 throw HttpException(response)
             }
@@ -180,7 +180,7 @@ class CachedPostRepository @Inject constructor(
         }
     }
 
-    override suspend fun remove(post: Post) = removeById(post.id)
+    override suspend fun remove(post: Post) = deleteById(post.id)
 
     private suspend fun uploadMedia(upload: File): Media = try {
         val media = MultipartBody.Part.createFormData(

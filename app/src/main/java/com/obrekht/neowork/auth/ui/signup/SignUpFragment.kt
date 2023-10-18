@@ -23,7 +23,7 @@ import com.obrekht.neowork.auth.ui.navigateToLogIn
 import com.obrekht.neowork.databinding.FragmentSignUpBinding
 import com.obrekht.neowork.utils.hideKeyboard
 import com.obrekht.neowork.utils.repeatOnStarted
-import com.obrekht.neowork.utils.setInsetsListener
+import com.obrekht.neowork.utils.setBarsInsetsListener
 import com.obrekht.neowork.utils.viewBinding
 import com.obrekht.neowork.utils.viewLifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,6 +46,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
                     val uri: Uri? = it.data?.data
                     viewModel.changeAvatar(uri, uri?.toFile())
                 }
+
                 ImagePicker.RESULT_ERROR -> {
                     Snackbar.make(
                         binding.root,
@@ -65,7 +66,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
-            view.setInsetsListener { insets ->
+            scrollView.setBarsInsetsListener { insets ->
                 setPadding(
                     paddingLeft,
                     paddingTop,
@@ -126,49 +127,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
 
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnStarted {
-                viewModel.uiState.onEach { state ->
-                    with(binding) {
-                        if (state.isLoading) {
-                            progressBar.show()
-                            setInteractionsActive(false)
-                        } else if(state.result !is SignUpResult.Success) {
-                            buttonSignUp.isEnabled = state.formState.isDataValid
-                        }
-
-                        state.avatarModel.uri?.let {
-                            avatar.setImageURI(it)
-                        }
-
-                        nameTextField.error = when (state.formState.nameError) {
-                            NameError.Empty -> getString(R.string.error_empty_name)
-                            else -> null
-                        }
-
-                        usernameTextField.error = when (state.formState.usernameError) {
-                            UsernameError.Empty -> getString(R.string.error_empty_username)
-                            else -> null
-                        }
-
-                        passwordTextField.error = when (state.formState.passwordError) {
-                            PasswordError.Empty -> getString(R.string.error_empty_password)
-                            else -> null
-                        }
-
-                        state.result?.let { result ->
-                            progressBar.hide()
-
-                            when (result) {
-                                SignUpResult.Success -> onSignedUp()
-                                is SignUpResult.Error -> {
-                                    setInteractionsActive(true)
-
-                                    result.error.printStackTrace()
-                                    showErrorSnackbar(R.string.error_unknown)
-                                }
-                            }
-                        }
-                    }
-                }.launchIn(this)
+                viewModel.uiState.onEach(::handleState).launchIn(this)
             }
         }
     }
@@ -177,6 +136,50 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
         formEditTextList = emptyList()
         snackbar = null
         super.onDestroyView()
+    }
+
+    private fun handleState(state: SignUpUiState) = with(binding) {
+        if (state.isLoading) {
+            progressBar.show()
+            setInteractionsActive(false)
+        } else if (state.result !is SignUpResult.Success) {
+            buttonSignUp.isEnabled = state.formState.isDataValid
+        }
+
+        state.avatarModel.uri?.let {
+            avatar.setImageURI(it)
+        }
+
+        nameTextField.error = when (state.formState.nameError) {
+            NameError.Empty -> getString(R.string.error_empty_name)
+            else -> null
+        }
+
+        usernameTextField.error = when (state.formState.usernameError) {
+            UsernameError.Empty -> getString(R.string.error_empty_username)
+            else -> null
+        }
+
+        passwordTextField.error = when (state.formState.passwordError) {
+            PasswordError.Empty -> getString(R.string.error_empty_password)
+            else -> null
+        }
+
+        state.result?.let { result ->
+            progressBar.hide()
+
+            when (result) {
+                SignUpResult.Success -> onSignedUp()
+                is SignUpResult.Error -> {
+                    setInteractionsActive(true)
+
+                    result.error.printStackTrace()
+                    showErrorSnackbar(R.string.error_unknown)
+                }
+            }
+        }
+
+        Unit
     }
 
     private fun onSignedUp() {

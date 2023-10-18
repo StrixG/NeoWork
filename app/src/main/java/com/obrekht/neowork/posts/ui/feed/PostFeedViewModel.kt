@@ -45,13 +45,14 @@ class PostFeedViewModel @Inject constructor(
                 initialLoadSize = POSTS_PER_PAGE * 2
             )
         )
+        .cachedIn(viewModelScope)
         .combine(appAuth.state) { pagingData, authState ->
             pagingData.map {
                 PostItem(it.copy(ownedByMe = it.authorId == authState.id))
             }
         }.map {
             it.insertDateSeparators()
-        }.flowOn(Dispatchers.Default).cachedIn(viewModelScope)
+        }.flowOn(Dispatchers.Default)
 
     private val _uiState = MutableStateFlow(FeedUiState())
     val uiState: StateFlow<FeedUiState> = _uiState
@@ -108,15 +109,15 @@ class PostFeedViewModel @Inject constructor(
         post?.let(::toggleLike) ?: _event.send(Event.ErrorLikingPost(postId))
     }
 
-    fun removeById(postId: Long) = viewModelScope.launch {
+    fun deleteById(postId: Long) = viewModelScope.launch {
         try {
-            repository.removeById(postId)
+            repository.deleteById(postId)
         } catch (e: Exception) {
             _event.send(Event.ErrorRemovingPost(postId))
         }
     }
 
-    fun remove(post: Post) = removeById(post.id)
+    fun remove(post: Post) = deleteById(post.id)
 
     fun scrollDone() {
         _uiState.update { it.copy(scrollDone = true) }
@@ -163,7 +164,7 @@ data class FeedUiState(
 )
 
 sealed interface Event {
-    object ErrorLoadPosts : Event
+    data object ErrorLoadPosts : Event
     class ErrorLikingPost(val postId: Long) : Event
     class ErrorRemovingPost(val postId: Long) : Event
 }

@@ -62,4 +62,23 @@
     <string name="error_deleting_comment">Something went wrong. Failed to delete the comment.</string>
     <string name="likers">Likers</string>
     <string name="menu_share">Share</string>
+    <string name="description_back_to_post">Back to post</string>
+    <string name="hint_post_edit">Write a post…</string>
+    <string name="hint_comment_edit">Write a comment…</string>
+    <string name="attached_photo_description">Attached photo</string>
+    <string name="menu_save">Save</string>
+    <string name="take_picture">Take a picture</string>
+    <string name="attach_media">Attach media file</string>
+    <string name="add_mentions">Add mentions</string>
+    <string name="add_location">Add location</string>
+    <string name="content_description_choose_event_time">Choose event time</string>
+    <string name="cancel_edit_title">Are you sure?</string>
+    <string name="cancel_edit_message">All changes will be lost.</string>
+    <string name="dont_save">Don\'t save</string>
+    <string name="error_empty_content">Content can\'t be empty</string>
+    <string name="error_saving">An error occurred during saving</string>
+    <string name="error_saving_post">An error occurred while saving the post</string>
+    <string name="error_saving_comment">An error occurred while saving the comment</string>
+    <string name="hint_edit">Write…</string>
+    <string name="content_description_attached_photo">Attached photo</string>
 </resources>

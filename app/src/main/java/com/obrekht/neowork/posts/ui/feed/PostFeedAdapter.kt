@@ -8,8 +8,10 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import coil.size.Scale
 import coil.transform.CircleCropTransformation
 import com.obrekht.neowork.R
+import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.databinding.ItemDateSeparatorBinding
 import com.obrekht.neowork.databinding.ItemPostBinding
 import com.obrekht.neowork.posts.model.Post
@@ -139,14 +141,29 @@ class PostViewHolder(
             )
             like.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
 
-            if (post.authorAvatar != null) {
+            post.authorAvatar?.let {
                 avatar.load(post.authorAvatar) {
                     placeholder(R.drawable.avatar_placeholder)
                     transformations(CircleCropTransformation())
                 }
-            }
+            } ?: avatar.setImageResource(R.drawable.avatar_placeholder)
 
-            // TODO: Load attachment
+            post.attachment?.let {
+                image.isVisible = it.type == AttachmentType.IMAGE
+
+                when (it.type) {
+                    AttachmentType.IMAGE -> {
+                        image.load(it.url) {
+                            scale(Scale.FILL)
+                            crossfade(true)
+                        }
+                    }
+                    AttachmentType.VIDEO -> {}
+                    AttachmentType.AUDIO -> {}
+                }
+            } ?: {
+                image.isVisible = false
+            }
         }
     }
 
