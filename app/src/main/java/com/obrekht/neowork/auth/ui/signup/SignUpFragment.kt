@@ -172,11 +172,10 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
                 SignUpResult.Success -> onSignedUp()
                 is SignUpResult.Error -> {
                     setInteractionsActive(true)
-
-                    result.error.printStackTrace()
                     showErrorSnackbar(R.string.error_unknown)
                 }
             }
+            viewModel.resultHandled()
         }
 
         Unit

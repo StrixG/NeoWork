@@ -81,4 +81,8 @@ class SignUpViewModel @Inject constructor(
     fun changeAvatar(uri: Uri?, toFile: File?) {
         _uiState.update { it.copy(avatarModel = AvatarModel(uri, toFile)) }
     }
+
+    fun resultHandled() {
+        _uiState.update { it.copy(result = null) }
+    }
 }

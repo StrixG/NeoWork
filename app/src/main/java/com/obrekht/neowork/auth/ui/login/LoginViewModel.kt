@@ -62,4 +62,8 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+    fun resultHandled() {
+        _uiState.update { it.copy(result = null) }
+    }
 }

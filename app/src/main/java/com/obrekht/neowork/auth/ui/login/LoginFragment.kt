@@ -83,38 +83,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnStarted {
-                viewModel.uiState.onEach { state ->
-                    with(binding) {
-                        if (state.isLoading) {
-                            progressBar.show()
-                            setInteractionsActive(false)
-                        } else if (state.result !is LoginResult.Success) {
-                            buttonLogIn.isEnabled = state.formState.isDataValid
-                        }
-
-                        usernameTextField.error = when (state.formState.usernameError) {
-                            UsernameError.Empty -> getString(R.string.error_empty_username)
-                            else -> null
-                        }
-
-                        passwordTextField.error = when (state.formState.passwordError) {
-                            PasswordError.Empty -> getString(R.string.error_empty_password)
-                            else -> null
-                        }
-
-                        state.result?.let { result ->
-                            when (result) {
-                                LoginResult.Success -> onLoggedIn()
-                                is LoginResult.Error -> {
-                                    progressBar.hide()
-                                    setInteractionsActive(true)
-                                    result.error.printStackTrace()
-                                    showErrorSnackbar(R.string.error_unknown)
-                                }
-                            }
-                        }
-                    }
-                }.launchIn(this)
+                viewModel.uiState.onEach(::handleState).launchIn(this)
             }
         }
     }
@@ -123,6 +92,40 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         formEditTextList = emptyList()
         snackbar = null
         super.onDestroyView()
+    }
+
+    private fun handleState(state: LoginUiState) = with(binding) {
+        if (state.isLoading) {
+            progressBar.show()
+            setInteractionsActive(false)
+        } else if (state.result !is LoginResult.Success) {
+            buttonLogIn.isEnabled = state.formState.isDataValid
+        }
+
+        usernameTextField.error = when (state.formState.usernameError) {
+            UsernameError.Empty -> getString(R.string.error_empty_username)
+            else -> null
+        }
+
+        passwordTextField.error = when (state.formState.passwordError) {
+            PasswordError.Empty -> getString(R.string.error_empty_password)
+            else -> null
+        }
+
+        state.result?.let { result ->
+            when (result) {
+                LoginResult.Success -> onLoggedIn()
+                is LoginResult.Error -> {
+                    progressBar.hide()
+                    setInteractionsActive(true)
+                    result.error.printStackTrace()
+                    showErrorSnackbar(R.string.error_unknown)
+                }
+            }
+            viewModel.resultHandled()
+        }
+
+        Unit
     }
 
     private fun onLoggedIn() {
