@@ -42,9 +42,9 @@
         android:id="@+id/edit_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="?attr/actionBarSize"
+        android:layout_marginBottom="@dimen/bottom_bar_height"
         android:clipToPadding="false"
-        android:paddingBottom="@dimen/common_spacing"
+        android:paddingBottom="@dimen/small_spacing"
         android:scrollbars="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 

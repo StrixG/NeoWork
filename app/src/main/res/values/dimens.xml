@@ -9,7 +9,7 @@
     <dimen name="sign_up_avatar_size">128dp</dimen>
     <dimen name="sign_up_edit_button_size">32dp</dimen>
     <dimen name="margin_auth_button">8dp</dimen>
-    <dimen name="post_list_bottom_padding">96dp</dimen>
+    <dimen name="post_list_bottom_padding">80dp</dimen>
     <dimen name="comment_avatar_size">32dp</dimen>
     <dimen name="icon_button_min_size">24dp</dimen>
     <dimen name="comment_option_height">64dp</dimen>
@@ -18,4 +18,5 @@
     <dimen name="max_input_field_width">384dp</dimen>
     <dimen name="margin_remove_attachment_button">8dp</dimen>
     <dimen name="max_image_height">512dp</dimen>
+    <dimen name="bottom_bar_height">80dp</dimen>
 </resources>

@@ -1,0 +1,16 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Lydia Westervelt",
+      "login": "lywest",
+      "avatar": "@sample/posts_avatars"
+    },
+    {
+      "id": 2,
+      "name": "Nikita Obrekht",
+      "login": "strix",
+      "avatar": "@sample/posts_avatars"
+    }
+  ]
+}

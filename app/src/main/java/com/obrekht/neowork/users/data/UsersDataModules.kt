@@ -2,15 +2,10 @@ package com.obrekht.neowork.users.data
 
 import android.content.Context
 import androidx.room.Room
-import com.obrekht.neowork.posts.data.local.PostDatabase
-import com.obrekht.neowork.posts.data.local.dao.CommentDao
-import com.obrekht.neowork.posts.data.local.dao.PostDao
-import com.obrekht.neowork.posts.data.remote.CommentApiService
-import com.obrekht.neowork.posts.data.remote.PostApiService
-import com.obrekht.neowork.posts.data.repository.CachedCommentRepository
-import com.obrekht.neowork.posts.data.repository.CachedPostRepository
-import com.obrekht.neowork.posts.data.repository.CommentRepository
-import com.obrekht.neowork.posts.data.repository.PostRepository
+import com.obrekht.neowork.users.data.local.dao.UserDao
+import com.obrekht.neowork.users.data.remote.UserApiService
+import com.obrekht.neowork.users.data.repository.CachedUserRepository
+import com.obrekht.neowork.users.data.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -23,48 +18,37 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class PostRepositoryModule {
+abstract class UserRepositoryModule {
 
     @Singleton
     @Binds
-    abstract fun bindPostRepository(repository: CachedPostRepository): PostRepository
-
-    @Singleton
-    @Binds
-    abstract fun bindCommentRepository(repository: CachedCommentRepository): CommentRepository
+    abstract fun bindUserRepository(repository: CachedUserRepository): UserRepository
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
-object PostDatabaseModule {
+object UserDatabaseModule {
 
     @Singleton
     @Provides
-    fun providePostDatabase(@ApplicationContext context: Context): PostDatabase =
+    fun provideUserDatabase(@ApplicationContext context: Context): UserDatabase =
         Room.databaseBuilder(
             context,
-            PostDatabase::class.java,
-            "posts.db"
+            UserDatabase::class.java,
+            "users.db"
         )
             .fallbackToDestructiveMigration()
             .build()
 
     @Provides
-    fun providePostDao(postDatabase: PostDatabase): PostDao = postDatabase.postDao()
-
-    @Provides
-    fun provideCommentDao(postDatabase: PostDatabase): CommentDao = postDatabase.commentDao()
+    fun provideUserDao(userDatabase: UserDatabase): UserDao = userDatabase.userDao()
 }
 
 @Module
 @InstallIn(SingletonComponent::class)
-object PostServiceModule {
+object UserServiceModule {
 
     @Singleton
     @Provides
-    fun providePostService(retrofit: Retrofit): PostApiService = retrofit.create()
-
-    @Singleton
-    @Provides
-    fun provideCommentService(retrofit: Retrofit): CommentApiService = retrofit.create()
+    fun provideUserService(retrofit: Retrofit): UserApiService = retrofit.create()
 }

@@ -8,8 +8,14 @@
     <fragment
         android:id="@+id/post_feed_fragment"
         android:name="com.obrekht.neowork.posts.ui.feed.PostFeedFragment"
-        android:label="fragment_post_feed"
+        android:label="@string/post_feed_label"
         tools:layout="@layout/fragment_post_feed" />
+
+    <fragment
+        android:id="@+id/users_fragment"
+        android:name="com.obrekht.neowork.users.ui.list.UserListFragment"
+        android:label="@string/user_list_label"
+        tools:layout="@layout/fragment_user_list" />
 
     <dialog
         android:id="@+id/suggest_auth_dialog"

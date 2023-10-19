@@ -3,21 +3,24 @@ package com.obrekht.neowork.posts.ui.feed
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
 import androidx.annotation.StringRes
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.obrekht.neowork.R
 import com.obrekht.neowork.auth.ui.navigateToLogIn
-import com.obrekht.neowork.auth.ui.navigateToSignUp
 import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
 import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
+import com.obrekht.neowork.core.ui.MainFragment
 import com.obrekht.neowork.databinding.FragmentPostFeedBinding
 import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment
@@ -26,7 +29,9 @@ import com.obrekht.neowork.posts.ui.navigateToPost
 import com.obrekht.neowork.posts.ui.navigateToPostEditor
 import com.obrekht.neowork.posts.ui.sharePost
 import com.obrekht.neowork.posts.ui.showDeleteConfirmation
+import com.obrekht.neowork.utils.findParent
 import com.obrekht.neowork.utils.repeatOnStarted
+import com.obrekht.neowork.utils.setBarsInsetsListener
 import com.obrekht.neowork.utils.viewBinding
 import com.obrekht.neowork.utils.viewLifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,7 +57,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
         get() = viewModel.uiState.value
 
     private var snackbar: Snackbar? = null
-    private var adapter: PostsAdapter? = null
+    private var adapter: PostFeedAdapter? = null
 
     private val interactionListener = object : PostInteractionListener {
         override fun onClick(post: Post) {
@@ -87,6 +92,24 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        findParent<MainFragment>()?.setFragmentResult(
+            MainFragment.REQUEST_KEY_SCROLL_TARGET,
+            bundleOf(MainFragment.RESULT_TARGET_VIEW_ID to R.id.post_list_view)
+        )
+
+        binding.postListView.setBarsInsetsListener {
+            setPadding(
+                paddingLeft, paddingRight, paddingTop,
+                resources.getDimension(R.dimen.post_list_bottom_padding).toInt()
+            )
+        }
+
+        view.setBarsInsetsListener {
+            updateLayoutParams<MarginLayoutParams> {
+                bottomMargin = it.bottom
+            }
+        }
+
         with(DeleteConfirmationDialogFragment) {
             setFragmentResultListener(
                 getRequestKey(DeleteElementType.POST)
@@ -108,35 +131,8 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
             }
         }
 
-        with(binding.toolbar) {
-            setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.log_in -> {
-                        navigateToLogIn()
-                        true
-                    }
-
-                    R.id.sign_up -> {
-                        navigateToSignUp()
-                        true
-                    }
-
-                    R.id.profile -> {
-                        // TODO: Open profile
-                        viewModel.logOut()
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-        }
-
         with(binding) {
-            appBar.statusBarForeground =
-                MaterialShapeDrawable.createWithElevationOverlay(requireContext())
-
-            adapter = PostsAdapter(interactionListener).apply {
+            adapter = PostFeedAdapter(interactionListener).apply {
                 postListView.adapter = withLoadStateHeaderAndFooter(
                     header = PostLoadStateAdapter(::retry),
                     footer = PostLoadStateAdapter(::retry)
@@ -229,9 +225,6 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
 
     private fun handleState(state: FeedUiState) {
         with(binding) {
-            toolbar.menu.setGroupVisible(R.id.unauthenticated, !state.isLoggedIn)
-            toolbar.menu.setGroupVisible(R.id.authenticated, state.isLoggedIn)
-
             if (state.dataState == DataState.Success) {
                 if (state.newerCount > 0) {
                     buttonNewPosts.text = getString(R.string.new_posts, state.newerCount)
@@ -317,7 +310,8 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
         while (currentCoroutineContext().isActive) {
             adapter?.let {
                 for (position in 0 until it.itemCount) {
-                    val holder = (binding.postListView.findViewHolderForAdapterPosition(position) as? PostViewHolder)
+                    val holder =
+                        (binding.postListView.findViewHolderForAdapterPosition(position) as? PostViewHolder)
                     holder?.refreshPublishedDate()
                 }
             }
@@ -327,7 +321,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
     }
 
     private fun showErrorSnackbar(@StringRes resId: Int, action: View.OnClickListener?) {
-        snackbar = Snackbar.make(binding.buttonAddPost, resId, Snackbar.LENGTH_INDEFINITE).apply {
+        snackbar = Snackbar.make(binding.buttonAddPost, resId, Snackbar.LENGTH_LONG).apply {
             anchorView = binding.buttonAddPost
             if (action != null) {
                 setAction(R.string.retry, action)

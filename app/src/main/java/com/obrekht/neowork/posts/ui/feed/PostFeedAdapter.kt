@@ -21,7 +21,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-class PostsAdapter(
+class PostFeedAdapter(
     private val interactionListener: PostInteractionListener
 ) : PagingDataAdapter<FeedItem, RecyclerView.ViewHolder>(DiffCallback()) {
 
@@ -146,7 +146,7 @@ class PostViewHolder(
                     placeholder(R.drawable.avatar_placeholder)
                     transformations(CircleCropTransformation())
                 }
-            } ?: avatar.setImageResource(R.drawable.avatar_placeholder)
+            } ?: avatar.load(R.drawable.avatar_placeholder)
 
             post.attachment?.let {
                 image.isVisible = it.type == AttachmentType.IMAGE
@@ -161,7 +161,7 @@ class PostViewHolder(
                     AttachmentType.VIDEO -> {}
                     AttachmentType.AUDIO -> {}
                 }
-            } ?: {
+            } ?: run {
                 image.isVisible = false
             }
         }

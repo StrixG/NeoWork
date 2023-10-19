@@ -81,4 +81,6 @@
     <string name="error_saving_comment">An error occurred while saving the comment</string>
     <string name="hint_edit">Write…</string>
     <string name="content_description_attached_photo">Attached photo</string>
+    <string name="no_users">There are no users.</string>
+    <string name="user_list_label">Users</string>
 </resources>

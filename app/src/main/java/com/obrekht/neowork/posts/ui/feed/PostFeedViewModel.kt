@@ -122,10 +122,6 @@ class PostFeedViewModel @Inject constructor(
     fun scrollDone() {
         _uiState.update { it.copy(scrollDone = true) }
     }
-
-    fun logOut() {
-        appAuth.removeAuth()
-    }
 }
 
 private fun PagingData<PostItem>.insertDateSeparators() = insertSeparators { before, after ->
