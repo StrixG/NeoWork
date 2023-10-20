@@ -299,6 +299,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             published.isVisible = publishedMillis > 0
 
             author.text = post.author
+            jobTitle.text = post.authorJob ?: getString(R.string.open_to_work)
             published.text = publishedDate
             content.text = post.content
 
