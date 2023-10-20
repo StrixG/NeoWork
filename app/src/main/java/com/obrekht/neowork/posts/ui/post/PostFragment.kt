@@ -31,7 +31,6 @@ import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType
 import com.obrekht.neowork.posts.ui.feed.PostInteractionListener
 import com.obrekht.neowork.posts.ui.navigateToPostEditor
 import com.obrekht.neowork.posts.ui.sharePost
-import com.obrekht.neowork.posts.ui.showDeleteConfirmation
 import com.obrekht.neowork.utils.StringUtils
 import com.obrekht.neowork.utils.TimeUtils
 import com.obrekht.neowork.utils.hideKeyboard
@@ -76,7 +75,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
 
         override fun onDelete(post: Post) {
             if (viewModel.isLoggedIn) {
-                showDeleteConfirmation(post.id, DeleteElementType.POST)
+                showDeleteConfirmation(post.id)
             }
         }
     }
@@ -338,6 +337,14 @@ class PostFragment : Fragment(R.layout.fragment_post) {
         }
 
         binding.content.maxLines = Int.MAX_VALUE
+    }
+
+    private fun showDeleteConfirmation(postId: Long) {
+        val action = PostFragmentDirections.actionOpenDeleteConfirmation(
+            postId,
+            DeleteElementType.POST
+        )
+        findNavController().navigate(action)
     }
 
     private fun showErrorSnackbar(

@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.setFragmentResultListener
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.obrekht.neowork.R
@@ -17,7 +18,6 @@ import com.obrekht.neowork.posts.model.Comment
 import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment
 import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType
 import com.obrekht.neowork.posts.ui.navigateToCommentEditor
-import com.obrekht.neowork.posts.ui.showDeleteConfirmation
 import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.viewBinding
 import com.obrekht.neowork.utils.viewLifecycleScope
@@ -92,7 +92,11 @@ class CommentOptionsDialogFragment :
                     },
                     // Delete
                     CommentOption(R.drawable.ic_delete, R.string.delete_comment) {
-                        showDeleteConfirmation(args.commentId, DeleteElementType.COMMENT)
+                        val action = CommentOptionsDialogFragmentDirections.actionOpenDeleteConfirmation(
+                            args.commentId,
+                            DeleteElementType.COMMENT
+                        )
+                        findNavController().navigate(action)
                     })
             }
         }

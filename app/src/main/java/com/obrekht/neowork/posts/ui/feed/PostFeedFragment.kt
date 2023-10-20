@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
@@ -28,7 +29,6 @@ import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType
 import com.obrekht.neowork.posts.ui.navigateToPost
 import com.obrekht.neowork.posts.ui.navigateToPostEditor
 import com.obrekht.neowork.posts.ui.sharePost
-import com.obrekht.neowork.posts.ui.showDeleteConfirmation
 import com.obrekht.neowork.utils.findParent
 import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.setBarsInsetsListener
@@ -86,7 +86,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
 
         override fun onDelete(post: Post) {
             if (viewModel.isLoggedIn) {
-                showDeleteConfirmation(post.id, DeleteElementType.POST)
+                showDeleteConfirmation(post.id)
             }
         }
     }
@@ -318,6 +318,14 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
 
             delay(PUBLISHED_DATE_REFRESH_INTERVAL)
         }
+    }
+
+    private fun showDeleteConfirmation(postId: Long) {
+        val action = PostFeedFragmentDirections.actionOpenDeleteConfirmation(
+            postId,
+            DeleteElementType.POST
+        )
+        findNavController().navigate(action)
     }
 
     private fun showErrorSnackbar(@StringRes resId: Int, action: View.OnClickListener?) {

@@ -32,4 +32,8 @@
             android:name="elementType"
             app:argType="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType" />
     </dialog>
+
+    <action
+        android:id="@+id/action_openDeleteConfirmation"
+        app:destination="@id/delete_confirmation_dialog" />
 </navigation>

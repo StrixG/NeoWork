@@ -6,11 +6,6 @@
     app:startDestination="@id/main_fragment">
 
     <fragment
-        android:id="@+id/main_fragment"
-        android:name="com.obrekht.neowork.core.ui.MainFragment"
-        tools:layout="@layout/fragment_main" />
-
-    <fragment
         android:id="@+id/sign_up_fragment"
         android:name="com.obrekht.neowork.auth.ui.signup.SignUpFragment"
         android:label="sign_up_fragment"
@@ -21,6 +16,11 @@
         android:name="com.obrekht.neowork.auth.ui.login.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" />
+
+    <fragment
+        android:id="@+id/main_fragment"
+        android:name="com.obrekht.neowork.core.ui.MainFragment"
+        tools:layout="@layout/fragment_main" />
 
     <fragment
         android:id="@+id/editor_fragment"
@@ -46,6 +46,26 @@
     </fragment>
 
     <action
+        android:id="@+id/action_openLogIn"
+        app:destination="@id/login_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"
+        app:popUpTo="@id/login_fragment" />
+
+    <action
+        android:id="@+id/action_openSignUp"
+        app:destination="@id/sign_up_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"
+        app:popUpTo="@id/sign_up_fragment" />
+
+    <action
         android:id="@+id/action_openEditor"
         app:destination="@id/editor_fragment"
         app:enterAnim="@anim/nav_default_enter_anim"
@@ -57,18 +77,6 @@
         android:id="@+id/suggest_auth_dialog"
         android:name="com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment"
         android:label="SuggestAuth" />
-
-    <dialog
-        android:id="@+id/delete_confirmation_dialog"
-        android:name="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment"
-        android:label="RemoveConfirmation">
-        <argument
-            android:name="elementId"
-            app:argType="long" />
-        <argument
-            android:name="elementType"
-            app:argType="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType" />
-    </dialog>
 
     <navigation
         android:id="@+id/post_graph"
@@ -100,6 +108,21 @@
                 android:name="ownedByMe"
                 app:argType="boolean" />
         </dialog>
+        <dialog
+            android:id="@+id/delete_confirmation_dialog"
+            android:name="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment"
+            android:label="RemoveConfirmation">
+            <argument
+                android:name="elementId"
+                app:argType="long" />
+            <argument
+                android:name="elementType"
+                app:argType="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType" />
+        </dialog>
+
+        <action
+            android:id="@+id/action_openDeleteConfirmation"
+            app:destination="@id/delete_confirmation_dialog" />
     </navigation>
 
     <action
@@ -110,23 +133,4 @@
         app:popEnterAnim="@anim/nav_default_pop_enter_anim"
         app:popExitAnim="@anim/nav_default_pop_exit_anim" />
 
-    <action
-        android:id="@+id/action_openLogIn"
-        app:destination="@id/login_fragment"
-        app:enterAnim="@anim/nav_default_enter_anim"
-        app:exitAnim="@anim/nav_default_exit_anim"
-        app:launchSingleTop="true"
-        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-        app:popExitAnim="@anim/nav_default_pop_exit_anim"
-        app:popUpTo="@id/login_fragment" />
-
-    <action
-        android:id="@+id/action_openSignUp"
-        app:destination="@id/sign_up_fragment"
-        app:enterAnim="@anim/nav_default_enter_anim"
-        app:exitAnim="@anim/nav_default_exit_anim"
-        app:launchSingleTop="true"
-        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-        app:popExitAnim="@anim/nav_default_pop_exit_anim"
-        app:popUpTo="@id/sign_up_fragment" />
 </navigation>
