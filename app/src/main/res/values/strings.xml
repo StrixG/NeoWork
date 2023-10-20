@@ -84,4 +84,5 @@
     <string name="no_users">There are no users.</string>
     <string name="user_list_label">Users</string>
     <string name="open_to_work">Open to work</string>
+    <string name="error_username_taken">The username is already taken</string>
 </resources>

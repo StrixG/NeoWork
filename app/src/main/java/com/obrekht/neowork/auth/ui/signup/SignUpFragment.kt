@@ -19,6 +19,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.obrekht.neowork.R
+import com.obrekht.neowork.auth.model.UsernameIsTakenException
 import com.obrekht.neowork.auth.ui.navigateToLogIn
 import com.obrekht.neowork.databinding.FragmentSignUpBinding
 import com.obrekht.neowork.utils.hideKeyboard
@@ -171,8 +172,14 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
             when (result) {
                 SignUpResult.Success -> onSignedUp()
                 is SignUpResult.Error -> {
+                    val message = when (result.error) {
+                        is UsernameIsTakenException -> {
+                            R.string.error_username_taken
+                        }
+                        else -> R.string.error_unknown
+                    }
                     setInteractionsActive(true)
-                    showErrorSnackbar(R.string.error_unknown)
+                    showErrorSnackbar(message)
                 }
             }
             viewModel.resultHandled()

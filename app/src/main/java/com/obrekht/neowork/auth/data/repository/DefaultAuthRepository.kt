@@ -2,12 +2,14 @@ package com.obrekht.neowork.auth.data.repository
 
 import com.obrekht.neowork.auth.data.local.AppAuth
 import com.obrekht.neowork.auth.data.remote.AuthApiService
+import com.obrekht.neowork.auth.model.UsernameIsTakenException
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.HttpException
 import java.io.File
+import java.net.HttpURLConnection
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -52,7 +54,11 @@ class DefaultAuthRepository @Inject constructor(
             media
         )
         if (!response.isSuccessful) {
-            throw HttpException(response)
+            if (response.code() == HttpURLConnection.HTTP_FORBIDDEN) {
+                throw UsernameIsTakenException()
+            } else {
+                throw HttpException(response)
+            }
         }
         val authState = response.body() ?: throw HttpException(response)
         authState.token?.let {
