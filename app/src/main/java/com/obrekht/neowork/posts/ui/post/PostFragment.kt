@@ -289,14 +289,14 @@ class PostFragment : Fragment(R.layout.fragment_post) {
 
     private fun bindPost(post: Post) {
         with(binding) {
-            val publishedMilli = post.published?.toEpochMilli() ?: 0
+            val publishedMillis = post.published?.toEpochMilli() ?: 0
 
             val publishedDate = TimeUtils.getRelativeDate(
                 requireContext(),
-                publishedMilli
+                publishedMillis
             )
 
-            published.isVisible = publishedMilli > 0
+            published.isVisible = publishedMillis > 0
 
             author.text = post.author
             published.text = publishedDate

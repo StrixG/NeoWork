@@ -168,9 +168,11 @@ class PostViewHolder(
     }
 
     fun refreshPublishedDate() = post?.let {
+        val publishedMillis = it.published?.toEpochMilli() ?: 0
+
         binding.published.text = TimeUtils.getRelativeDate(
-            binding.root.context,
-            it.published?.epochSecond ?: 0
+            itemView.context,
+            publishedMillis
         )
     }
 }
