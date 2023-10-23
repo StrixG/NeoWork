@@ -2,7 +2,7 @@
 
 package com.obrekht.neowork.posts.model
 
-import com.obrekht.neowork.utils.InstantSerializer
+import com.obrekht.neowork.core.data.serializer.InstantSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import java.time.Instant

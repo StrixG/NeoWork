@@ -1,4 +1,4 @@
-package com.obrekht.neowork.utils
+package com.obrekht.neowork.core.data.serializer
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
