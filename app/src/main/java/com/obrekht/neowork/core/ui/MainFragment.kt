@@ -50,7 +50,13 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
-        setFragmentResultListener(REQUEST_KEY_SCROLL_TARGET) { requestKey, bundle ->
+        val navHostFragment = mainFragmentContainer.getFragment<NavHostFragment>()
+        val navController = navHostFragment.navController
+
+        navHostFragment.childFragmentManager.setFragmentResultListener(
+            REQUEST_KEY_SCROLL_TARGET,
+            viewLifecycleOwner
+        ) { _, bundle ->
             val targetViewId = bundle.getInt(RESULT_TARGET_VIEW_ID)
             val targetView = view.findViewById<View>(targetViewId)
             binding.appBar.setLiftOnScrollTargetView(targetView)

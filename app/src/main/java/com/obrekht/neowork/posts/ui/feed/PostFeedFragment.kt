@@ -92,7 +92,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        findParent<MainFragment>()?.setFragmentResult(
+        setFragmentResult(
             MainFragment.REQUEST_KEY_SCROLL_TARGET,
             bundleOf(MainFragment.RESULT_TARGET_VIEW_ID to R.id.post_list_view)
         )

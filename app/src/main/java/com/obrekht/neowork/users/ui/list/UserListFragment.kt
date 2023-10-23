@@ -41,7 +41,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        findParent<MainFragment>()?.setFragmentResult(
+        setFragmentResult(
             MainFragment.REQUEST_KEY_SCROLL_TARGET,
             bundleOf(MainFragment.RESULT_TARGET_VIEW_ID to R.id.user_list_view)
         )
