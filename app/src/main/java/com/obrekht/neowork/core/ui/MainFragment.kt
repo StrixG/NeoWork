@@ -62,7 +62,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             binding.appBar.setLiftOnScrollTargetView(targetView)
         }
 
-        val navController = mainFragmentContainer.getFragment<NavHostFragment>().navController
         val appBarConfiguration = AppBarConfiguration(
             bottomNavigation.menu.children
                 .map { it.itemId }.toSet()
