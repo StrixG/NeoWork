@@ -22,7 +22,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:menu="@menu/menu_add_edit_post"
+                app:menu="@menu/menu_editor"
                 app:navigationContentDescription="@string/description_back_to_post"
                 app:navigationIcon="@drawable/ic_arrow_back" />
 
@@ -69,7 +69,7 @@
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/attachment_photo"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/attached_photo_description"

@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import coil.load
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -157,7 +158,11 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                         attachmentPhoto.isVisible = it.type == AttachmentType.IMAGE
 
                         if (it.type == AttachmentType.IMAGE) {
-                            attachmentPhoto.setImageURI(it.file.toUri())
+                            if (it.uri != null) {
+                                attachmentPhoto.load(it.uri)
+                            } else if (it.file != null) {
+                                attachmentPhoto.setImageURI(it.file.toUri())
+                            }
                         }
                     } else {
                         attachmentPreviewGroup.isVisible = false

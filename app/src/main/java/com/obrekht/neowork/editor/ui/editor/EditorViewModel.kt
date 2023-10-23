@@ -1,6 +1,7 @@
 package com.obrekht.neowork.editor.ui.editor
 
 import android.net.Uri
+import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -58,6 +59,12 @@ class EditorViewModel @Inject constructor(
                             _uiState.update {
                                 it.copy(shouldInitialize = true, initialContent = post.content)
                             }
+                            post.attachment?.let {
+                                _attachment.value = AttachmentModel(
+                                    uri = it.url.toUri(),
+                                    type = it.type
+                                )
+                            }
                         }
 
                     EditableType.COMMENT -> commentRepository.getCommentStream(args.id)
@@ -89,7 +96,9 @@ class EditorViewModel @Inject constructor(
                                 content = content.trim()
                             )
                             val mediaUpload = _attachment.value?.let {
-                                MediaUpload(it.file, it.type)
+                                it.file?.let { file ->
+                                    MediaUpload(file, it.type)
+                                }
                             }
                             postRepository.save(post, mediaUpload)
                         }
@@ -121,7 +130,10 @@ class EditorViewModel @Inject constructor(
             mediaCache.createFile(uri)?.let { file ->
                 val mimeType = file.getMimeType()
                 AttachmentType.getFromMimeType(mimeType)?.let { type ->
-                    AttachmentModel(file, type)
+                    AttachmentModel(
+                        file = file,
+                        type = type
+                    )
                 }
             }
         }
@@ -152,7 +164,8 @@ data class EditorUiState(
 )
 
 data class AttachmentModel(
-    val file: File,
+    val uri: Uri? = null,
+    val file: File? = null,
     val type: AttachmentType
 )
 
