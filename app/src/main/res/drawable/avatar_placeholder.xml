@@ -3,7 +3,7 @@
     <item
         android:width="@dimen/avatar_size"
         android:height="@dimen/avatar_size">
-        <shape android:shape="oval">
+        <shape>
             <gradient
                 android:angle="135"
                 android:endColor="?attr/colorPrimary"

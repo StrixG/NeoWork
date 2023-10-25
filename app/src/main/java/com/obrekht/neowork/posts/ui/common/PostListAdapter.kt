@@ -1,4 +1,4 @@
-package com.obrekht.neowork.posts.ui.feed
+package com.obrekht.neowork.posts.ui.common
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,7 +8,6 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import coil.size.Scale
 import coil.transform.CircleCropTransformation
 import com.obrekht.neowork.R
 import com.obrekht.neowork.core.model.AttachmentType
@@ -21,9 +20,9 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-class PostFeedAdapter(
+class PostListAdapter(
     private val interactionListener: PostInteractionListener
-) : PagingDataAdapter<FeedItem, RecyclerView.ViewHolder>(DiffCallback()) {
+) : PagingDataAdapter<PostListItem, RecyclerView.ViewHolder>(DiffCallback()) {
 
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
         is PostItem, null -> R.layout.item_post
@@ -59,8 +58,8 @@ class PostFeedAdapter(
         }
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<FeedItem>() {
-        override fun areItemsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean = when {
+    class DiffCallback : DiffUtil.ItemCallback<PostListItem>() {
+        override fun areItemsTheSame(oldItem: PostListItem, newItem: PostListItem): Boolean = when {
             oldItem is PostItem && newItem is PostItem -> {
                 oldItem.post.id == newItem.post.id
             }
@@ -72,7 +71,7 @@ class PostFeedAdapter(
             else -> false
         }
 
-        override fun areContentsTheSame(oldItem: FeedItem, newItem: FeedItem): Boolean {
+        override fun areContentsTheSame(oldItem: PostListItem, newItem: PostListItem): Boolean {
             return oldItem == newItem
         }
     }
@@ -107,6 +106,9 @@ class PostViewHolder(
         with(binding) {
             card.setOnClickListener {
                 post?.let(interactionListener::onClick)
+            }
+            avatar.setOnClickListener {
+                post?.let(interactionListener::onAvatarClick)
             }
             like.setOnClickListener {
                 post?.let(interactionListener::onLike)
@@ -154,11 +156,14 @@ class PostViewHolder(
                 when (it.type) {
                     AttachmentType.IMAGE -> {
                         image.load(it.url) {
-                            scale(Scale.FILL)
                             crossfade(true)
                         }
                     }
-                    AttachmentType.VIDEO -> {}
+                    AttachmentType.VIDEO -> {
+                        image.load(it.url) {
+                            crossfade(true)
+                        }
+                    }
                     AttachmentType.AUDIO -> {}
                 }
             } ?: run {

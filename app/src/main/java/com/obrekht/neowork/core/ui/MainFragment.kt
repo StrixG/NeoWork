@@ -5,7 +5,6 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -15,6 +14,7 @@ import com.obrekht.neowork.R
 import com.obrekht.neowork.auth.ui.navigateToLogIn
 import com.obrekht.neowork.auth.ui.navigateToSignUp
 import com.obrekht.neowork.databinding.FragmentMainBinding
+import com.obrekht.neowork.users.ui.navigateToUserProfile
 import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.viewBinding
 import com.obrekht.neowork.utils.viewLifecycleScope
@@ -40,8 +40,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             }
 
             R.id.profile -> {
-                // TODO: Open user profile
-                viewModel.logOut()
+                navigateToUserProfile(viewModel.loggedInUserId)
                 true
             }
 

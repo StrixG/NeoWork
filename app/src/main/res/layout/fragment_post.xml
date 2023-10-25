@@ -48,7 +48,7 @@
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/common_spacing">
 
-                    <ImageView
+                    <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/avatar"
                         android:layout_width="@dimen/avatar_size"
                         android:layout_height="@dimen/avatar_size"
@@ -58,6 +58,7 @@
                         app:layout_constraintBottom_toBottomOf="@id/top_barrier"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
+                        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
                         tools:srcCompat="@drawable/avatar_placeholder" />
 
                     <TextView
@@ -68,7 +69,7 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-                        app:layout_constraintBottom_toTopOf="@+id/job_title"
+                        app:layout_constraintBottom_toTopOf="@+id/job"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/avatar"
                         app:layout_constraintTop_toTopOf="parent"
@@ -76,7 +77,7 @@
                         tools:text="@sample/posts.json/data/author" />
 
                     <TextView
-                        android:id="@+id/job_title"
+                        android:id="@+id/job"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/common_spacing"
@@ -98,7 +99,7 @@
                         app:layout_constraintBottom_toBottomOf="@id/top_barrier"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/avatar"
-                        app:layout_constraintTop_toBottomOf="@id/job_title"
+                        app:layout_constraintTop_toBottomOf="@id/job"
                         tools:text="@sample/posts.json/data/published"
                         tools:visibility="visible" />
 
@@ -117,6 +118,7 @@
                         android:contentDescription="@string/content_description_attached_photo"
                         android:maxHeight="@dimen/max_image_height"
                         android:paddingBottom="@dimen/common_spacing"
+                        android:scaleType="centerCrop"
                         android:visibility="gone"
                         app:layout_constraintBottom_toTopOf="@id/media_barrier"
                         app:layout_constraintTop_toBottomOf="@id/top_barrier"

@@ -20,16 +20,12 @@ interface PostDao {
     fun pagingSource(): PagingSource<Int, PostData>
 
     @Transaction
-    @Query("SELECT * FROM post ORDER BY postId DESC")
-    fun observeAll(): Flow<List<PostData>>
+    @Query("SELECT * FROM post WHERE authorId = :userId ORDER BY postId DESC")
+    fun userWallPagingSource(userId: Long): PagingSource<Int, PostData>
 
     @Transaction
     @Query("SELECT * FROM post ORDER BY postId DESC LIMIT :count")
     fun observeLatest(count: Long = 1): Flow<List<PostData>>
-
-    @Transaction
-    @Query("SELECT * FROM post WHERE isShown = 1 ORDER BY postId DESC")
-    fun observeAllVisible(): Flow<List<PostData>>
 
     @Transaction
     @Query("SELECT * FROM post WHERE postId = :id")
@@ -60,6 +56,9 @@ interface PostDao {
 
     @Query("DELETE FROM post")
     suspend fun deleteAll()
+
+    @Query("DELETE FROM post WHERE authorId = :authorId")
+    suspend fun deleteAllByAuthorId(authorId: Long)
 
     @Delete
     suspend fun delete(post: PostEntity)

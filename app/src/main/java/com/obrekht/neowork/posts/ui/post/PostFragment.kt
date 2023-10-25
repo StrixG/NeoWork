@@ -13,7 +13,6 @@ import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
-import coil.size.Scale
 import coil.transform.CircleCropTransformation
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
@@ -24,13 +23,14 @@ import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
 import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
 import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.databinding.FragmentPostBinding
+import com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment
+import com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType
 import com.obrekht.neowork.posts.model.Comment
 import com.obrekht.neowork.posts.model.Post
-import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment
-import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType
-import com.obrekht.neowork.posts.ui.feed.PostInteractionListener
+import com.obrekht.neowork.posts.ui.common.PostInteractionListener
 import com.obrekht.neowork.posts.ui.navigateToPostEditor
 import com.obrekht.neowork.posts.ui.sharePost
+import com.obrekht.neowork.users.ui.navigateToUserProfile
 import com.obrekht.neowork.utils.StringUtils
 import com.obrekht.neowork.utils.TimeUtils
 import com.obrekht.neowork.utils.hideKeyboard
@@ -55,6 +55,10 @@ class PostFragment : Fragment(R.layout.fragment_post) {
     private var commentsAdapter: CommentsAdapter? = null
 
     private val interactionListener = object : PostInteractionListener {
+        override fun onAvatarClick(post: Post) {
+            navigateToUserProfile(post.authorId)
+        }
+
         override fun onLike(post: Post) {
             if (viewModel.isLoggedIn) {
                 viewModel.toggleLike()
@@ -299,7 +303,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             published.isVisible = publishedMillis > 0
 
             author.text = post.author
-            jobTitle.text = post.authorJob ?: getString(R.string.open_to_work)
+            job.text = post.authorJob ?: getString(R.string.open_to_work)
             published.text = publishedDate
             content.text = post.content
 
@@ -325,7 +329,6 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                 when (it.type) {
                     AttachmentType.IMAGE -> {
                         image.load(it.url) {
-                            scale(Scale.FILL)
                             crossfade(true)
                         }
                     }

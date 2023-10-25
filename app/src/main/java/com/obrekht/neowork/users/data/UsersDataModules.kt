@@ -2,6 +2,7 @@ package com.obrekht.neowork.users.data
 
 import android.content.Context
 import androidx.room.Room
+import com.obrekht.neowork.users.data.local.UserDatabase
 import com.obrekht.neowork.users.data.local.dao.UserDao
 import com.obrekht.neowork.users.data.remote.UserApiService
 import com.obrekht.neowork.users.data.repository.CachedUserRepository

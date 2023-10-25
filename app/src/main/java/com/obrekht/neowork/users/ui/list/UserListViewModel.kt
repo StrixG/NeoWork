@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import java.net.ConnectException
 import javax.inject.Inject
 
 private const val USERS_PER_PAGE = 10
@@ -69,6 +70,9 @@ class UserListViewModel @Inject constructor(
                 is HttpException -> {
                     _event.send(Event.ErrorLoadUsers)
                 }
+                is ConnectException -> {
+                    _event.send(Event.ErrorConnection)
+                }
 
                 else -> {
                     _uiState.update { it.copy(dataState = DataState.Error) }
@@ -78,17 +82,18 @@ class UserListViewModel @Inject constructor(
     }
 }
 
+data class UserListUiState(
+    val isLoggedIn: Boolean = false,
+    val dataState: DataState = DataState.Success
+)
+
 sealed interface DataState {
     data object Loading : DataState
     data object Success : DataState
     data object Error : DataState
 }
 
-data class UserListUiState(
-    val isLoggedIn: Boolean = false,
-    val dataState: DataState = DataState.Success
-)
-
 sealed interface Event {
     data object ErrorLoadUsers : Event
+    data object ErrorConnection : Event
 }

@@ -11,6 +11,8 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     val loggedInState = appAuth.loggedInState
+    val loggedInUserId: Long
+        get() = appAuth.state.value.id
 
     fun logOut() {
         appAuth.removeAuth()

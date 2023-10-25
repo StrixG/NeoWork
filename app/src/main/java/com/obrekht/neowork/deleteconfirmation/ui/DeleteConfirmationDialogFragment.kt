@@ -1,4 +1,4 @@
-package com.obrekht.neowork.posts.ui.deleteconfirmation
+package com.obrekht.neowork.deleteconfirmation.ui
 
 import android.app.Dialog
 import android.content.DialogInterface
@@ -40,5 +40,6 @@ class DeleteConfirmationDialogFragment : DialogFragment() {
 
 enum class DeleteElementType {
     POST,
-    COMMENT
+    COMMENT,
+    JOB
 }

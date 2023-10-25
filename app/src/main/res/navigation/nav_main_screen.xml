@@ -24,13 +24,13 @@
 
     <dialog
         android:id="@+id/delete_confirmation_dialog"
-        android:name="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment">
+        android:name="com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment">
         <argument
             android:name="elementId"
             app:argType="long" />
         <argument
             android:name="elementType"
-            app:argType="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType" />
+            app:argType="com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType" />
     </dialog>
 
     <action

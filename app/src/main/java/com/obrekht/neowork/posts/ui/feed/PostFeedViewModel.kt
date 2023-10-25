@@ -10,6 +10,9 @@ import androidx.paging.map
 import com.obrekht.neowork.auth.data.local.AppAuth
 import com.obrekht.neowork.posts.data.repository.PostRepository
 import com.obrekht.neowork.posts.model.Post
+import com.obrekht.neowork.posts.ui.common.DateSeparatorItem
+import com.obrekht.neowork.posts.ui.common.PostItem
+import com.obrekht.neowork.posts.ui.common.PostListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -38,7 +41,7 @@ class PostFeedViewModel @Inject constructor(
     private val repository: PostRepository
 ) : ViewModel() {
 
-    val data: Flow<PagingData<FeedItem>> = repository
+    val data: Flow<PagingData<PostListItem>> = repository
         .getPagingData(
             PagingConfig(
                 pageSize = POSTS_PER_PAGE,
@@ -113,7 +116,7 @@ class PostFeedViewModel @Inject constructor(
         try {
             repository.deleteById(postId)
         } catch (e: Exception) {
-            _event.send(Event.ErrorRemovingPost(postId))
+            _event.send(Event.ErrorDeleting(postId))
         }
     }
 
@@ -162,5 +165,5 @@ data class FeedUiState(
 sealed interface Event {
     data object ErrorLoadPosts : Event
     class ErrorLikingPost(val postId: Long) : Event
-    class ErrorRemovingPost(val postId: Long) : Event
+    class ErrorDeleting(val postId: Long) : Event
 }

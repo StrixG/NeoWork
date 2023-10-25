@@ -7,10 +7,13 @@ import com.obrekht.neowork.posts.data.local.dao.CommentDao
 import com.obrekht.neowork.posts.data.local.dao.PostDao
 import com.obrekht.neowork.posts.data.remote.CommentApiService
 import com.obrekht.neowork.posts.data.remote.PostApiService
+import com.obrekht.neowork.posts.data.remote.WallApiService
 import com.obrekht.neowork.posts.data.repository.CachedCommentRepository
 import com.obrekht.neowork.posts.data.repository.CachedPostRepository
+import com.obrekht.neowork.posts.data.repository.CachedWallRepository
 import com.obrekht.neowork.posts.data.repository.CommentRepository
 import com.obrekht.neowork.posts.data.repository.PostRepository
+import com.obrekht.neowork.posts.data.repository.WallRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -28,6 +31,10 @@ abstract class PostRepositoryModule {
     @Singleton
     @Binds
     abstract fun bindPostRepository(repository: CachedPostRepository): PostRepository
+
+    @Singleton
+    @Binds
+    abstract fun bindWallRepository(repository: CachedWallRepository): WallRepository
 
     @Singleton
     @Binds
@@ -63,6 +70,10 @@ object PostServiceModule {
     @Singleton
     @Provides
     fun providePostService(retrofit: Retrofit): PostApiService = retrofit.create()
+
+    @Singleton
+    @Provides
+    fun provideWallService(retrofit: Retrofit): WallApiService = retrofit.create()
 
     @Singleton
     @Provides

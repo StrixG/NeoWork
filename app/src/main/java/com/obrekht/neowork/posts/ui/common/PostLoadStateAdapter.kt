@@ -1,4 +1,4 @@
-package com.obrekht.neowork.posts.ui.feed
+package com.obrekht.neowork.posts.ui.common
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

@@ -4,7 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.obrekht.neowork.core.model.Attachment
-import com.obrekht.neowork.posts.model.Coordinates
+import com.obrekht.neowork.core.model.Coordinates
 import java.time.Instant
 
 @Entity("post")

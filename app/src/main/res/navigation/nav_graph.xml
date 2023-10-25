@@ -17,6 +17,31 @@
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" />
 
+    <action
+        android:id="@+id/action_openLogIn"
+        app:destination="@id/login_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"
+        app:popUpTo="@id/login_fragment" />
+
+    <action
+        android:id="@+id/action_openSignUp"
+        app:destination="@id/sign_up_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"
+        app:popUpTo="@id/sign_up_fragment" />
+
+    <dialog
+        android:id="@+id/suggest_auth_dialog"
+        android:name="com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment"
+        android:label="SuggestAuth" />
+
     <fragment
         android:id="@+id/main_fragment"
         android:name="com.obrekht.neowork.core.ui.MainFragment"
@@ -46,84 +71,15 @@
     </fragment>
 
     <action
-        android:id="@+id/action_openLogIn"
-        app:destination="@id/login_fragment"
-        app:enterAnim="@anim/nav_default_enter_anim"
-        app:exitAnim="@anim/nav_default_exit_anim"
-        app:launchSingleTop="true"
-        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-        app:popExitAnim="@anim/nav_default_pop_exit_anim"
-        app:popUpTo="@id/login_fragment" />
-
-    <action
-        android:id="@+id/action_openSignUp"
-        app:destination="@id/sign_up_fragment"
-        app:enterAnim="@anim/nav_default_enter_anim"
-        app:exitAnim="@anim/nav_default_exit_anim"
-        app:launchSingleTop="true"
-        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-        app:popExitAnim="@anim/nav_default_pop_exit_anim"
-        app:popUpTo="@id/sign_up_fragment" />
-
-    <action
         android:id="@+id/action_openEditor"
         app:destination="@id/editor_fragment"
         app:enterAnim="@anim/nav_default_enter_anim"
         app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
         app:popEnterAnim="@anim/nav_default_pop_enter_anim"
         app:popExitAnim="@anim/nav_default_pop_exit_anim" />
 
-    <dialog
-        android:id="@+id/suggest_auth_dialog"
-        android:name="com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment"
-        android:label="SuggestAuth" />
-
-    <navigation
-        android:id="@+id/post_graph"
-        app:startDestination="@id/post_fragment">
-        <argument
-            android:name="postId"
-            app:argType="long" />
-        <fragment
-            android:id="@+id/post_fragment"
-            android:name="com.obrekht.neowork.posts.ui.post.PostFragment"
-            android:label="@string/title_post"
-            tools:layout="@layout/fragment_post">
-            <argument
-                android:name="postId"
-                app:argType="long" />
-            <action
-                android:id="@+id/action_openCommentOptions"
-                app:destination="@id/comment_options" />
-        </fragment>
-        <dialog
-            android:id="@+id/comment_options"
-            android:name="com.obrekht.neowork.posts.ui.post.CommentOptionsDialogFragment"
-            android:label="CommentOptionsDialogFragment"
-            tools:layout="@layout/bottom_sheet_comment_options">
-            <argument
-                android:name="commentId"
-                app:argType="long" />
-            <argument
-                android:name="ownedByMe"
-                app:argType="boolean" />
-        </dialog>
-        <dialog
-            android:id="@+id/delete_confirmation_dialog"
-            android:name="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment"
-            android:label="RemoveConfirmation">
-            <argument
-                android:name="elementId"
-                app:argType="long" />
-            <argument
-                android:name="elementType"
-                app:argType="com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType" />
-        </dialog>
-
-        <action
-            android:id="@+id/action_openDeleteConfirmation"
-            app:destination="@id/delete_confirmation_dialog" />
-    </navigation>
+    <include app:graph="@navigation/nav_post_details" />
 
     <action
         android:id="@+id/action_openPost"
@@ -131,6 +87,47 @@
         app:enterAnim="@anim/nav_default_enter_anim"
         app:exitAnim="@anim/nav_default_exit_anim"
         app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim">
+        <argument
+            android:name="postId"
+            app:argType="long" />
+    </action>
+
+    <include app:graph="@navigation/nav_user_profile" />
+
+    <action
+        android:id="@+id/action_openUserProfile"
+        app:destination="@id/user_profile_graph">
+        <argument
+            android:name="userId"
+            app:argType="long" />
+    </action>
+
+    <fragment
+        android:id="@+id/add_edit_job_fragment"
+        android:name="com.obrekht.neowork.jobs.ui.addedit.AddEditJobFragment"
+        android:label="AddEditJobFragment">
+        <argument
+            android:name="jobId"
+            android:defaultValue="0L"
+            app:argType="long" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_openJobEditor"
+        app:destination="@id/add_edit_job_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
         app:popExitAnim="@anim/nav_default_pop_exit_anim" />
 
+    <dialog
+        android:id="@+id/select_job_dates_dialog"
+        android:name="com.obrekht.neowork.jobs.ui.addedit.SelectJobDatesDialogFragment">
+    </dialog>
+
+    <action
+        android:id="@+id/action_selectJobDatesDialog"
+        app:destination="@id/select_job_dates_dialog" />
 </navigation>

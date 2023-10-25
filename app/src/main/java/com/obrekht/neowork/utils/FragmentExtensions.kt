@@ -2,7 +2,7 @@ package com.obrekht.neowork.utils
 
 import androidx.fragment.app.Fragment
 
-inline fun <reified T : Fragment> Fragment.findParent(): Fragment? {
+inline fun <reified T : Fragment> Fragment.findParent(): T? {
     var fragment: Fragment? = this
     while (fragment != null) {
         if (fragment is T) {

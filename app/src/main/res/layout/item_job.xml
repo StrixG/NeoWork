@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/card"
+        style="@style/Widget.Material3.CardView.Outlined"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/small_spacing">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <TextView
+                android:id="@+id/name"
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/common_spacing"
+                android:layout_marginTop="@dimen/common_spacing"
+                android:layout_marginEnd="@dimen/common_spacing"
+                android:ellipsize="end"
+                android:maxLines="1"
+                app:layout_constraintBottom_toTopOf="@id/experience"
+                app:layout_constraintEnd_toStartOf="@id/menu"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                tools:text="Neo Work" />
+
+        <TextView
+                android:id="@+id/experience"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/common_spacing"
+                android:layout_marginEnd="@dimen/common_spacing"
+                android:layout_marginBottom="@dimen/common_spacing"
+                android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                app:layout_constraintEnd_toStartOf="@id/menu"
+                app:layout_constraintBottom_toTopOf="@id/position"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/name"
+                tools:text="1 января 2020 – НВ" />
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/menu"
+                style="@style/Widget.App.Button.Menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/common_spacing"
+                android:layout_marginEnd="@dimen/common_spacing"
+                android:contentDescription="@string/description_post_menu"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tooltipText="@string/description_post_menu" />
+
+        <TextView
+                android:id="@+id/position"
+                style="@style/TextAppearance.Material3.BodyLarge"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/common_spacing"
+                android:layout_marginBottom="@dimen/common_spacing"
+                android:ellipsize="end"
+                android:maxLines="3"
+                app:layout_constraintBottom_toTopOf="@id/link"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/experience"
+                tools:text="Android разработчик" />
+
+        <TextView
+                android:id="@+id/link"
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/common_spacing"
+                android:layout_marginBottom="@dimen/common_spacing"
+                android:ellipsize="end"
+                android:maxLines="3"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/position"
+                tools:text="https://m3.material.io/" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

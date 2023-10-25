@@ -16,8 +16,8 @@ interface PostRepository {
     fun getPostStream(postId: Long): Flow<Post?>
     suspend fun likeById(postId: Long): Post
     suspend fun unlikeById(postId: Long): Post
+    suspend fun save(post: Post, mediaUpload: MediaUpload? = null): Post
     suspend fun deleteById(postId: Long)
     suspend fun delete(post: Post)
-    suspend fun save(post: Post, mediaUpload: MediaUpload? = null): Post
     suspend fun refreshPost(postId: Long)
 }

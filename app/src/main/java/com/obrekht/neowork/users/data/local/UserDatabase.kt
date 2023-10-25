@@ -1,4 +1,4 @@
-package com.obrekht.neowork.users.data
+package com.obrekht.neowork.users.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

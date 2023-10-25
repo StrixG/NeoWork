@@ -46,7 +46,12 @@ class SignUpViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, result = null) }
 
             try {
-                authRepository.signUp(username, password, name, _uiState.value.avatarModel.file)
+                authRepository.signUp(
+                    username.trim(),
+                    password,
+                    name,
+                    _uiState.value.avatarModel.file
+                )
                 _uiState.update { it.copy(isLoading = false, result = SignUpResult.Success) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, result = SignUpResult.Error(e)) }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/user_profile_graph"
+        app:startDestination="@id/user_profile_fragment">
+    <fragment
+            android:id="@+id/user_profile_fragment"
+            android:name="com.obrekht.neowork.users.ui.profile.UserProfileFragment"
+            android:label="fragment_user_profile"
+            tools:layout="@layout/fragment_user_profile">
+        <argument
+                android:name="userId"
+                app:argType="long" />
+    </fragment>
+
+    <dialog
+            android:id="@+id/delete_confirmation_dialog"
+            android:name="com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment"
+            android:label="RemoveConfirmation">
+        <argument
+                android:name="elementId"
+                app:argType="long" />
+        <argument
+                android:name="elementType"
+                app:argType="com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType" />
+    </dialog>
+
+    <action
+            android:id="@+id/action_openDeleteConfirmation"
+            app:destination="@id/delete_confirmation_dialog" />
+</navigation>

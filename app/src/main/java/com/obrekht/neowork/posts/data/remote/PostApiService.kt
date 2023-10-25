@@ -11,9 +11,6 @@ import retrofit2.http.Query
 
 interface PostApiService {
 
-    @GET("posts")
-    suspend fun getAll(): Response<List<Post>>
-
     @GET("posts/{id}/newer")
     suspend fun getNewer(@Path("id") postId: Long): Response<List<Post>>
 

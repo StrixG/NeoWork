@@ -2,9 +2,10 @@
 
 package com.obrekht.neowork.posts.model
 
-import com.obrekht.neowork.core.model.Attachment
-import com.obrekht.neowork.core.model.UserPreview
 import com.obrekht.neowork.core.data.serializer.InstantSerializer
+import com.obrekht.neowork.core.model.Attachment
+import com.obrekht.neowork.core.model.Coordinates
+import com.obrekht.neowork.userpreview.model.UserPreview
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import java.time.Instant

@@ -2,6 +2,15 @@ package com.obrekht.neowork
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
+import timber.log.Timber
 
 @HiltAndroidApp
-class NeoWorkApplication : Application()
+class NeoWorkApplication : Application() {
+
+    override fun onCreate() {
+        super.onCreate()
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
+    }
+}

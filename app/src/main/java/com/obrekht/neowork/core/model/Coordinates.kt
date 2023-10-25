@@ -1,4 +1,4 @@
-package com.obrekht.neowork.posts.model
+package com.obrekht.neowork.core.model
 
 import kotlinx.serialization.Serializable
 

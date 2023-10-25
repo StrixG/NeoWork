@@ -23,13 +23,17 @@ import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
 import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
 import com.obrekht.neowork.core.ui.MainFragment
 import com.obrekht.neowork.databinding.FragmentPostFeedBinding
+import com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment
+import com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType
 import com.obrekht.neowork.posts.model.Post
-import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteConfirmationDialogFragment
-import com.obrekht.neowork.posts.ui.deleteconfirmation.DeleteElementType
+import com.obrekht.neowork.posts.ui.common.PostInteractionListener
+import com.obrekht.neowork.posts.ui.common.PostListAdapter
+import com.obrekht.neowork.posts.ui.common.PostLoadStateAdapter
+import com.obrekht.neowork.posts.ui.common.PostViewHolder
 import com.obrekht.neowork.posts.ui.navigateToPost
 import com.obrekht.neowork.posts.ui.navigateToPostEditor
 import com.obrekht.neowork.posts.ui.sharePost
-import com.obrekht.neowork.utils.findParent
+import com.obrekht.neowork.users.ui.navigateToUserProfile
 import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.setBarsInsetsListener
 import com.obrekht.neowork.utils.viewBinding
@@ -57,11 +61,15 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
         get() = viewModel.uiState.value
 
     private var snackbar: Snackbar? = null
-    private var adapter: PostFeedAdapter? = null
+    private var adapter: PostListAdapter? = null
 
     private val interactionListener = object : PostInteractionListener {
         override fun onClick(post: Post) {
             navigateToPost(post.id)
+        }
+
+        override fun onAvatarClick(post: Post) {
+            navigateToUserProfile(post.authorId)
         }
 
         override fun onLike(post: Post) {
@@ -132,7 +140,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
         }
 
         with(binding) {
-            adapter = PostFeedAdapter(interactionListener).apply {
+            adapter = PostListAdapter(interactionListener).apply {
                 postListView.adapter = withLoadStateHeaderAndFooter(
                     header = PostLoadStateAdapter(::retry),
                     footer = PostLoadStateAdapter(::retry)
@@ -298,7 +306,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
                 }
             }
 
-            is Event.ErrorRemovingPost -> {
+            is Event.ErrorDeleting -> {
                 showErrorSnackbar(R.string.error_deleting) {
                     viewModel.deleteById(event.postId)
                 }

@@ -19,4 +19,6 @@
     <dimen name="margin_remove_attachment_button">8dp</dimen>
     <dimen name="max_image_height">512dp</dimen>
     <dimen name="bottom_bar_height">80dp</dimen>
+    <dimen name="max_profile_avatar_height">256dp</dimen>
+    <dimen name="max_date_input_width">192dp</dimen>
 </resources>

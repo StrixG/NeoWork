@@ -1,4 +1,4 @@
-package com.obrekht.neowork.core.model
+package com.obrekht.neowork.userpreview.model
 
 import kotlinx.serialization.Serializable
 

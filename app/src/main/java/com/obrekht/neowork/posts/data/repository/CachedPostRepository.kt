@@ -11,7 +11,6 @@ import com.obrekht.neowork.core.model.Attachment
 import com.obrekht.neowork.media.data.MediaApiService
 import com.obrekht.neowork.media.model.Media
 import com.obrekht.neowork.media.model.MediaUpload
-import com.obrekht.neowork.posts.data.local.PostDatabase
 import com.obrekht.neowork.posts.data.local.dao.PostDao
 import com.obrekht.neowork.posts.data.local.entity.PostData
 import com.obrekht.neowork.posts.data.local.entity.PostLikeOwnerEntity
@@ -41,7 +40,7 @@ private const val GET_NEW_POSTS_INTERVAL = 10_000L
 @Singleton
 class CachedPostRepository @Inject constructor(
     private val auth: AppAuth,
-    private val db: PostDatabase,
+    private val postRemoteMediator: PostRemoteMediator,
     private val postDao: PostDao,
     private val postApi: PostApiService,
     private val mediaApi: MediaApiService
@@ -54,13 +53,10 @@ class CachedPostRepository @Inject constructor(
         postDao.pagingSource()
     }
 
-    @Inject
-    lateinit var remoteMediator: PostRemoteMediator
-
     @OptIn(ExperimentalPagingApi::class)
     override fun getPagingData(config: PagingConfig): Flow<PagingData<Post>> = Pager(
         config = config,
-        remoteMediator = remoteMediator,
+        remoteMediator = postRemoteMediator,
         pagingSourceFactory = pagingSourceFactory
     ).flow.map {
         it.map(PostData::toModel)

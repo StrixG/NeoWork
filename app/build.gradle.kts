@@ -89,6 +89,8 @@ dependencies {
     ksp(libs.hilt.compiler)
     ksp(libs.jetpack.hilt.compiler)
 
+    implementation(libs.timber)
+
     coreLibraryDesugaring(libs.desugar)
 
     testImplementation(libs.junit)

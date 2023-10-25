@@ -13,7 +13,7 @@ object TimeUtils {
             timestamp,
             DateUtils.SECOND_IN_MILLIS,
             DateUtils.DAY_IN_MILLIS * 2,
-            0
+            DateUtils.FORMAT_SHOW_TIME
         ).toString()
     }
 }
