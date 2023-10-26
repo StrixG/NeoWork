@@ -39,11 +39,9 @@ class WallRemoteMediator @AssistedInject constructor(
                 LoadType.REFRESH -> wallApi.getLatest(userId, state.config.initialLoadSize)
 
                 LoadType.PREPEND -> {
-                    val id = state.firstItemOrNull()?.post?.postId ?: return MediatorResult.Success(
-                        endOfPaginationReached = false
+                    return MediatorResult.Success(
+                        endOfPaginationReached = true
                     )
-
-                    wallApi.getAfter(userId, id, state.config.pageSize)
                 }
 
                 LoadType.APPEND -> {
@@ -60,6 +58,9 @@ class WallRemoteMediator @AssistedInject constructor(
             val body = response.body() ?: throw HttpException(response)
 
             database.withTransaction {
+                if (loadType == LoadType.REFRESH) {
+                    postDao.deleteAllByAuthorId(userId)
+                }
                 postDao.upsertWithData(body.toEntityData())
             }
             MediatorResult.Success(endOfPaginationReached = body.isEmpty())

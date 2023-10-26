@@ -37,6 +37,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.net.ConnectException
 
 @AndroidEntryPoint
 class WallFragment : Fragment(R.layout.fragment_wall) {
@@ -92,7 +94,7 @@ class WallFragment : Fragment(R.layout.fragment_wall) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(DeleteConfirmationDialogFragment) {
-            setFragmentResultListener(
+            parentFragment?.setFragmentResultListener(
                 getRequestKey(DeleteElementType.POST)
             ) { _, bundle ->
                 val clickedButton = bundle.getInt(RESULT_CLICKED_BUTTON)
@@ -103,14 +105,11 @@ class WallFragment : Fragment(R.layout.fragment_wall) {
             }
         }
 
-        val adapter = PostListAdapter(
-            interactionListener
-        ).also { adapter ->
-            binding.postListView.adapter = adapter
-            this.adapter = adapter
-        }
+        val adapter = PostListAdapter(interactionListener)
+        this.adapter = adapter
 
         with(binding) {
+            postListView.adapter = adapter
             postListView.setBarsInsetsListener {
                 setPadding(
                     paddingLeft,
@@ -171,11 +170,21 @@ class WallFragment : Fragment(R.layout.fragment_wall) {
                 swipeRefresh.isRefreshing = false
             }
 
-            if (state.refresh is LoadState.Error) {
+            (state.refresh as? LoadState.Error)?.let {
                 viewModel.updateDataState(DataState.Error)
 
-                showErrorSnackbar(R.string.error_loading) {
-                    refresh()
+                when (it.error) {
+                    is HttpException -> showErrorSnackbar(R.string.error_loading_users) {
+                        refresh()
+                    }
+
+                    is ConnectException -> showErrorSnackbar(R.string.error_connection) {
+                        refresh()
+                    }
+
+                    else -> showErrorSnackbar(R.string.error_loading) {
+                        refresh()
+                    }
                 }
             }
         }
@@ -183,7 +192,6 @@ class WallFragment : Fragment(R.layout.fragment_wall) {
 
     private fun refresh() {
         userProfileViewModel.refresh()
-        viewModel.refresh()
         adapter?.refresh()
     }
 

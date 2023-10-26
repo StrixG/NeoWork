@@ -24,7 +24,7 @@ class PostListAdapter(
     private val interactionListener: PostInteractionListener
 ) : PagingDataAdapter<PostListItem, RecyclerView.ViewHolder>(DiffCallback()) {
 
-    override fun getItemViewType(position: Int): Int = when (getItem(position)) {
+    override fun getItemViewType(position: Int): Int = when (peek(position)) {
         is PostItem, null -> R.layout.item_post
         is DateSeparatorItem -> R.layout.item_date_separator
     }
@@ -52,8 +52,8 @@ class PostListAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
-            is PostItem? -> (holder as? PostViewHolder)?.bind(item ?: PostItem(Post()))
-            is DateSeparatorItem -> (holder as? DateSeparatorViewHolder)?.bind(item)
+            is PostItem? -> (holder as PostViewHolder).bind(item ?: PostItem(Post()))
+            is DateSeparatorItem -> (holder as DateSeparatorViewHolder).bind(item)
             else -> error("Unknown item type")
         }
     }

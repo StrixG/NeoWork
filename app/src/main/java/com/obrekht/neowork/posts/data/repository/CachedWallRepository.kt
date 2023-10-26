@@ -57,12 +57,6 @@ class CachedWallRepository @Inject constructor(
         pagingSourceFactory?.invalidate()
     }
 
-    override suspend fun refreshAll(userId: Long) = try {
-        postDao.deleteAllByAuthorId(userId)
-    } catch (e: Exception) {
-        throw e
-    }
-
     override suspend fun likeById(postId: Long): Post = try {
         postDao.like(PostLikeOwnerEntity(postId, loggedInUserId))
 

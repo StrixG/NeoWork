@@ -24,7 +24,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -69,8 +71,12 @@ class WallViewModel @Inject constructor(
             it.insertDateSeparators()
         }.flowOn(Dispatchers.Default)
 
-    fun refresh() = viewModelScope.launch {
-        wallRepository.refreshAll(userId)
+    init {
+        viewModelScope.launch {
+            appAuth.state.onEach {
+                wallRepository.invalidatePagingSource()
+            }.launchIn(this)
+        }
     }
 
     fun togglePostLike(post: Post) {

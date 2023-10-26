@@ -57,7 +57,7 @@ class JobsFragment : Fragment(R.layout.fragment_jobs) {
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(DeleteConfirmationDialogFragment) {
-            setFragmentResultListener(
+            parentFragment?.setFragmentResultListener(
                 getRequestKey(DeleteElementType.JOB)
             ) { _, bundle ->
                 val clickedButton = bundle.getInt(RESULT_CLICKED_BUTTON)
@@ -68,20 +68,15 @@ class JobsFragment : Fragment(R.layout.fragment_jobs) {
             }
         }
 
-        val adapter = JobListAdapter(
-            interactionListener, userProfileViewModel.isOwnProfile
-        ).also { adapter ->
-            binding.jobListView.adapter = adapter
-            this.adapter = adapter
-        }
+        val adapter = JobListAdapter(interactionListener, userProfileViewModel.isOwnProfile)
+        this.adapter = adapter
 
         with(binding) {
+            jobListView.adapter = adapter
             jobListView.setBarsInsetsListener {
                 setPadding(
-                    paddingLeft,
-                    paddingTop,
-                    paddingRight,
-                    it.bottom
+                    paddingLeft, paddingTop, paddingRight,
+                    it.bottom + resources.getDimension(R.dimen.fab_bottom_padding).toInt()
                 )
             }
 
@@ -106,6 +101,7 @@ class JobsFragment : Fragment(R.layout.fragment_jobs) {
                 }.launchIn(this)
 
                 viewModel.uiState.onEach(::handleState).launchIn(this)
+                viewModel.event.onEach(::handleEvent).launchIn(this)
             }
         }
     }
@@ -133,10 +129,23 @@ class JobsFragment : Fragment(R.layout.fragment_jobs) {
 
     private fun handleLoadState(state: CombinedLoadStates): Unit = with(binding) {
         adapter?.let { adapter ->
-            if (state.refresh !is LoadState.Loading) {
-                emptyText.isVisible = adapter.itemCount == 0
+            if (state.refresh is LoadState.NotLoading
+                && viewModel.uiState.value.dataState != DataState.Loading) {
+                if (state.append.endOfPaginationReached) {
+                    emptyText.isVisible = adapter.itemCount == 0
+                }
             } else {
                 emptyText.isVisible = false
+            }
+        }
+    }
+
+    private fun handleEvent(event: Event) {
+        when (event) {
+            is Event.ErrorDeleting -> {
+                showErrorSnackbar(R.string.error_deleting_job) {
+                    viewModel.deleteJobById(event.jobId)
+                }
             }
         }
     }

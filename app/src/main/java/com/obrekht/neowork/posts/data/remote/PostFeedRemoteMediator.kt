@@ -15,7 +15,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
-class PostRemoteMediator @Inject constructor(
+class PostFeedRemoteMediator @Inject constructor(
     private val database: PostDatabase,
     private val postDao: PostDao,
     private val postApi: PostApiService
@@ -30,11 +30,9 @@ class PostRemoteMediator @Inject constructor(
                 LoadType.REFRESH -> postApi.getLatest(state.config.initialLoadSize)
 
                 LoadType.PREPEND -> {
-                    val id = state.firstItemOrNull()?.post?.postId ?: return MediatorResult.Success(
-                        endOfPaginationReached = false
+                    return MediatorResult.Success(
+                        endOfPaginationReached = true
                     )
-
-                    postApi.getAfter(id, state.config.pageSize)
                 }
 
                 LoadType.APPEND -> {
@@ -51,6 +49,9 @@ class PostRemoteMediator @Inject constructor(
             val body = response.body() ?: throw HttpException(response)
 
             database.withTransaction {
+                if (loadType == LoadType.REFRESH) {
+                    postDao.deleteAll()
+                }
                 postDao.upsertWithData(body.toEntityData())
             }
             MediatorResult.Success(endOfPaginationReached = body.isEmpty())

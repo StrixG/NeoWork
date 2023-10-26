@@ -48,14 +48,16 @@ class PostFeedViewModel @Inject constructor(
                 initialLoadSize = POSTS_PER_PAGE * 2
             )
         )
-        .cachedIn(viewModelScope)
         .combine(appAuth.state) { pagingData, authState ->
             pagingData.map {
                 PostItem(it.copy(ownedByMe = it.authorId == authState.id))
             }
-        }.map {
+        }
+        .map {
             it.insertDateSeparators()
-        }.flowOn(Dispatchers.Default)
+        }
+        .cachedIn(viewModelScope)
+        .flowOn(Dispatchers.Default)
 
     private val _uiState = MutableStateFlow(FeedUiState())
     val uiState: StateFlow<FeedUiState> = _uiState
@@ -74,12 +76,6 @@ class PostFeedViewModel @Inject constructor(
                 repository.invalidatePagingSource()
                 _uiState.update { it.copy(isLoggedIn = authState.id > 0L) }
             }.launchIn(this)
-
-//            repository.getNewerCount().onEach { newerCount ->
-//                _uiState.update { it.copy(newerCount = newerCount) }
-//            }
-//                .retry()
-//                .launchIn(this)
         }
     }
 
@@ -121,25 +117,15 @@ class PostFeedViewModel @Inject constructor(
     }
 
     fun delete(post: Post) = deleteById(post.id)
-
-    fun scrollDone() {
-        _uiState.update { it.copy(scrollDone = true) }
-    }
 }
 
 private fun PagingData<PostItem>.insertDateSeparators() = insertSeparators { before, after ->
     val beforePostDate = before?.let {
-        LocalDate.ofInstant(
-            before.post.published,
-            ZoneId.systemDefault()
-        )
+        LocalDate.ofInstant(before.post.published, ZoneId.systemDefault())
     }
 
     val afterPostDate = after?.let {
-        LocalDate.ofInstant(
-            after.post.published,
-            ZoneId.systemDefault()
-        )
+        LocalDate.ofInstant(after.post.published, ZoneId.systemDefault())
     }
 
     if (afterPostDate != null && beforePostDate != afterPostDate) {
@@ -158,12 +144,10 @@ sealed interface DataState {
 data class FeedUiState(
     val isLoggedIn: Boolean = false,
     val dataState: DataState = DataState.Success,
-    val newerCount: Int = 0,
-    val scrollDone: Boolean = false
+    val newerCount: Int = 0
 )
 
 sealed interface Event {
-    data object ErrorLoadPosts : Event
     class ErrorLikingPost(val postId: Long) : Event
     class ErrorDeleting(val postId: Long) : Event
 }

@@ -9,14 +9,12 @@ import com.obrekht.neowork.auth.data.local.AppAuth
 import com.obrekht.neowork.users.data.repository.UserRepository
 import com.obrekht.neowork.users.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -46,9 +44,6 @@ class UserListViewModel @Inject constructor(
     val isLoggedIn: Boolean
         get() = uiState.value.isLoggedIn
 
-    private val _event = Channel<Event>()
-    val event: Flow<Event> = _event.receiveAsFlow()
-
     init {
         refresh()
 
@@ -66,18 +61,12 @@ class UserListViewModel @Inject constructor(
             repository.refreshAll()
             _uiState.update { it.copy(dataState = DataState.Success) }
         } catch (e: Exception) {
-            when (e) {
-                is HttpException -> {
-                    _event.send(Event.ErrorLoadUsers)
-                }
-                is ConnectException -> {
-                    _event.send(Event.ErrorConnection)
-                }
-
-                else -> {
-                    _uiState.update { it.copy(dataState = DataState.Error) }
-                }
+            val errorType = when (e) {
+                is HttpException -> ErrorType.FailedToLoad
+                is ConnectException -> ErrorType.Connection
+                else -> ErrorType.Unknown
             }
+            _uiState.update { it.copy(dataState = DataState.Error(errorType)) }
         }
     }
 }
@@ -90,10 +79,11 @@ data class UserListUiState(
 sealed interface DataState {
     data object Loading : DataState
     data object Success : DataState
-    data object Error : DataState
+    data class Error(val type: ErrorType = ErrorType.Unknown) : DataState
 }
 
-sealed interface Event {
-    data object ErrorLoadUsers : Event
-    data object ErrorConnection : Event
+enum class ErrorType {
+    Unknown,
+    FailedToLoad,
+    Connection
 }

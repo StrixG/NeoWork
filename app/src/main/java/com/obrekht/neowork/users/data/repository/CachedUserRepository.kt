@@ -42,14 +42,14 @@ class CachedUserRepository @Inject constructor(
     override fun invalidatePagingSource() = pagingSourceFactory.invalidate()
 
     override suspend fun refreshAll() = try {
-        userDao.deleteAll()
-
         val response = userApi.getAll()
         if (!response.isSuccessful) {
             throw HttpException(response)
         }
 
         val body = response.body() ?: throw HttpException(response)
+
+        userDao.deleteAll()
         userDao.upsert(body.toEntity())
     } catch (e: Exception) {
         throw e

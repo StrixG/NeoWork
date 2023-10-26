@@ -196,17 +196,8 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
     private fun handleEvent(event: Event) {
         if (event == Event.Saved) {
             with(findNavController()) {
-                if (args.editableType == EditableType.POST &&
-                    previousBackStackEntry?.destination?.id == R.id.post_feed_fragment
-                ) {
-//                                val action =
-//                                    EditorFragmentDirections.actionShowPostInFeed().apply {
-//                                        updatedPostId = args.id
-//                                    }
-//                                navigate(action)
-                } else {
-                    popBackStack()
-                }
+                previousBackStackEntry?.savedStateHandle?.set(KEY_SCROLL_TO_ID, args.id)
+                popBackStack()
             }
         } else {
             val message = when (event) {
@@ -266,5 +257,9 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                 popBackStack()
             }
         }
+    }
+
+    companion object {
+        const val KEY_SCROLL_TO_ID = "scrollToId"
     }
 }

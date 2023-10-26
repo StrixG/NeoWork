@@ -64,28 +64,22 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             }
         }
 
-        with(binding) {
-            adapter = UserListAdapter(userClickListener).apply {
-                userListView.adapter = this
-            }.also { adapter ->
-                viewLifecycleScope.launch {
-                    viewLifecycleOwner.repeatOnStarted {
-                        launch {
-                            adapter.loadStateFlow.collectLatest(::handleLoadState)
-                        }
-                    }
-                }
-            }
+        val adapter = UserListAdapter(userClickListener)
+        this.adapter = adapter
 
-            swipeRefresh.setOnRefreshListener { viewModel.refresh() }
-            retryButton.setOnClickListener { viewModel.refresh() }
+        with(binding) {
+            userListView.adapter = adapter
+            swipeRefresh.setOnRefreshListener { refresh() }
+            retryButton.setOnClickListener { refresh() }
         }
 
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnStarted {
-                viewModel.data.onEach { adapter?.submitData(it) }.launchIn(this)
+                launch {
+                    adapter.loadStateFlow.collectLatest(::handleLoadState)
+                }
+                viewModel.data.onEach { adapter.submitData(it) }.launchIn(this)
                 viewModel.uiState.onEach(::handleState).launchIn(this)
-                viewModel.event.onEach(::handleEvent).launchIn(this)
             }
         }
     }
@@ -112,36 +106,39 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             swipeRefresh.isRefreshing = false
         }
 
+        if (state.dataState is DataState.Error) {
+            when (state.dataState.type) {
+                ErrorType.FailedToLoad -> showErrorSnackbar(R.string.error_loading_users) {
+                    refresh()
+                }
+
+                ErrorType.Connection -> showErrorSnackbar(R.string.error_connection) {
+                    refresh()
+                }
+
+                else -> showErrorSnackbar(R.string.error_loading) {
+                    refresh()
+                }
+            }
+            errorGroup.isVisible = adapter?.itemCount == 0
+        } else {
+            errorGroup.isVisible = false
+        }
+
         Unit
     }
 
     private fun handleLoadState(state: CombinedLoadStates): Unit = with(binding) {
-        if (state.refresh !is LoadState.Loading &&
-            viewModel.uiState.value.dataState is DataState.Error
-        ) {
-            if (adapter?.itemCount == 0) {
-                errorGroup.isVisible = true
-            } else {
-                errorGroup.isVisible = false
-                showErrorSnackbar(R.string.error_loading) {
-                    viewModel.refresh()
-                }
-            }
-        } else {
-            errorGroup.isVisible = false
+        val dataState = viewModel.uiState.value.dataState
+
+        if (state.refresh is LoadState.Error || dataState is DataState.Error) {
+            errorGroup.isVisible = adapter?.itemCount == 0
         }
     }
 
-    private fun handleEvent(event: Event) {
-        when (event) {
-            Event.ErrorLoadUsers -> showErrorSnackbar(R.string.error_loading_users) {
-                viewModel.refresh()
-            }
-
-            Event.ErrorConnection -> showErrorSnackbar(R.string.error_connection) {
-                viewModel.refresh()
-            }
-        }
+    private fun refresh() {
+        viewModel.refresh()
+        adapter?.refresh()
     }
 
     private fun showErrorSnackbar(@StringRes resId: Int, action: View.OnClickListener?) {

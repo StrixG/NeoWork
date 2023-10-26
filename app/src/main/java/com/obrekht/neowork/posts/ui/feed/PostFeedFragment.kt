@@ -22,11 +22,14 @@ import com.obrekht.neowork.auth.ui.navigateToLogIn
 import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
 import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
 import com.obrekht.neowork.core.ui.MainFragment
+import com.obrekht.neowork.core.ui.findRootNavController
 import com.obrekht.neowork.databinding.FragmentPostFeedBinding
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType
+import com.obrekht.neowork.editor.ui.editor.EditorFragment
 import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.posts.ui.common.PostInteractionListener
+import com.obrekht.neowork.posts.ui.common.PostItem
 import com.obrekht.neowork.posts.ui.common.PostListAdapter
 import com.obrekht.neowork.posts.ui.common.PostLoadStateAdapter
 import com.obrekht.neowork.posts.ui.common.PostViewHolder
@@ -42,12 +45,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.net.ConnectException
 
 private const val PUBLISHED_DATE_REFRESH_INTERVAL: Long = 1000 // In milliseconds
 
@@ -108,7 +111,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
         binding.postListView.setBarsInsetsListener {
             setPadding(
                 paddingLeft, paddingRight, paddingTop,
-                resources.getDimension(R.dimen.post_list_bottom_padding).toInt()
+                resources.getDimension(R.dimen.fab_bottom_padding).toInt()
             )
         }
 
@@ -139,46 +142,15 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
             }
         }
 
-        with(binding) {
-            adapter = PostListAdapter(interactionListener).apply {
-                postListView.adapter = withLoadStateHeaderAndFooter(
-                    header = PostLoadStateAdapter(::retry),
-                    footer = PostLoadStateAdapter(::retry)
-                )
-            }.also { adapter ->
-                viewLifecycleScope.launch {
-                    viewLifecycleOwner.repeatOnStarted {
-                        launch {
-                            adapter.loadStateFlow.collectLatest(::handleLoadState)
-                        }
-                        launch {
-                            adapter.loadStateFlow
-                                .distinctUntilChangedBy { it.refresh }
-                                .filter { it.refresh is LoadState.NotLoading }
-                                .collect {
-                                    postListView.scrollToPosition(0)
-                                }
-                        }
-//                        launch {
-//                            adapter.onPagesUpdatedFlow.collectLatest {
-//                                if (!uiState.scrollDone) {
-//                                    val postPosition =
-//                                        adapter.snapshot().indexOfFirst {
-//                                            (it as? PostItem)?.let { item ->
-//                                                item.post.id == args.updatedPostId
-//                                            } ?: false
-//                                        }
-//                                    if (postPosition >= 0) {
-//                                        postListView.scrollToPosition(postPosition)
-//                                        viewModel.scrollDone()
-//                                    }
-//                                }
-//                            }
-//                        }
-                    }
-                }
-            }
+        val adapter = PostListAdapter(interactionListener).apply {
+            binding.postListView.adapter = withLoadStateHeaderAndFooter(
+                header = PostLoadStateAdapter(::retry),
+                footer = PostLoadStateAdapter(::retry)
+            )
+        }
+        this.adapter = adapter
 
+        with(binding) {
             // Hide new posts button on scroll down and show on scroll up
             postListView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -211,18 +183,25 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
 
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnStarted {
-                viewModel.data.onEach { adapter?.submitData(it) }.launchIn(this)
+                launch {
+                    adapter.loadStateFlow.collectLatest(::handleLoadState)
+                }
+                launch {
+                    adapter.onPagesUpdatedFlow.collect {
+                        tryScrollToPost()
+                    }
+                }
+
+                viewModel.data.onEach {
+                    adapter.submitData(it)
+                }.launchIn(this)
+
                 viewModel.uiState.onEach(::handleState).launchIn(this)
                 viewModel.event.onEach(::handleEvent).launchIn(this)
 
                 startRefreshingPublishedDate()
             }
         }
-    }
-
-    private fun refresh() {
-        adapter?.refresh()
-        binding.buttonNewPosts.hide()
     }
 
     override fun onDestroyView() {
@@ -275,31 +254,33 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
                 swipeRefresh.isRefreshing = false
             }
 
-            if (state.refresh is LoadState.Error) {
+            (state.refresh as? LoadState.Error)?.let {
                 viewModel.updateDataState(DataState.Error)
 
-                if (adapter.itemCount == 0) {
-                    errorGroup.isVisible = true
-                } else {
-                    errorGroup.isVisible = false
-                    showErrorSnackbar(R.string.error_loading) {
+                when (it.error) {
+                    is HttpException -> showErrorSnackbar(R.string.error_loading_users) {
+                        refresh()
+                    }
+
+                    is ConnectException -> showErrorSnackbar(R.string.error_connection) {
+                        refresh()
+                    }
+
+                    else -> showErrorSnackbar(R.string.error_loading) {
                         refresh()
                     }
                 }
-            } else {
+                errorGroup.isVisible = adapter.itemCount == 0
+            } ?: {
                 errorGroup.isVisible = false
             }
+
+            Unit
         }
     }
 
     private fun handleEvent(event: Event) {
         when (event) {
-            Event.ErrorLoadPosts -> {
-                showErrorSnackbar(R.string.error_loading) {
-                    refresh()
-                }
-            }
-
             is Event.ErrorLikingPost -> {
                 showErrorSnackbar(R.string.error_liking) {
                     viewModel.toggleLikeById(event.postId)
@@ -310,6 +291,28 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
                 showErrorSnackbar(R.string.error_deleting) {
                     viewModel.deleteById(event.postId)
                 }
+            }
+        }
+    }
+
+    private fun refresh() {
+        adapter?.refresh()
+        binding.buttonNewPosts.hide()
+    }
+
+    private fun tryScrollToPost() {
+        val adapter = adapter ?: return
+
+        findRootNavController().currentBackStackEntry?.run {
+            val postId = savedStateHandle.get<Long>(EditorFragment.KEY_SCROLL_TO_ID) ?: return
+            val postPosition = adapter.snapshot().indexOfFirst {
+                (it as? PostItem)?.let { item ->
+                    item.post.id == postId
+                } ?: false
+            }
+            if (postPosition >= 0) {
+                binding.postListView.scrollToPosition(postPosition)
+                savedStateHandle.remove<Long>(EditorFragment.KEY_SCROLL_TO_ID)
             }
         }
     }

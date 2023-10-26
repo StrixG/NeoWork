@@ -10,11 +10,13 @@ import com.obrekht.neowork.jobs.data.repository.JobRepository
 import com.obrekht.neowork.jobs.model.Job
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,6 +33,9 @@ class JobsViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(JobsUiState())
     val uiState: StateFlow<JobsUiState> = _uiState.asStateFlow()
+
+    private val _event = Channel<Event>()
+    val event: Flow<Event> = _event.receiveAsFlow()
 
     init {
         refresh()
@@ -62,7 +67,7 @@ class JobsViewModel @Inject constructor(
         try {
             jobRepository.deleteById(jobId)
         } catch (e: Exception) {
-            // TODO: Notify about delete error
+            _event.send(Event.ErrorDeleting(jobId))
         }
     }
 
@@ -77,4 +82,8 @@ sealed interface DataState {
     data object Loading : DataState
     data object Success : DataState
     data object Error : DataState
+}
+
+sealed interface Event {
+    data class ErrorDeleting(val jobId: Long) : Event
 }

@@ -5,7 +5,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import androidx.room.withTransaction
 import com.obrekht.neowork.auth.data.local.AppAuth
+import com.obrekht.neowork.jobs.data.local.JobDatabase
 import com.obrekht.neowork.jobs.data.local.dao.JobDao
 import com.obrekht.neowork.jobs.data.local.entity.JobEntity
 import com.obrekht.neowork.jobs.data.local.entity.toEntity
@@ -19,6 +21,7 @@ import javax.inject.Inject
 
 class CachedJobRepository @Inject constructor(
     private val auth: AppAuth,
+    private val db: JobDatabase,
     private val jobDao: JobDao,
     private val jobApi: JobApiService
 ) : JobRepository {
@@ -47,15 +50,17 @@ class CachedJobRepository @Inject constructor(
     }
 
     override suspend fun refreshUserJobs(userId: Long) = try {
-        jobDao.deleteAllByUserId(userId)
-
         val response = jobApi.getByUserId(userId)
         if (!response.isSuccessful) {
             throw HttpException(response)
         }
 
         val body = response.body() ?: throw HttpException(response)
-        jobDao.upsert(body.toEntity(userId))
+
+        db.withTransaction {
+            jobDao.deleteAllByUserId(userId)
+            jobDao.upsert(body.toEntity(userId))
+        }
     } catch (e: Exception) {
         throw e
     }
