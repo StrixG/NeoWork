@@ -115,4 +115,7 @@
     <string name="error_loading_users">Something went wrong. Please, try again later.</string>
     <string name="error_connection">Please check your internet connection.</string>
     <string name="error_deleting_job">Failed to delete the job</string>
+    <string name="content_description_play_video">Play video</string>
+    <string name="title_user_chooser">Choose users</string>
+    <string name="menu_accept">Accept</string>
 </resources>

@@ -155,14 +155,16 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                 viewModel.attachment.onEach {
                     if (it != null) {
                         attachmentPreviewGroup.isVisible = true
-                        attachmentPhoto.isVisible = it.type == AttachmentType.IMAGE
+                        attachmentPreview.isVisible = it.type == AttachmentType.IMAGE || it.type == AttachmentType.VIDEO
+                        buttonPlayVideo.isVisible = it.type == AttachmentType.VIDEO
 
-                        if (it.type == AttachmentType.IMAGE) {
-                            if (it.uri != null) {
-                                attachmentPhoto.load(it.uri)
-                            } else if (it.file != null) {
-                                attachmentPhoto.setImageURI(it.file.toUri())
+                        when (it.type) {
+                            AttachmentType.IMAGE, AttachmentType.VIDEO -> {
+                                val uri = it.uri ?: it.file?.toUri()
+                                attachmentPreview.load(uri)
                             }
+
+                            AttachmentType.AUDIO -> {}
                         }
                     } else {
                         attachmentPreviewGroup.isVisible = false

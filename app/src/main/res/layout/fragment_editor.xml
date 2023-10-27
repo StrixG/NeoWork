@@ -67,17 +67,29 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/attachment_photo"
+                android:id="@+id/attachment_preview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
+                android:layout_margin="@dimen/small_spacing"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/attached_photo_description"
-                android:scaleType="fitCenter"
+                android:maxHeight="@dimen/max_image_height"
+                android:scaleType="centerCrop"
                 android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/input_field"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Small"
                 tools:src="@tools:sample/backgrounds/scenic" />
+
+            <ImageView
+                android:id="@+id/button_play_video"
+                android:layout_width="@dimen/video_play_button_size"
+                android:layout_height="@dimen/video_play_button_size"
+                android:contentDescription="@string/content_description_play_video"
+                android:src="@drawable/ic_play_circle"
+                app:layout_constraintBottom_toBottomOf="@id/attachment_preview"
+                app:layout_constraintEnd_toEndOf="@id/attachment_preview"
+                app:layout_constraintStart_toStartOf="@id/attachment_preview"
+                app:layout_constraintTop_toTopOf="@id/attachment_preview" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_remove_attachment"
@@ -85,15 +97,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin_remove_attachment_button"
-                app:layout_constraintEnd_toEndOf="@id/attachment_photo"
-                app:layout_constraintTop_toTopOf="@id/attachment_photo" />
+                app:layout_constraintEnd_toEndOf="@id/attachment_preview"
+                app:layout_constraintTop_toTopOf="@id/attachment_preview" />
 
             <androidx.constraintlayout.widget.Group
                 android:id="@+id/attachment_preview_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:constraint_referenced_ids="attachment_photo,button_remove_attachment"
+                app:constraint_referenced_ids="attachment_preview,button_play_video,button_remove_attachment"
                 tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

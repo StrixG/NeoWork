@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.bundles.retrofit)
     implementation(libs.coil)
+    implementation(libs.coil.video)
 
     implementation(libs.bundles.hilt)
     ksp(libs.hilt.compiler)

@@ -91,6 +91,17 @@
             tools:src="@tools:sample/backgrounds/scenic"
             tools:visibility="visible" />
 
+        <ImageView
+            android:id="@+id/button_play_video"
+            android:layout_width="@dimen/video_play_button_size"
+            android:layout_height="@dimen/video_play_button_size"
+            android:contentDescription="@string/content_description_play_video"
+            android:src="@drawable/ic_play_circle"
+            app:layout_constraintBottom_toBottomOf="@id/image"
+            app:layout_constraintEnd_toEndOf="@id/image"
+            app:layout_constraintStart_toStartOf="@id/image"
+            app:layout_constraintTop_toTopOf="@id/image" />
+
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/media_barrier"
             android:layout_width="wrap_content"
