@@ -107,18 +107,13 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         }
 
         if (state.dataState is DataState.Error) {
-            when (state.dataState.type) {
-                ErrorType.FailedToLoad -> showErrorSnackbar(R.string.error_loading_users) {
-                    refresh()
-                }
-
-                ErrorType.Connection -> showErrorSnackbar(R.string.error_connection) {
-                    refresh()
-                }
-
-                else -> showErrorSnackbar(R.string.error_loading) {
-                    refresh()
-                }
+            val text = when (state.dataState.type) {
+                ErrorType.FailedToLoad -> R.string.error_loading_users
+                ErrorType.Connection -> R.string.error_connection
+                else -> R.string.error_loading
+            }
+            showErrorSnackbar(text) {
+                refresh()
             }
             errorGroup.isVisible = adapter?.itemCount == 0
         } else {
