@@ -37,6 +37,7 @@ class EditorViewModel @Inject constructor(
     private val args = EditorFragmentArgs.fromSavedStateHandle(savedStateHandle)
 
     private var edited: Any = getEmptyEditable()
+    private var mentionedUserIds: Set<Long> = emptySet()
 
     private val _uiState = MutableStateFlow(EditorUiState())
     val uiState: StateFlow<EditorUiState> = _uiState.asStateFlow()
@@ -59,6 +60,7 @@ class EditorViewModel @Inject constructor(
                             _uiState.update {
                                 it.copy(shouldInitialize = true, initialContent = post.content)
                             }
+                            mentionedUserIds = post.mentionIds
                             post.attachment?.let {
                                 _attachment.value = AttachmentModel(
                                     uri = it.url.toUri(),
@@ -93,7 +95,8 @@ class EditorViewModel @Inject constructor(
                     when (args.editableType) {
                         EditableType.POST -> {
                             val post = (edited as Post).copy(
-                                content = content.trim()
+                                content = content.trim(),
+                                mentionIds = mentionedUserIds
                             )
                             val mediaUpload = _attachment.value?.let {
                                 it.file?.let { file ->
@@ -155,6 +158,16 @@ class EditorViewModel @Inject constructor(
         EditableType.POST -> Post()
         EditableType.COMMENT -> Comment()
     }
+
+    fun setMentionedUserIds(userIds: Set<Long>) {
+        mentionedUserIds = userIds
+    }
+
+    fun navigateToUserChooser() = viewModelScope.launch {
+        _event.send(
+            Event.NavigateToMentionedUsersChooser(mentionedUserIds.toLongArray())
+        )
+    }
 }
 
 data class EditorUiState(
@@ -170,6 +183,7 @@ data class AttachmentModel(
 )
 
 sealed interface Event {
+    data class NavigateToMentionedUsersChooser(val userIds: LongArray) : Event
     data object Saved : Event
     data object ErrorEmptyContent : Event
     data object ErrorSaving : Event

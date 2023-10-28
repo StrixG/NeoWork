@@ -161,7 +161,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                 viewModel.refresh()
             }
 
-            likers.like.setOnClickListener {
+            likers.buttonLike.setOnClickListener {
                 post.let(interactionListener::onLike)
             }
 
@@ -307,14 +307,15 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             published.text = publishedDate
             content.text = post.content
 
-            likers.like.setIconResource(
+            likers.buttonLike.setIconResource(
                 if (post.likedByMe) {
                     R.drawable.ic_like
                 } else {
                     R.drawable.ic_like_border
                 }
             )
-            likers.like.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
+            likers.buttonLike.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
+            mentioned.buttonMentioned.text = StringUtils.getCompactNumber(post.mentionIds.size)
 
             post.authorAvatar?.let {
                 avatar.load(it) {

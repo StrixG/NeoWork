@@ -6,22 +6,23 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/title_likers"
+        android:id="@+id/title_mentioned"
         style="@style/TextAppearance.Material3.TitleMedium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/likers"
+        android:text="@string/mentioned"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_like"
-        style="@style/Widget.App.PostButton.Like"
+        android:id="@+id/button_mentioned"
+        style="@style/Widget.App.PostButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/small_spacing"
-        android:contentDescription="@string/description_like"
+        android:contentDescription="@string/mentioned"
+        app:icon="@drawable/ic_people_outline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_likers"
-        tools:text="10" />
+        app:layout_constraintTop_toBottomOf="@id/title_mentioned"
+        tools:text="5" />
 </androidx.constraintlayout.widget.ConstraintLayout>

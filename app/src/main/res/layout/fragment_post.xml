@@ -172,8 +172,18 @@
                         android:layout_marginStart="@dimen/common_spacing"
                         android:layout_marginTop="@dimen/common_spacing"
                         android:layout_marginBottom="@dimen/small_spacing"
-                        app:layout_constraintBottom_toBottomOf="@id/buttons_barrier"
+                        app:layout_constraintBottom_toTopOf="@id/mentioned"
                         app:layout_constraintTop_toBottomOf="@id/content_barrier" />
+
+                    <include
+                        android:id="@+id/mentioned"
+                        layout="@layout/include_mentioned"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/common_spacing"
+                        android:layout_marginBottom="@dimen/small_spacing"
+                        app:layout_constraintBottom_toBottomOf="@id/buttons_barrier"
+                        app:layout_constraintTop_toBottomOf="@id/likers" />
 
                     <androidx.constraintlayout.widget.Barrier
                         android:id="@+id/buttons_barrier"

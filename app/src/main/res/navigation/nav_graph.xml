@@ -124,10 +124,30 @@
 
     <dialog
         android:id="@+id/select_job_dates_dialog"
-        android:name="com.obrekht.neowork.jobs.ui.addedit.SelectJobDatesDialogFragment">
-    </dialog>
+        android:name="com.obrekht.neowork.jobs.ui.addedit.SelectJobDatesDialogFragment" />
 
     <action
         android:id="@+id/action_selectJobDatesDialog"
         app:destination="@id/select_job_dates_dialog" />
+
+    <fragment
+        android:id="@+id/user_chooser_fragment"
+        android:name="com.obrekht.neowork.userchooser.ui.UserChooserFragment"
+        android:label="UserChooserFragment" >
+        <argument
+            android:name="request_key"
+            app:argType="string" />
+        <argument
+            android:name="selected_user_ids"
+            app:argType="long[]" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_openUserChooser"
+        app:destination="@id/user_chooser_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
 </navigation>

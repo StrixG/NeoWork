@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.marginBottom
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -23,6 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.obrekht.neowork.R
 import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.databinding.FragmentEditorBinding
+import com.obrekht.neowork.userchooser.ui.UserChooserFragment
 import com.obrekht.neowork.utils.focusAndShowKeyboard
 import com.obrekht.neowork.utils.hideKeyboard
 import com.obrekht.neowork.utils.repeatOnStarted
@@ -33,6 +35,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+
+private const val REQUEST_KEY_MENTIONED_USERS = "mentionedUsers"
 
 @AndroidEntryPoint
 class EditorFragment : Fragment(R.layout.fragment_editor) {
@@ -102,7 +106,7 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
             }
 
             R.id.add_mentions -> {
-                // TODO: Open user chooser
+                viewModel.navigateToUserChooser()
                 true
             }
 
@@ -119,6 +123,12 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
+        setFragmentResultListener(REQUEST_KEY_MENTIONED_USERS) { _, bundle ->
+            bundle.getLongArray(UserChooserFragment.RESULT_CHOSEN_USER_IDS)?.let { chosenUserIds ->
+                viewModel.setMentionedUserIds(chosenUserIds.toSet())
+            }
+        }
+
         val scrollViewBottomMargin = if (editableConfig.doesSupportAttachments) {
             editScrollView.marginBottom
         } else 0
@@ -155,7 +165,8 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                 viewModel.attachment.onEach {
                     if (it != null) {
                         attachmentPreviewGroup.isVisible = true
-                        attachmentPreview.isVisible = it.type == AttachmentType.IMAGE || it.type == AttachmentType.VIDEO
+                        attachmentPreview.isVisible =
+                            it.type == AttachmentType.IMAGE || it.type == AttachmentType.VIDEO
                         buttonPlayVideo.isVisible = it.type == AttachmentType.VIDEO
 
                         when (it.type) {
@@ -196,25 +207,37 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
     }
 
     private fun handleEvent(event: Event) {
-        if (event == Event.Saved) {
-            with(findNavController()) {
-                previousBackStackEntry?.savedStateHandle?.set(KEY_SCROLL_TO_ID, args.id)
-                popBackStack()
+        when (event) {
+            is Event.NavigateToMentionedUsersChooser -> {
+                val action = EditorFragmentDirections.actionOpenUserChooser(
+                    REQUEST_KEY_MENTIONED_USERS,
+                    event.userIds
+                )
+                findNavController().navigate(action)
             }
-        } else {
-            val message = when (event) {
-                Event.ErrorEmptyContent -> editableConfig.messageErrorEmpty
-                Event.ErrorSaving -> editableConfig.messageErrorSaving
-                else -> editableConfig.messageErrorLoading
-            }
-            with(binding) {
-                Snackbar.make(inputField, message, Snackbar.LENGTH_LONG)
-                    .setAnchorView(bottomAppBar)
-                    .show()
 
-                progressBar.isVisible = false
-                inputField.isEnabled = true
-                toolbar.menu.findItem(R.id.save).isVisible = true
+            is Event.Saved -> {
+                with(findNavController()) {
+                    previousBackStackEntry?.savedStateHandle?.set(KEY_SCROLL_TO_ID, args.id)
+                    popBackStack()
+                }
+            }
+
+            else -> {
+                val message = when (event) {
+                    Event.ErrorEmptyContent -> editableConfig.messageErrorEmpty
+                    Event.ErrorSaving -> editableConfig.messageErrorSaving
+                    else -> editableConfig.messageErrorLoading
+                }
+                with(binding) {
+                    Snackbar.make(inputField, message, Snackbar.LENGTH_LONG)
+                        .setAnchorView(bottomAppBar)
+                        .show()
+
+                    progressBar.isVisible = false
+                    inputField.isEnabled = true
+                    toolbar.menu.findItem(R.id.save).isVisible = true
+                }
             }
         }
     }

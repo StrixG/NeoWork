@@ -118,4 +118,5 @@
     <string name="content_description_play_video">Play video</string>
     <string name="title_user_chooser">Choose users</string>
     <string name="menu_accept">Accept</string>
+    <string name="mentioned">Mentioned</string>
 </resources>
