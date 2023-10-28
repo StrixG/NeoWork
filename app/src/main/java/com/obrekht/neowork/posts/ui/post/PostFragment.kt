@@ -315,7 +315,12 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                 }
             )
             likers.buttonLike.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
-            mentioned.buttonMentioned.text = StringUtils.getCompactNumber(post.mentionIds.size)
+
+            val mentionedCount = post.mentionIds.size
+            if (mentionedCount > 0) {
+                mentioned.buttonMentioned.text = StringUtils.getCompactNumber(post.mentionIds.size)
+            }
+            mentioned.root.isVisible = mentionedCount > 0
 
             post.authorAvatar?.let {
                 avatar.load(it) {
