@@ -341,7 +341,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                     }
                     AttachmentType.AUDIO -> {}
                 }
-            } ?: {
+            } ?: run {
                 image.isVisible = false
                 buttonPlayVideo.isVisible = false
             }
