@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.View.OnClickListener
 import androidx.annotation.StringRes
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
@@ -100,33 +101,34 @@ class PostFragment : Fragment(R.layout.fragment_post) {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        with(DeleteConfirmationDialogFragment) {
-            setFragmentResultListener(
-                getRequestKey(DeleteElementType.POST)
-            ) { _, bundle ->
-                val clickedButton = bundle.getInt(RESULT_CLICKED_BUTTON)
-                if (clickedButton == DialogInterface.BUTTON_POSITIVE) {
-                    viewModel.delete()
-                }
+    private val menuClickListener = Toolbar.OnMenuItemClickListener {
+        when (it.itemId) {
+            R.id.share -> {
+                post.let(interactionListener::onShare)
+                true
             }
-        }
 
-        setFragmentResultListener(
-            SuggestAuthDialogFragment.REQUEST_KEY
-        ) { _, bundle ->
-            val positive = bundle.getBoolean(SuggestAuthDialogFragment.RESULT_POSITIVE)
-            if (positive) {
-                navigateToLogIn()
+            R.id.edit -> {
+                post.let(interactionListener::onEdit)
+                true
             }
+
+            R.id.delete -> {
+                post.let(interactionListener::onDelete)
+                true
+            }
+
+            else -> false
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setupResultListeners()
 
         with(binding) {
             commentInputContainer.setBarsInsetsListener { insets ->
                 setPadding(
-                    paddingLeft,
-                    paddingTop,
-                    paddingRight,
+                    paddingLeft, paddingTop, paddingRight,
                     insets.bottom
                 )
             }
@@ -137,26 +139,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             toolbar.setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
-            toolbar.setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.share -> {
-                        post.let(interactionListener::onShare)
-                        true
-                    }
-
-                    R.id.edit -> {
-                        post.let(interactionListener::onEdit)
-                        true
-                    }
-
-                    R.id.delete -> {
-                        post.let(interactionListener::onDelete)
-                        true
-                    }
-
-                    else -> false
-                }
-            }
+            toolbar.setOnMenuItemClickListener(menuClickListener)
             swipeRefresh.setOnRefreshListener {
                 viewModel.refresh()
             }
@@ -197,6 +180,28 @@ class PostFragment : Fragment(R.layout.fragment_post) {
         snackbar = null
         commentsAdapter = null
         super.onDestroyView()
+    }
+
+    private fun setupResultListeners() {
+        with(DeleteConfirmationDialogFragment) {
+            setFragmentResultListener(
+                getRequestKey(DeleteElementType.POST)
+            ) { _, bundle ->
+                val clickedButton = bundle.getInt(RESULT_CLICKED_BUTTON)
+                if (clickedButton == DialogInterface.BUTTON_POSITIVE) {
+                    viewModel.delete()
+                }
+            }
+        }
+
+        setFragmentResultListener(
+            SuggestAuthDialogFragment.REQUEST_KEY
+        ) { _, bundle ->
+            val positive = bundle.getBoolean(SuggestAuthDialogFragment.RESULT_POSITIVE)
+            if (positive) {
+                navigateToLogIn()
+            }
+        }
     }
 
     private fun handleState(state: PostUiState) {
