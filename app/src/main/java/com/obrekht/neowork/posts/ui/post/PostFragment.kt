@@ -87,9 +87,14 @@ class PostFragment : Fragment(R.layout.fragment_post) {
 
     private val commentInteractionListener = object : CommentInteractionListener {
         override fun onClick(comment: Comment) {
-            val action =
-                PostFragmentDirections.actionOpenCommentOptions(comment.id, comment.ownedByMe)
-            findNavController().navigate(action)
+            with(findNavController()) {
+                if (currentDestination?.id != R.id.post_fragment) return
+
+                val action = PostFragmentDirections.actionOpenCommentOptions(
+                    comment.id, comment.ownedByMe
+                )
+                navigate(action)
+            }
         }
 
         override fun onLike(comment: Comment) {
