@@ -7,13 +7,14 @@
     android:background="?selectableItemBackground"
     android:padding="@dimen/common_spacing">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/avatar"
         android:layout_width="@dimen/comment_avatar_size"
         android:layout_height="@dimen/comment_avatar_size"
         android:contentDescription="@string/description_post_author_avatar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
         tools:srcCompat="@drawable/avatar_placeholder" />
 
     <TextView
