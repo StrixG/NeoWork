@@ -13,6 +13,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.obrekht.neowork.R
+import com.obrekht.neowork.auth.model.InvalidUsernameOrPasswordException
 import com.obrekht.neowork.auth.ui.navigateToSignUp
 import com.obrekht.neowork.databinding.FragmentLoginBinding
 import com.obrekht.neowork.utils.hideKeyboard
@@ -113,13 +114,19 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
 
         state.result?.let { result ->
+            progressBar.hide()
+
             when (result) {
                 LoginResult.Success -> onLoggedIn()
                 is LoginResult.Error -> {
-                    progressBar.hide()
+                    val message = when (result.error) {
+                        is InvalidUsernameOrPasswordException -> {
+                            R.string.error_invalid_username_or_password
+                        }
+                        else -> R.string.error_unknown
+                    }
                     setInteractionsActive(true)
-                    result.error.printStackTrace()
-                    showErrorSnackbar(R.string.error_unknown)
+                    showErrorSnackbar(message)
                 }
             }
             viewModel.resultHandled()

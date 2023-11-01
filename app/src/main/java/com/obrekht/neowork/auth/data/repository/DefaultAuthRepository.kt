@@ -2,6 +2,7 @@ package com.obrekht.neowork.auth.data.repository
 
 import com.obrekht.neowork.auth.data.local.AppAuth
 import com.obrekht.neowork.auth.data.remote.AuthApiService
+import com.obrekht.neowork.auth.model.InvalidUsernameOrPasswordException
 import com.obrekht.neowork.auth.model.UsernameIsTakenException
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -22,19 +23,21 @@ class DefaultAuthRepository @Inject constructor(
     override val isLoggedIn: Boolean
         get() = appAuth.state.value.id > 0
 
-    override suspend fun logIn(username: String, password: String) = try {
+    override suspend fun logIn(username: String, password: String) {
         val response = authService.logIn(username, password)
         if (!response.isSuccessful) {
-            throw HttpException(response)
+            if (response.code() == HttpURLConnection.HTTP_FORBIDDEN
+                || response.code() == HttpURLConnection.HTTP_NOT_FOUND
+            ) {
+                throw InvalidUsernameOrPasswordException()
+            } else {
+                throw HttpException(response)
+            }
         }
         val authState = response.body() ?: throw HttpException(response)
         authState.token?.let {
             appAuth.setAuth(authState.id, authState.token)
         }
-
-        authState
-    } catch (e: Exception) {
-        throw e
     }
 
     override suspend fun signUp(
@@ -42,7 +45,7 @@ class DefaultAuthRepository @Inject constructor(
         password: String,
         name: String,
         avatar: File?
-    ) = try {
+    ) {
         val media = if (avatar != null) MultipartBody.Part.createFormData(
             "file", avatar.name, avatar.asRequestBody()
         ) else null
@@ -64,9 +67,5 @@ class DefaultAuthRepository @Inject constructor(
         authState.token?.let {
             appAuth.setAuth(authState.id, authState.token)
         }
-
-        authState
-    } catch (e: Exception) {
-        throw e
     }
 }
