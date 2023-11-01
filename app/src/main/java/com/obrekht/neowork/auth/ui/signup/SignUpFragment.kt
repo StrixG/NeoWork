@@ -31,6 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.net.ConnectException
 
 @AndroidEntryPoint
 class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
@@ -175,6 +176,9 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
                     val message = when (result.error) {
                         is UsernameIsTakenException -> {
                             R.string.error_username_taken
+                        }
+                        is ConnectException -> {
+                            R.string.error_connection
                         }
                         else -> R.string.error_unknown
                     }

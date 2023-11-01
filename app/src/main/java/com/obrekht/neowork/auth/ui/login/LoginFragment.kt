@@ -25,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.net.ConnectException
 
 @AndroidEntryPoint
 class LoginFragment : Fragment(R.layout.fragment_login) {
@@ -122,6 +123,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     val message = when (result.error) {
                         is InvalidUsernameOrPasswordException -> {
                             R.string.error_invalid_username_or_password
+                        }
+                        is ConnectException -> {
+                            R.string.error_connection
                         }
                         else -> R.string.error_unknown
                     }
