@@ -1,4 +1,4 @@
-package com.obrekht.neowork.users.ui.list
+package com.obrekht.neowork.users.ui.allusers
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,44 +24,44 @@ import javax.inject.Inject
 private const val USERS_PER_PAGE = 10
 
 @HiltViewModel
-class UserListViewModel @Inject constructor(
+class AllUsersViewModel @Inject constructor(
     private val appAuth: AppAuth,
     private val repository: UserRepository
 ) : ViewModel() {
 
     val data: Flow<PagingData<User>> = repository
         .getPagingData(
-            PagingConfig(
+            config = PagingConfig(
                 pageSize = USERS_PER_PAGE,
                 initialLoadSize = USERS_PER_PAGE * 2
             )
         )
         .cachedIn(viewModelScope)
 
-    private val _uiState = MutableStateFlow(UserListUiState())
-    val uiState: StateFlow<UserListUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(AllUsersUiState())
+    val uiState: StateFlow<AllUsersUiState> = _uiState.asStateFlow()
 
     val isLoggedIn: Boolean
-        get() = uiState.value.isLoggedIn
+        get() = appAuth.loggedInState.value
 
     init {
         refresh()
 
         viewModelScope.launch {
-            appAuth.state.onEach { authState ->
+            appAuth.loggedInState.onEach { isLoggedIn ->
                 repository.invalidatePagingSource()
-                _uiState.update { it.copy(isLoggedIn = authState.id > 0L) }
+                _uiState.update { it.copy(isLoggedIn = isLoggedIn) }
             }.launchIn(this)
         }
     }
 
     fun refresh() = viewModelScope.launch {
         _uiState.update { it.copy(dataState = DataState.Loading) }
-        try {
+        runCatching {
             repository.refreshAll()
             _uiState.update { it.copy(dataState = DataState.Success) }
-        } catch (e: Exception) {
-            val errorType = when (e) {
+        }.onFailure { exception ->
+            val errorType = when (exception) {
                 is HttpException -> ErrorType.FailedToLoad
                 is ConnectException -> ErrorType.Connection
                 else -> ErrorType.Unknown
@@ -71,7 +71,7 @@ class UserListViewModel @Inject constructor(
     }
 }
 
-data class UserListUiState(
+data class AllUsersUiState(
     val isLoggedIn: Boolean = false,
     val dataState: DataState = DataState.Success
 )

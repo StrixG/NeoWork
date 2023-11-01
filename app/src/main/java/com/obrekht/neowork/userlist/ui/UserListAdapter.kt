@@ -1,4 +1,4 @@
-package com.obrekht.neowork.users.ui.list
+package com.obrekht.neowork.userlist.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

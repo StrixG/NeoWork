@@ -133,18 +133,40 @@
     <fragment
         android:id="@+id/user_chooser_fragment"
         android:name="com.obrekht.neowork.userchooser.ui.UserChooserFragment"
-        android:label="UserChooserFragment" >
+        android:label="UserChooserFragment">
         <argument
-            android:name="request_key"
+            android:name="requestKey"
             app:argType="string" />
         <argument
-            android:name="selected_user_ids"
+            android:name="selectedUserIds"
             app:argType="long[]" />
     </fragment>
 
     <action
         android:id="@+id/action_openUserChooser"
         app:destination="@id/user_chooser_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+    <fragment
+        android:id="@+id/user_list_fragment"
+        android:name="com.obrekht.neowork.userlist.ui.UserListFragment"
+        android:label="@string/user_list_label"
+        tools:layout="@layout/fragment_user_list">
+        <argument
+            android:name="userIds"
+            app:argType="long[]" />
+        <argument
+            android:name="title"
+            app:argType="string" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_openUserList"
+        app:destination="@id/user_list_fragment"
         app:enterAnim="@anim/nav_default_enter_anim"
         app:exitAnim="@anim/nav_default_exit_anim"
         app:launchSingleTop="true"

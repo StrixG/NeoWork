@@ -22,4 +22,7 @@
     <dimen name="max_profile_avatar_height">256dp</dimen>
     <dimen name="max_date_input_width">192dp</dimen>
     <dimen name="video_play_button_size">80dp</dimen>
+    <dimen name="users_preview_margin">-8dp</dimen>
+    <dimen name="user_preview_size">40dp</dimen>
+    <dimen name="user_preview_stroke_width">2dp</dimen>
 </resources>

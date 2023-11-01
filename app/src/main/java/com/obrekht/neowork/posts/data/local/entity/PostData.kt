@@ -3,6 +3,7 @@ package com.obrekht.neowork.posts.data.local.entity
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.obrekht.neowork.posts.model.Post
+import com.obrekht.neowork.userpreview.model.UserPreview
 
 data class PostData(
     @Embedded
@@ -23,11 +24,11 @@ data class PostData(
     val mentionIds: List<Long>
 )
 
-fun PostData.toModel() = Post(
+fun PostData.toModel(users: Map<Long, UserPreview> = emptyMap()) = Post(
     post.postId, post.authorId, post.author, post.authorJob, post.authorAvatar, post.content,
     post.published, post.coords, post.link,
     mentionIds.toSet(), post.mentionedMe, likeOwnerIds.toSet(), post.likedByMe,
-    post.attachment, emptyMap()
+    post.attachment, users
 )
 
 fun Post.toEntityData(isShown: Boolean = true) = PostData(

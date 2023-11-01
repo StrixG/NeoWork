@@ -1,4 +1,4 @@
-package com.obrekht.neowork.users.ui.list
+package com.obrekht.neowork.users.ui.allusers
 
 import android.os.Bundle
 import android.view.View
@@ -9,16 +9,15 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
-import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import com.google.android.material.snackbar.Snackbar
 import com.obrekht.neowork.R
-import com.obrekht.neowork.auth.ui.navigateToLogIn
-import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
 import com.obrekht.neowork.core.ui.MainFragment
-import com.obrekht.neowork.databinding.FragmentUserListBinding
+import com.obrekht.neowork.databinding.FragmentAllUsersBinding
+import com.obrekht.neowork.userlist.ui.UserClickListener
+import com.obrekht.neowork.userlist.ui.UserListAdapter
 import com.obrekht.neowork.users.ui.navigateToUserProfile
 import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.setBarsInsetsListener
@@ -31,10 +30,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class UserListFragment : Fragment(R.layout.fragment_user_list) {
+class AllUsersFragment : Fragment(R.layout.fragment_all_users) {
 
-    private val binding by viewBinding(FragmentUserListBinding::bind)
-    private val viewModel: UserListViewModel by viewModels()
+    private val binding by viewBinding(FragmentAllUsersBinding::bind)
+    private val viewModel: AllUsersViewModel by viewModels()
 
     private var snackbar: Snackbar? = null
     private var adapter: UserListAdapter? = null
@@ -48,15 +47,6 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
             MainFragment.REQUEST_KEY_SCROLL_TARGET,
             bundleOf(MainFragment.RESULT_TARGET_VIEW_ID to R.id.user_list_view)
         )
-
-        setFragmentResultListener(
-            SuggestAuthDialogFragment.REQUEST_KEY
-        ) { _, bundle ->
-            val positive = bundle.getBoolean(SuggestAuthDialogFragment.RESULT_POSITIVE)
-            if (positive) {
-                navigateToLogIn()
-            }
-        }
 
         view.setBarsInsetsListener {
             updateLayoutParams<ViewGroup.MarginLayoutParams> {
@@ -90,7 +80,7 @@ class UserListFragment : Fragment(R.layout.fragment_user_list) {
         super.onDestroyView()
     }
 
-    private fun handleState(state: UserListUiState) = with(binding) {
+    private fun handleState(state: AllUsersUiState) = with(binding) {
         if (state.dataState is DataState.Loading) {
             snackbar?.dismiss()
             if (adapter?.itemCount == 0) {

@@ -55,6 +55,7 @@
                         android:layout_marginStart="@dimen/common_spacing"
                         android:layout_marginBottom="@dimen/common_spacing"
                         android:contentDescription="@string/description_post_author_avatar"
+                        android:foreground="?actionBarItemBackground"
                         app:layout_constraintBottom_toBottomOf="@id/top_barrier"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
@@ -131,10 +132,12 @@
                         android:layout_height="@dimen/video_play_button_size"
                         android:contentDescription="@string/content_description_play_video"
                         android:src="@drawable/ic_play_circle"
+                        android:visibility="gone"
                         app:layout_constraintBottom_toBottomOf="@id/image"
                         app:layout_constraintEnd_toEndOf="@id/image"
                         app:layout_constraintStart_toStartOf="@id/image"
-                        app:layout_constraintTop_toTopOf="@id/image" />
+                        app:layout_constraintTop_toTopOf="@id/image"
+                        tools:visibility="visible" />
 
                     <androidx.constraintlayout.widget.Barrier
                         android:id="@+id/media_barrier"

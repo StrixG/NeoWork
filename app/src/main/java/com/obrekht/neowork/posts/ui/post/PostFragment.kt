@@ -31,6 +31,9 @@ import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.posts.ui.common.PostInteractionListener
 import com.obrekht.neowork.posts.ui.navigateToPostEditor
 import com.obrekht.neowork.posts.ui.sharePost
+import com.obrekht.neowork.userlist.ui.navigateToUserList
+import com.obrekht.neowork.userpreview.ui.UserPreviewClickListener
+import com.obrekht.neowork.userpreview.ui.UserPreviewMoreClickListener
 import com.obrekht.neowork.users.ui.navigateToUserProfile
 import com.obrekht.neowork.utils.StringUtils
 import com.obrekht.neowork.utils.TimeUtils
@@ -127,6 +130,18 @@ class PostFragment : Fragment(R.layout.fragment_post) {
         }
     }
 
+    private val userPreviewClickListener: UserPreviewClickListener = { userId ->
+        navigateToUserProfile(userId)
+    }
+
+    private val likersMoreClickListener: UserPreviewMoreClickListener = {
+        navigateToUserList(post.likeOwnerIds, getString(R.string.likers))
+    }
+
+    private val mentionedMoreClickListener: UserPreviewMoreClickListener = {
+        navigateToUserList(post.likeOwnerIds, getString(R.string.mentioned))
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupResultListeners()
 
@@ -147,6 +162,10 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             toolbar.setOnMenuItemClickListener(menuClickListener)
             swipeRefresh.setOnRefreshListener {
                 viewModel.refresh()
+            }
+
+            avatar.setOnClickListener {
+                post.let(interactionListener::onAvatarClick)
             }
 
             likers.buttonLike.setOnClickListener {
@@ -317,6 +336,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             published.text = publishedDate
             content.text = post.content
 
+            // Likers
             likers.buttonLike.setIconResource(
                 if (post.likedByMe) {
                     R.drawable.ic_like
@@ -326,12 +346,24 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             )
             likers.buttonLike.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
 
+            val likerList = post.users.filterKeys { post.likeOwnerIds.contains(it) }
+            likers.preview.setPreviews(likerList)
+            likers.preview.setOnPreviewClickListener(userPreviewClickListener)
+            likers.preview.setOnMoreClickListener(likersMoreClickListener)
+
+            // Mentioned
             val mentionedCount = post.mentionIds.size
             if (mentionedCount > 0) {
                 mentioned.buttonMentioned.text = StringUtils.getCompactNumber(post.mentionIds.size)
             }
             mentioned.root.isVisible = mentionedCount > 0
 
+            val mentionList = post.users.filterKeys { post.mentionIds.contains(it) }
+            mentioned.preview.setPreviews(mentionList)
+            mentioned.preview.setOnPreviewClickListener(userPreviewClickListener)
+            mentioned.preview.setOnMoreClickListener(mentionedMoreClickListener)
+
+            // Avatar
             post.authorAvatar?.let {
                 avatar.load(it) {
                     placeholder(R.drawable.avatar_placeholder)
@@ -339,16 +371,29 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                 }
             } ?: avatar.setImageResource(R.drawable.avatar_placeholder)
 
+            // Attachments
             post.attachment?.let {
-                image.isVisible = it.type == AttachmentType.IMAGE || it.type == AttachmentType.VIDEO
-                buttonPlayVideo.isVisible = it.type == AttachmentType.VIDEO
+                image.isVisible = false
+                buttonPlayVideo.isVisible = false
 
                 when (it.type) {
-                    AttachmentType.IMAGE, AttachmentType.VIDEO -> {
+                    AttachmentType.IMAGE -> {
                         image.load(it.url) {
                             crossfade(true)
                         }
+                        image.isVisible = true
                     }
+
+                    AttachmentType.VIDEO -> {
+                        image.load(it.url) {
+                            crossfade(true)
+                            listener { _, _ ->
+                                buttonPlayVideo.isVisible = true
+                            }
+                        }
+                        image.isVisible = true
+                    }
+
                     AttachmentType.AUDIO -> {}
                 }
             } ?: run {

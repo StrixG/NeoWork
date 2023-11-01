@@ -25,4 +25,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title_mentioned"
         tools:text="5" />
+
+    <com.obrekht.neowork.userpreview.ui.UsersPreviewLayout
+        android:id="@+id/preview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/small_spacing"
+        app:layout_constraintBottom_toBottomOf="@id/button_mentioned"
+        app:layout_constraintStart_toEndOf="@id/button_mentioned"
+        app:layout_constraintTop_toTopOf="@id/button_mentioned" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,9 +13,9 @@
 
     <fragment
         android:id="@+id/users_fragment"
-        android:name="com.obrekht.neowork.users.ui.list.UserListFragment"
+        android:name="com.obrekht.neowork.users.ui.allusers.AllUsersFragment"
         android:label="@string/user_list_label"
-        tools:layout="@layout/fragment_user_list" />
+        tools:layout="@layout/fragment_all_users" />
 
     <dialog
         android:id="@+id/suggest_auth_dialog"

@@ -151,16 +151,25 @@ class PostViewHolder(
             } ?: avatar.load(R.drawable.avatar_placeholder)
 
             post.attachment?.let {
-                image.isVisible = it.type == AttachmentType.IMAGE || it.type == AttachmentType.VIDEO
-                buttonPlayVideo.isVisible = it.type == AttachmentType.VIDEO
+                image.isVisible = false
+                buttonPlayVideo.isVisible = false
 
                 when (it.type) {
-                    AttachmentType.IMAGE, AttachmentType.VIDEO -> {
+                    AttachmentType.IMAGE -> {
                         image.load(it.url) {
                             crossfade(true)
                         }
+                        image.isVisible = true
                     }
-
+                    AttachmentType.VIDEO -> {
+                        image.load(it.url) {
+                            crossfade(true)
+                            listener { _, _ ->
+                                buttonPlayVideo.isVisible = true
+                            }
+                        }
+                        image.isVisible = true
+                    }
                     AttachmentType.AUDIO -> {}
                 }
             } ?: run {

@@ -16,6 +16,10 @@ interface UserDao {
     fun pagingSource(): PagingSource<Int, UserEntity>
 
     @Transaction
+    @Query("SELECT * FROM user WHERE userId IN (:userIds) ORDER BY userId DESC")
+    fun pagingSource(userIds: Collection<Long>): PagingSource<Int, UserEntity>
+
+    @Transaction
     @Query("SELECT * FROM user ORDER BY userId DESC")
     fun observeAll(): Flow<List<UserEntity>>
 

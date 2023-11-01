@@ -19,10 +19,15 @@ import com.obrekht.neowork.posts.data.local.entity.toModel
 import com.obrekht.neowork.posts.data.remote.PostApiService
 import com.obrekht.neowork.posts.data.remote.PostFeedRemoteMediator
 import com.obrekht.neowork.posts.model.Post
+import com.obrekht.neowork.userpreview.data.local.dao.UserPreviewDao
+import com.obrekht.neowork.userpreview.data.local.entity.toEntity
+import com.obrekht.neowork.userpreview.data.local.entity.toModelMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -42,6 +47,7 @@ class CachedPostRepository @Inject constructor(
     private val auth: AppAuth,
     private val postFeedRemoteMediator: PostFeedRemoteMediator,
     private val postDao: PostDao,
+    private val userPreviewDao: UserPreviewDao,
     private val postApi: PostApiService,
     private val mediaApi: MediaApiService
 ) : PostRepository {
@@ -83,13 +89,11 @@ class CachedPostRepository @Inject constructor(
     }
         .flowOn(Dispatchers.Default)
 
-    override suspend fun showNewPosts() = try {
+    override suspend fun showNewPosts() {
         postDao.showNewPosts()
-    } catch (e: Exception) {
-        throw e
     }
 
-    override suspend fun refreshPost(postId: Long) = try {
+    override suspend fun refreshPost(postId: Long) {
         val response = postApi.getById(postId)
         if (!response.isSuccessful) {
             if (response.code() == HttpURLConnection.HTTP_NOT_FOUND) {
@@ -100,16 +104,27 @@ class CachedPostRepository @Inject constructor(
 
         val body = response.body() ?: throw HttpException(response)
         postDao.upsertWithData(body.toEntityData())
-    } catch (e: Exception) {
-        throw e
+        userPreviewDao.upsert(body.users.toEntity())
     }
 
-    override suspend fun getPost(postId: Long): Post? = postDao.getById(postId)?.toModel()
+    override suspend fun getPost(postId: Long): Post? = postDao.getById(postId)?.run {
+        val userIds = likeOwnerIds union mentionIds
+        val users = userPreviewDao.getByIds(userIds)
+        toModel(users.toModelMap())
+    }
+
 
     override fun getPostStream(postId: Long): Flow<Post?> =
-        postDao.observeById(postId).map { it?.toModel() }
+        postDao.observeById(postId).map { it?.toModel() }.flatMapLatest { post ->
+            post?.let {
+                val userIds = post.likeOwnerIds union post.mentionIds
+                userPreviewDao.observeByIds(userIds).map { previewList ->
+                    post.copy(users = previewList.toModelMap())
+                }
+            } ?: emptyFlow()
+        }
 
-    override suspend fun likeById(postId: Long): Post = try {
+    override suspend fun likeById(postId: Long): Post = runCatching {
         postDao.like(PostLikeOwnerEntity(postId, loggedInUserId))
 
         val response = postApi.likeById(postId)
@@ -120,12 +135,12 @@ class CachedPostRepository @Inject constructor(
         postDao.upsertWithData(post.toEntityData())
 
         post
-    } catch (e: Exception) {
+    }.getOrElse { exception ->
         postDao.unlike(PostLikeOwnerEntity(postId, loggedInUserId))
-        throw e
+        throw exception
     }
 
-    override suspend fun unlikeById(postId: Long): Post = try {
+    override suspend fun unlikeById(postId: Long): Post = runCatching {
         postDao.unlike(PostLikeOwnerEntity(postId, loggedInUserId))
 
         val response = postApi.unlikeById(postId)
@@ -136,12 +151,12 @@ class CachedPostRepository @Inject constructor(
         postDao.upsertWithData(post.toEntityData())
 
         post
-    } catch (e: Exception) {
+    }.getOrElse { exception ->
         postDao.like(PostLikeOwnerEntity(postId, loggedInUserId))
-        throw e
+        throw exception
     }
 
-    override suspend fun save(post: Post, mediaUpload: MediaUpload?): Post = try {
+    override suspend fun save(post: Post, mediaUpload: MediaUpload?): Post {
         val savingPost = mediaUpload?.let {
             val media = uploadMedia(mediaUpload.file)
             post.copy(attachment = Attachment(media.url, mediaUpload.type))
@@ -155,14 +170,12 @@ class CachedPostRepository @Inject constructor(
         val body = response.body() ?: throw HttpException(response)
         postDao.upsertWithData(body.toEntityData())
 
-        body
-    } catch (e: Exception) {
-        throw e
+        return body
     }
 
     override suspend fun deleteById(postId: Long) {
         var post: PostData? = null
-        try {
+        runCatching {
             post = postDao.getById(postId)
             postDao.deleteById(postId)
 
@@ -170,15 +183,15 @@ class CachedPostRepository @Inject constructor(
             if (!response.isSuccessful) {
                 throw HttpException(response)
             }
-        } catch (e: Exception) {
+        }.onFailure { exception ->
             post?.let { postDao.upsertWithData(it) }
-            throw e
+            throw exception
         }
     }
 
     override suspend fun delete(post: Post) = deleteById(post.id)
 
-    private suspend fun uploadMedia(upload: File): Media = try {
+    private suspend fun uploadMedia(upload: File): Media {
         val media = MultipartBody.Part.createFormData(
             "file", upload.name, upload.asRequestBody()
         )
@@ -188,8 +201,6 @@ class CachedPostRepository @Inject constructor(
             throw HttpException(response)
         }
 
-        response.body() ?: throw HttpException(response)
-    } catch (e: Exception) {
-        throw e
+        return response.body() ?: throw HttpException(response)
     }
 }

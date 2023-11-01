@@ -5,7 +5,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.obrekht.neowork.auth.data.local.AppAuth
+import androidx.room.withTransaction
 import com.obrekht.neowork.posts.data.local.PostDatabase
 import com.obrekht.neowork.users.data.local.dao.UserDao
 import com.obrekht.neowork.users.data.local.entity.UserEntity
@@ -22,26 +22,35 @@ import javax.inject.Singleton
 
 @Singleton
 class CachedUserRepository @Inject constructor(
-    private val auth: AppAuth,
     private val db: PostDatabase,
     private val userDao: UserDao,
     private val userApi: UserApiService
 ) : UserRepository {
 
-    private val pagingSourceFactory = InvalidatingPagingSourceFactory {
-        userDao.pagingSource()
+    private var pagingSourceFactory: InvalidatingPagingSourceFactory<Int, UserEntity>? = null
+
+    override fun getPagingData(
+        userIds: Collection<Long>?,
+        config: PagingConfig
+    ): Flow<PagingData<User>> {
+        val factory = InvalidatingPagingSourceFactory {
+            userIds?.let(userDao::pagingSource) ?: userDao.pagingSource()
+        }
+        pagingSourceFactory = factory
+
+        return Pager(
+            config = config,
+            pagingSourceFactory = factory
+        ).flow.map {
+            it.map(UserEntity::toModel)
+        }
     }
 
-    override fun getPagingData(config: PagingConfig): Flow<PagingData<User>> = Pager(
-        config = config,
-        pagingSourceFactory = pagingSourceFactory
-    ).flow.map {
-        it.map(UserEntity::toModel)
+    override fun invalidatePagingSource() {
+        pagingSourceFactory?.invalidate()
     }
 
-    override fun invalidatePagingSource() = pagingSourceFactory.invalidate()
-
-    override suspend fun refreshAll() = try {
+    override suspend fun refreshAll() {
         val response = userApi.getAll()
         if (!response.isSuccessful) {
             throw HttpException(response)
@@ -49,13 +58,31 @@ class CachedUserRepository @Inject constructor(
 
         val body = response.body() ?: throw HttpException(response)
 
-        userDao.deleteAll()
-        userDao.upsert(body.toEntity())
-    } catch (e: Exception) {
-        throw e
+        db.withTransaction {
+            userDao.deleteAll()
+            userDao.upsert(body.toEntity())
+        }
     }
 
-    override suspend fun refreshUser(userId: Long) = try {
+    override suspend fun refreshUsers(userIds: Collection<Long>) {
+        val userList = mutableListOf<User>()
+        for (userId in userIds) {
+            val response = userApi.getById(userId)
+            if (response.isSuccessful) {
+                val user = response.body() ?: throw HttpException(response)
+                userList.add(user)
+            }
+        }
+
+        db.withTransaction {
+            for (userId in userIds) {
+                userDao.deleteById(userId)
+            }
+            userDao.upsert(userList.toEntity())
+        }
+    }
+
+    override suspend fun refreshUser(userId: Long) {
         val response = userApi.getById(userId)
         if (!response.isSuccessful) {
             if (response.code() == HttpURLConnection.HTTP_NOT_FOUND) {
@@ -66,8 +93,6 @@ class CachedUserRepository @Inject constructor(
 
         val body = response.body() ?: throw HttpException(response)
         userDao.upsert(body.toEntity())
-    } catch (e: Exception) {
-        throw e
     }
 
     override suspend fun getUser(userId: Long): User? = userDao.getById(userId)?.toModel()

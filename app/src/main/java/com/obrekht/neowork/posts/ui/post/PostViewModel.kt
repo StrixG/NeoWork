@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -53,14 +54,12 @@ class PostViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoggedIn = authState.id > 0L) }
             }.launchIn(this)
 
-            postRepository.getPostStream(postId).combine(appAuth.state) { post, authState ->
-                post?.copy(ownedByMe = post.authorId == authState.id)
+            postRepository.getPostStream(postId).onEach {
+                if (it == null) _event.send(Event.PostDeleted)
+            }.filterNotNull().combine(appAuth.state) { post, authState ->
+                post.copy(ownedByMe = post.authorId == authState.id)
             }.onEach { post ->
-                if (post != null) {
-                    _uiState.update { it.copy(post = post, state = State.Success) }
-                } else {
-                    _event.send(Event.PostDeleted)
-                }
+                _uiState.update { it.copy(post = post, state = State.Success) }
             }.launchIn(this)
 
             commentRepository.getCommentListStream(postId).combine(appAuth.state) { comments, authState ->
@@ -86,10 +85,10 @@ class PostViewModel @Inject constructor(
 
     fun refreshPost() = viewModelScope.launch {
         _uiState.update { it.copy(state = State.Loading) }
-        try {
+        runCatching {
             postRepository.refreshPost(postId)
-        } catch (e: Exception) {
-            when (e) {
+        }.onFailure { exception ->
+            when (exception) {
                 is HttpException -> {
                     _event.send(Event.PostDeleted)
                 }
@@ -104,10 +103,10 @@ class PostViewModel @Inject constructor(
     fun refreshComments(showLoadingState: Boolean = true) = viewModelScope.launch {
         if (showLoadingState) _uiState.update { it.copy(commentsState = State.Loading) }
 
-        try {
+        runCatching {
             commentRepository.refreshComments(postId)
             _uiState.update { it.copy(commentsState = State.Success) }
-        } catch (e: Exception) {
+        }.onFailure {
             _uiState.update { it.copy(commentsState = State.Error) }
         }
     }
@@ -130,10 +129,10 @@ class PostViewModel @Inject constructor(
     }
 
     fun delete() = viewModelScope.launch {
-        try {
+        runCatching {
             postRepository.deleteById(postId)
             _event.send(Event.PostDeleted)
-        } catch (e: Exception) {
+        }.onFailure {
             _event.send(Event.ErrorRemovingPost)
         }
     }
@@ -141,13 +140,13 @@ class PostViewModel @Inject constructor(
     fun getComment(commentId: Long): Flow<Comment?> = commentRepository.getCommentStream(commentId)
 
     fun toggleCommentLike(comment: Comment) = viewModelScope.launch {
-        try {
+        runCatching {
             if (comment.likedByMe) {
                 commentRepository.unlikeCommentById(comment.id)
             } else {
                 commentRepository.likeCommentById(comment.id)
             }
-        } catch (e: Exception) {
+        }.onFailure {
             _event.send(Event.ErrorLikingComment(comment.id))
         }
     }
@@ -162,9 +161,9 @@ class PostViewModel @Inject constructor(
     }
 
     fun deleteCommentById(commentId: Long) = viewModelScope.launch {
-        try {
+        runCatching {
             commentRepository.deleteCommentById(commentId)
-        } catch (e: Exception) {
+        }.onFailure {
             _event.send(Event.ErrorDeletingComment(commentId))
         }
     }
