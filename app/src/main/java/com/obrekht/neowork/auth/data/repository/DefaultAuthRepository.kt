@@ -26,7 +26,7 @@ class DefaultAuthRepository @Inject constructor(
     override suspend fun logIn(username: String, password: String) {
         val response = authService.logIn(username, password)
         if (!response.isSuccessful) {
-            if (response.code() == HttpURLConnection.HTTP_FORBIDDEN
+            if (response.code() == HttpURLConnection.HTTP_BAD_REQUEST
                 || response.code() == HttpURLConnection.HTTP_NOT_FOUND
             ) {
                 throw InvalidUsernameOrPasswordException()
