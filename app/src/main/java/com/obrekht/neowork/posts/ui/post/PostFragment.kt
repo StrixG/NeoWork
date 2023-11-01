@@ -139,7 +139,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
     }
 
     private val mentionedMoreClickListener: UserPreviewMoreClickListener = {
-        navigateToUserList(post.likeOwnerIds, getString(R.string.mentioned))
+        navigateToUserList(post.mentionIds, getString(R.string.mentioned))
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
