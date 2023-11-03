@@ -78,13 +78,12 @@
             app:constraint_referenced_ids="avatar,published,menu" />
 
         <ImageView
-            android:id="@+id/image"
+            android:id="@+id/attachment_preview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:contentDescription="@string/content_description_attached_photo"
             android:maxHeight="@dimen/max_image_height"
-            android:paddingBottom="@dimen/common_spacing"
             android:scaleType="centerCrop"
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/media_barrier"
@@ -99,10 +98,10 @@
             android:contentDescription="@string/content_description_play_video"
             android:src="@drawable/ic_play_circle"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/image"
-            app:layout_constraintEnd_toEndOf="@id/image"
-            app:layout_constraintStart_toStartOf="@id/image"
-            app:layout_constraintTop_toTopOf="@id/image"
+            app:layout_constraintBottom_toBottomOf="@id/attachment_preview"
+            app:layout_constraintEnd_toEndOf="@id/attachment_preview"
+            app:layout_constraintStart_toStartOf="@id/attachment_preview"
+            app:layout_constraintTop_toTopOf="@id/attachment_preview"
             tools:visibility="visible" />
 
         <androidx.constraintlayout.widget.Barrier
@@ -110,7 +109,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="image" />
+            app:constraint_referenced_ids="attachment_preview" />
 
         <TextView
             android:id="@+id/content"

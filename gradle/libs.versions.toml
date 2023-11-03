@@ -26,6 +26,9 @@ coil = "2.4.0"
 hilt = "2.48.1"
 jetpack-hilt = "1.0.0"
 timber = "5.0.1"
+yandex-mapkit = "4.4.0-full"
+play-services = "21.0.1"
+leakcanary = "2.12"
 
 # Tests
 junit = "4.13.2"
@@ -67,6 +70,9 @@ jetpack-hilt-navigation = { module = "androidx.hilt:hilt-navigation-fragment", v
 jetpack-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "jetpack-hilt" }
 jetpack-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "jetpack-hilt" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+yandex-mapkit = { module = "com.yandex.android:maps.mobile", version.ref = "yandex-mapkit" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services" }
+leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 
 # Tests
 junit = { module = "junit:junit", version.ref = "junit" }

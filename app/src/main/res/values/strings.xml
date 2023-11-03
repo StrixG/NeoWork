@@ -120,4 +120,11 @@
     <string name="menu_accept">Accept</string>
     <string name="mentioned">Mentioned</string>
     <string name="error_invalid_username_or_password">Invalid username or password</string>
+    <string name="location_permission_denied">You\'ve denied access to the location.\nYou won\'t be able to locate yourself on the map.</string>
+    <string name="content_description_save_location">Save location</string>
+    <string name="hint_address_search">Search here</string>
+    <string name="save">Save</string>
+    <string name="apply">Apply</string>
+    <string name="loading">Loading…</string>
+    <string name="location_address_unknown">Unknown address</string>
 </resources>

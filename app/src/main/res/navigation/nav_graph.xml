@@ -172,4 +172,24 @@
         app:launchSingleTop="true"
         app:popEnterAnim="@anim/nav_default_pop_enter_anim"
         app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+    <fragment
+        android:id="@+id/location_picker_fragment"
+        android:name="com.obrekht.neowork.map.ui.LocationPickerFragment"
+        tools:layout="@layout/fragment_location_picker">
+        <argument
+            android:name="position"
+            android:defaultValue="@null"
+            app:argType="com.obrekht.neowork.map.model.LocationPoint"
+            app:nullable="true" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_openLocationPicker"
+        app:destination="@id/location_picker_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
 </navigation>

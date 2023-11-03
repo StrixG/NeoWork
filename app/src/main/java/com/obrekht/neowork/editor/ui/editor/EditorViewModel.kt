@@ -6,6 +6,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.obrekht.neowork.core.model.AttachmentType
+import com.obrekht.neowork.core.model.Coordinates
+import com.obrekht.neowork.map.model.LocationPoint
 import com.obrekht.neowork.media.data.MediaCache
 import com.obrekht.neowork.media.model.MediaUpload
 import com.obrekht.neowork.posts.data.repository.CommentRepository
@@ -36,8 +38,8 @@ class EditorViewModel @Inject constructor(
 
     private val args = EditorFragmentArgs.fromSavedStateHandle(savedStateHandle)
 
-    private var edited: Any = getEmptyEditable()
-    private var mentionedUserIds: Set<Long> = emptySet()
+    private val _edited = MutableStateFlow(getEmptyEditable())
+    val edited: StateFlow<Any> = _edited.asStateFlow()
 
     private val _uiState = MutableStateFlow(EditorUiState())
     val uiState: StateFlow<EditorUiState> = _uiState.asStateFlow()
@@ -56,11 +58,10 @@ class EditorViewModel @Inject constructor(
                 when (args.editableType) {
                     EditableType.POST -> postRepository.getPost(args.id)
                         ?.let { post ->
-                            edited = post
+                            _edited.value = post
                             _uiState.update {
                                 it.copy(shouldInitialize = true, initialContent = post.content)
                             }
-                            mentionedUserIds = post.mentionIds
                             post.attachment?.let {
                                 _attachment.value = AttachmentModel(
                                     uri = it.url.toUri(),
@@ -72,7 +73,7 @@ class EditorViewModel @Inject constructor(
                     EditableType.COMMENT -> commentRepository.getCommentStream(args.id)
                         .firstOrNull()
                         ?.let { comment ->
-                            edited = comment
+                            _edited.value = comment
                             _uiState.update {
                                 it.copy(shouldInitialize = true, initialContent = comment.content)
                             }
@@ -86,47 +87,44 @@ class EditorViewModel @Inject constructor(
         _uiState.update { it.copy(shouldInitialize = false, initialized = true) }
     }
 
-    fun save(content: String) {
-        viewModelScope.launch {
-            if (content.isBlank()) {
-                _event.send(Event.ErrorEmptyContent)
-            } else {
-                try {
-                    when (args.editableType) {
-                        EditableType.POST -> {
-                            val post = (edited as Post).copy(
-                                content = content.trim(),
-                                mentionIds = mentionedUserIds
-                            )
-                            val mediaUpload = _attachment.value?.let {
-                                it.file?.let { file ->
-                                    MediaUpload(file, it.type)
-                                }
+    fun save(content: String) = viewModelScope.launch {
+        if (content.isBlank()) {
+            _event.send(Event.ErrorEmptyContent)
+        } else {
+            runCatching {
+                when (args.editableType) {
+                    EditableType.POST -> {
+                        val post = (edited.value as Post).copy(
+                            content = content.trim()
+                        )
+                        val mediaUpload = _attachment.value?.let {
+                            it.file?.let { file ->
+                                MediaUpload(file, it.type)
                             }
-                            postRepository.save(post, mediaUpload)
                         }
-
-                        EditableType.COMMENT -> {
-                            val comment = (edited as Comment).copy(
-                                content = content.trim()
-                            )
-                            commentRepository.save(comment)
-                        }
+                        postRepository.save(post, mediaUpload)
                     }
 
-                    clearEdited()
-                    removeAttachment()
-
-                    _event.send(Event.Saved)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    _event.send(Event.ErrorSaving)
+                    EditableType.COMMENT -> {
+                        val comment = (edited.value as Comment).copy(
+                            content = content.trim()
+                        )
+                        commentRepository.save(comment)
+                    }
                 }
+
+                clearEdited()
+                removeAttachment()
+
+                _event.send(Event.Saved)
+            }.onFailure {
+                it.printStackTrace()
+                _event.send(Event.ErrorSaving)
             }
         }
     }
 
-    fun changeAttachment(uri: Uri) {
+    fun setAttachment(uri: Uri) {
         _attachment.update {
             it?.file?.delete()
 
@@ -150,8 +148,30 @@ class EditorViewModel @Inject constructor(
         }
     }
 
+    fun setMentionedUserIds(userIds: Set<Long>) {
+        _edited.update {
+            when (it) {
+                is Post -> {
+                    it.copy(mentionIds = userIds)
+                }
+                else -> it
+            }
+        }
+    }
+
+    fun setLocationCoordinates(coordinates: Coordinates?) {
+        _edited.update {
+            when (it) {
+                is Post -> {
+                    it.copy(coords = coordinates)
+                }
+                else -> it
+            }
+        }
+    }
+
     private fun clearEdited() {
-        edited = getEmptyEditable()
+        _edited.value = getEmptyEditable()
     }
 
     private fun getEmptyEditable(): Any = when (args.editableType) {
@@ -159,14 +179,24 @@ class EditorViewModel @Inject constructor(
         EditableType.COMMENT -> Comment()
     }
 
-    fun setMentionedUserIds(userIds: Set<Long>) {
-        mentionedUserIds = userIds
+    fun navigateToMentionedUsersChooser() = viewModelScope.launch {
+        when (val editable = edited.value) {
+            is Post -> _event.send(
+                Event.NavigateToMentionedUsersChooser(editable.mentionIds.toLongArray())
+            )
+        }
     }
 
-    fun navigateToUserChooser() = viewModelScope.launch {
-        _event.send(
-            Event.NavigateToMentionedUsersChooser(mentionedUserIds.toLongArray())
-        )
+    fun navigateToLocationPicker() = viewModelScope.launch {
+        when (val editable = edited.value) {
+            is Post -> {
+                val locationPoint = editable.coords?.let {
+                    LocationPoint(it.lat, it.long)
+                }
+
+                _event.send(Event.NavigateToLocationPicker(locationPoint))
+            }
+        }
     }
 }
 
@@ -183,7 +213,8 @@ data class AttachmentModel(
 )
 
 sealed interface Event {
-    data class NavigateToMentionedUsersChooser(val userIds: LongArray) : Event
+    class NavigateToMentionedUsersChooser(val userIds: LongArray) : Event
+    class NavigateToLocationPicker(val locationPoint: LocationPoint? = null) : Event
     data object Saved : Event
     data object ErrorEmptyContent : Event
     data object ErrorSaving : Event

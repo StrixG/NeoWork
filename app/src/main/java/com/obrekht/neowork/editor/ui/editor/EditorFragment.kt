@@ -18,25 +18,43 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
 import com.github.dhaval2404.imagepicker.ImagePicker
+import com.github.dhaval2404.imagepicker.constant.ImageProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.obrekht.neowork.R
 import com.obrekht.neowork.core.model.AttachmentType
+import com.obrekht.neowork.core.model.Coordinates
 import com.obrekht.neowork.databinding.FragmentEditorBinding
+import com.obrekht.neowork.map.navigateToLocationPicker
+import com.obrekht.neowork.map.ui.LocationPickerFragment
+import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.userchooser.ui.UserChooserFragment
+import com.obrekht.neowork.userchooser.ui.navigateToUserChooser
 import com.obrekht.neowork.utils.focusAndShowKeyboard
 import com.obrekht.neowork.utils.hideKeyboard
 import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.setBarsInsetsListener
 import com.obrekht.neowork.utils.viewBinding
 import com.obrekht.neowork.utils.viewLifecycleScope
+import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.search.Response
+import com.yandex.mapkit.search.SearchFactory
+import com.yandex.mapkit.search.SearchManager
+import com.yandex.mapkit.search.SearchManagerType
+import com.yandex.mapkit.search.SearchOptions
+import com.yandex.mapkit.search.SearchType
+import com.yandex.mapkit.search.Session
+import com.yandex.runtime.Error
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 private const val REQUEST_KEY_MENTIONED_USERS = "mentionedUsers"
+private const val IMAGE_COMPRESS_SIZE = 2048
+private const val LOCATION_PREVIEW_DEFAULT_ZOOM = 15f
 
 @AndroidEntryPoint
 class EditorFragment : Fragment(R.layout.fragment_editor) {
@@ -51,11 +69,32 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
     private val uiState: EditorUiState
         get() = viewModel.uiState.value
 
+    private val searchManager: SearchManager = SearchFactory.getInstance()
+        .createSearchManager(SearchManagerType.COMBINED)
+
+    private val searchOptions = SearchOptions().apply {
+        searchTypes = SearchType.GEO.value
+        resultPageSize = 1
+    }
+
+    private val searchSessionListener = object : Session.SearchListener {
+        override fun onSearchResponse(response: Response) {
+            val geoObject = response.collection.children.firstOrNull()?.obj
+            binding.locationAddress.text = geoObject?.let {
+                "${geoObject.name}\n${geoObject.descriptionText}"
+            } ?: getString(R.string.location_address_unknown)
+        }
+
+        override fun onSearchError(error: Error) {
+            binding.locationAddress.text = getString(R.string.location_address_unknown)
+        }
+    }
+
     private val takePhotoResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             when (it.resultCode) {
                 Activity.RESULT_OK -> {
-                    it.data?.data?.let(viewModel::changeAttachment)
+                    it.data?.data?.let(viewModel::setAttachment)
                 }
 
                 ImagePicker.RESULT_ERROR -> {
@@ -70,7 +109,7 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
 
     private val attachMediaLauncher =
         registerForActivityResult(GetMediaContract()) { uri ->
-            uri?.let(viewModel::changeAttachment)
+            uri?.let(viewModel::setAttachment)
         }
 
     private val menuClickListener = Toolbar.OnMenuItemClickListener { menuItem ->
@@ -106,7 +145,12 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
             }
 
             R.id.add_mentions -> {
-                viewModel.navigateToUserChooser()
+                viewModel.navigateToMentionedUsersChooser()
+                true
+            }
+
+            R.id.add_location -> {
+                viewModel.navigateToLocationPicker()
                 true
             }
 
@@ -126,6 +170,14 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
         setFragmentResultListener(REQUEST_KEY_MENTIONED_USERS) { _, bundle ->
             bundle.getLongArray(UserChooserFragment.RESULT_CHOSEN_USER_IDS)?.let { chosenUserIds ->
                 viewModel.setMentionedUserIds(chosenUserIds.toSet())
+            }
+        }
+
+        with(LocationPickerFragment) {
+            setFragmentResultListener(REQUEST_KEY) { _, bundle ->
+                val latitude = bundle.getDouble(RESULT_LOCATION_LATITUDE)
+                val longitude = bundle.getDouble(RESULT_LOCATION_LONGITUDE)
+                viewModel.setLocationCoordinates(Coordinates(latitude, longitude))
             }
         }
 
@@ -157,28 +209,58 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
             buttonRemoveAttachment.setOnClickListener {
                 viewModel.removeAttachment()
             }
+            buttonRemoveLocation.setOnClickListener {
+                viewModel.setLocationCoordinates(null)
+            }
         }
         bottomAppBar.isVisible = editableConfig.doesSupportAttachments
 
         viewLifecycleScope.launch {
             viewLifecycleOwner.repeatOnStarted {
-                viewModel.attachment.onEach {
-                    if (it != null) {
-                        attachmentPreviewGroup.isVisible = true
-                        attachmentPreview.isVisible =
-                            it.type == AttachmentType.IMAGE || it.type == AttachmentType.VIDEO
-                        buttonPlayVideo.isVisible = it.type == AttachmentType.VIDEO
+                viewModel.attachment.onEach { attachment ->
+                    attachmentPreviewGroup.isVisible = false
+                    buttonPlayVideo.isVisible = false
 
-                        when (it.type) {
-                            AttachmentType.IMAGE, AttachmentType.VIDEO -> {
-                                val uri = it.uri ?: it.file?.toUri()
-                                attachmentPreview.load(uri)
+                    attachment?.let {
+                        val uri = attachment.uri ?: attachment.file?.toUri()
+                        when (attachment.type) {
+                            AttachmentType.IMAGE -> {
+                                attachmentPreview.load(uri) {
+                                    crossfade(true)
+                                }
+                                attachmentPreviewGroup.isVisible = true
+                            }
+
+                            AttachmentType.VIDEO -> {
+                                attachmentPreview.load(uri) {
+                                    crossfade(true)
+                                    listener { _, _ ->
+                                        buttonPlayVideo.isVisible = true
+                                    }
+                                }
+                                attachmentPreviewGroup.isVisible = true
                             }
 
                             AttachmentType.AUDIO -> {}
                         }
-                    } else {
-                        attachmentPreviewGroup.isVisible = false
+                    }
+                }.launchIn(this)
+
+                viewModel.edited.onEach { editable ->
+                    when (editable) {
+                        is Post -> {
+
+                            locationPreviewGroup.isVisible = editable.coords != null
+                            editable.coords?.let { (latitude, longitude) ->
+                                locationAddress.text = getString(R.string.loading)
+                                searchManager.submit(
+                                    Point(latitude, longitude),
+                                    LOCATION_PREVIEW_DEFAULT_ZOOM.toInt(),
+                                    searchOptions,
+                                    searchSessionListener
+                                )
+                            }
+                        }
                     }
                 }.launchIn(this)
 
@@ -188,6 +270,16 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
         }
 
         Unit
+    }
+
+    override fun onStart() {
+        super.onStart()
+        MapKitFactory.getInstance().onStart()
+    }
+
+    override fun onStop() {
+        MapKitFactory.getInstance().onStop()
+        super.onStop()
     }
 
     private fun handleState(state: EditorUiState) = with(binding) {
@@ -209,11 +301,11 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
     private fun handleEvent(event: Event) {
         when (event) {
             is Event.NavigateToMentionedUsersChooser -> {
-                val action = EditorFragmentDirections.actionOpenUserChooser(
-                    REQUEST_KEY_MENTIONED_USERS,
-                    event.userIds
-                )
-                findNavController().navigate(action)
+                navigateToUserChooser(REQUEST_KEY_MENTIONED_USERS, event.userIds)
+            }
+
+            is Event.NavigateToLocationPicker -> {
+                navigateToLocationPicker(event.locationPoint)
             }
 
             is Event.Saved -> {
@@ -245,8 +337,8 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
     private fun openCamera() {
         ImagePicker.with(this@EditorFragment)
             .crop()
-            .compress(2048)
-//            .provider(ImageProvider.CAMERA)
+            .compress(IMAGE_COMPRESS_SIZE)
+            .provider(ImageProvider.CAMERA)
             .createIntent(takePhotoResultLauncher::launch)
     }
 

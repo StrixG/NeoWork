@@ -25,4 +25,12 @@
     <dimen name="users_preview_margin">-8dp</dimen>
     <dimen name="user_preview_size">40dp</dimen>
     <dimen name="user_preview_stroke_width">2dp</dimen>
+    <dimen name="pin_size">64dp</dimen>
+    <dimen name="compass_icon_size">24dp</dimen>
+    <dimen name="find_me_button_padding">16dp</dimen>
+    <dimen name="find_me_icon_size">32dp</dimen>
+    <dimen name="preview_map_height">256dp</dimen>
+    <dimen name="pin_size_preview">48dp</dimen>
+    <dimen name="pin_shadow_size">32dp</dimen>
+    <dimen name="pin_shadow_size_preview">24dp</dimen>
 </resources>

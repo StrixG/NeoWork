@@ -1,7 +1,10 @@
 package com.obrekht.neowork.posts.ui.post
 
 import android.content.DialogInterface
+import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.View.OnClickListener
@@ -38,15 +41,29 @@ import com.obrekht.neowork.users.ui.navigateToUserProfile
 import com.obrekht.neowork.utils.StringUtils
 import com.obrekht.neowork.utils.TimeUtils
 import com.obrekht.neowork.utils.hideKeyboard
+import com.obrekht.neowork.utils.isLightTheme
 import com.obrekht.neowork.utils.makeLinks
 import com.obrekht.neowork.utils.repeatOnStarted
+import com.obrekht.neowork.utils.setAllOnClickListener
 import com.obrekht.neowork.utils.setBarsInsetsListener
 import com.obrekht.neowork.utils.viewBinding
+import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.search.Response
+import com.yandex.mapkit.search.SearchFactory
+import com.yandex.mapkit.search.SearchManagerType
+import com.yandex.mapkit.search.SearchOptions
+import com.yandex.mapkit.search.SearchType
+import com.yandex.mapkit.search.Session.SearchListener
+import com.yandex.runtime.Error
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+
+private const val LOCATION_PREVIEW_DEFAULT_ZOOM = 15f
 
 @AndroidEntryPoint
 class PostFragment : Fragment(R.layout.fragment_post) {
@@ -57,6 +74,27 @@ class PostFragment : Fragment(R.layout.fragment_post) {
     private lateinit var post: Post
     private var snackbar: Snackbar? = null
     private var commentsAdapter: CommentsAdapter? = null
+
+    private val searchManager = SearchFactory.getInstance()
+        .createSearchManager(SearchManagerType.COMBINED)
+
+    private val searchOptions = SearchOptions().apply {
+        searchTypes = SearchType.GEO.value
+        resultPageSize = 1
+    }
+
+    private val searchSessionListener = object : SearchListener {
+        override fun onSearchResponse(response: Response) {
+            val geoObject = response.collection.children.firstOrNull()?.obj
+            binding.locationAddress.text = geoObject?.let {
+                "${geoObject.name}\n${geoObject.descriptionText}"
+            } ?: getString(R.string.location_address_unknown)
+        }
+
+        override fun onSearchError(error: Error) {
+            binding.locationAddress.text = getString(R.string.location_address_unknown)
+        }
+    }
 
     private val interactionListener = object : PostInteractionListener {
         override fun onAvatarClick(post: Post) {
@@ -171,6 +209,14 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             likers.buttonLike.setOnClickListener {
                 post.let(interactionListener::onLike)
             }
+            likers.preview.setOnPreviewClickListener(userPreviewClickListener)
+            likers.preview.setOnMoreClickListener(likersMoreClickListener)
+
+            mentioned.buttonMentioned.setOnClickListener {
+                mentionedMoreClickListener()
+            }
+            mentioned.preview.setOnPreviewClickListener(userPreviewClickListener)
+            mentioned.preview.setOnMoreClickListener(mentionedMoreClickListener)
 
             commentsAdapter = CommentsAdapter(commentInteractionListener).apply {
                 setHasStableIds(true)
@@ -204,6 +250,18 @@ class PostFragment : Fragment(R.layout.fragment_post) {
         snackbar = null
         commentsAdapter = null
         super.onDestroyView()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        MapKitFactory.getInstance().onStart()
+        binding.locationPreview.onStart()
+    }
+
+    override fun onStop() {
+        binding.locationPreview.onStop()
+        MapKitFactory.getInstance().onStop()
+        super.onStop()
     }
 
     private fun setupResultListeners() {
@@ -336,6 +394,14 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             published.text = publishedDate
             content.text = post.content
 
+            // Avatar
+            post.authorAvatar?.let {
+                avatar.load(it) {
+                    placeholder(R.drawable.avatar_placeholder)
+                    transformations(CircleCropTransformation())
+                }
+            } ?: avatar.setImageResource(R.drawable.avatar_placeholder)
+
             // Likers
             likers.buttonLike.setIconResource(
                 if (post.likedByMe) {
@@ -348,8 +414,6 @@ class PostFragment : Fragment(R.layout.fragment_post) {
 
             val likerList = post.users.filterKeys { post.likeOwnerIds.contains(it) }
             likers.preview.setPreviews(likerList)
-            likers.preview.setOnPreviewClickListener(userPreviewClickListener)
-            likers.preview.setOnMoreClickListener(likersMoreClickListener)
 
             // Mentioned
             val mentionedCount = post.mentionIds.size
@@ -360,49 +424,76 @@ class PostFragment : Fragment(R.layout.fragment_post) {
 
             val mentionList = post.users.filterKeys { post.mentionIds.contains(it) }
             mentioned.preview.setPreviews(mentionList)
-            mentioned.preview.setOnPreviewClickListener(userPreviewClickListener)
-            mentioned.preview.setOnMoreClickListener(mentionedMoreClickListener)
 
-            // Avatar
-            post.authorAvatar?.let {
-                avatar.load(it) {
-                    placeholder(R.drawable.avatar_placeholder)
-                    transformations(CircleCropTransformation())
+            // Location
+            post.coords?.let { (latitude, longitude) ->
+                searchManager.submit(
+                    Point(latitude, longitude),
+                    LOCATION_PREVIEW_DEFAULT_ZOOM.toInt(),
+                    searchOptions,
+                    searchSessionListener
+                )
+
+                locationPreviewGroup.setAllOnClickListener {
+                    openMap(latitude, longitude)
                 }
-            } ?: avatar.setImageResource(R.drawable.avatar_placeholder)
+                locationPreview.setNoninteractive(true)
+                locationPreview.mapWindow.map.apply {
+                    val cameraPosition = CameraPosition(
+                        Point(latitude, longitude),
+                        LOCATION_PREVIEW_DEFAULT_ZOOM,
+                        0f, 0f
+                    )
+                    move(cameraPosition)
+                    isNightModeEnabled = !resources.configuration.isLightTheme
+                }
+                locationAddress.text = getString(R.string.loading)
+
+                val pinSize = resources.getDimension(R.dimen.pin_size_preview)
+                pin.translationY = -pinSize / 2
+
+                locationPreviewGroup.isVisible = true
+            } ?: run {
+                locationPreviewGroup.isVisible = false
+            }
 
             // Attachments
-            post.attachment?.let {
-                image.isVisible = false
-                buttonPlayVideo.isVisible = false
+            attachmentPreview.isVisible = false
+            buttonPlayVideo.isVisible = false
 
+            post.attachment?.let {
                 when (it.type) {
                     AttachmentType.IMAGE -> {
-                        image.load(it.url) {
+                        attachmentPreview.load(it.url) {
                             crossfade(true)
                         }
-                        image.isVisible = true
+                        attachmentPreview.isVisible = true
                     }
 
                     AttachmentType.VIDEO -> {
-                        image.load(it.url) {
+                        attachmentPreview.load(it.url) {
                             crossfade(true)
                             listener { _, _ ->
                                 buttonPlayVideo.isVisible = true
                             }
                         }
-                        image.isVisible = true
+                        attachmentPreview.isVisible = true
                     }
 
                     AttachmentType.AUDIO -> {}
                 }
-            } ?: run {
-                image.isVisible = false
-                buttonPlayVideo.isVisible = false
             }
         }
 
         binding.content.maxLines = Int.MAX_VALUE
+    }
+
+    private fun openMap(latitude: Double, longitude: Double) {
+        val intent = Intent(
+            ACTION_VIEW,
+            Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude")
+        )
+        startActivity(intent)
     }
 
     private fun showDeleteConfirmation(postId: Long) {

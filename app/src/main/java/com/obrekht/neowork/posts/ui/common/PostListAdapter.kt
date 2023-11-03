@@ -134,6 +134,15 @@ class PostViewHolder(
             content.text = post.content
             refreshPublishedDate()
 
+            // Avatar
+            post.authorAvatar?.let {
+                avatar.load(post.authorAvatar) {
+                    placeholder(R.drawable.avatar_placeholder)
+                    transformations(CircleCropTransformation())
+                }
+            } ?: avatar.load(R.drawable.avatar_placeholder)
+
+            // Like
             like.setIconResource(
                 if (post.likedByMe) {
                     R.drawable.ic_like
@@ -143,38 +152,29 @@ class PostViewHolder(
             )
             like.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
 
-            post.authorAvatar?.let {
-                avatar.load(post.authorAvatar) {
-                    placeholder(R.drawable.avatar_placeholder)
-                    transformations(CircleCropTransformation())
-                }
-            } ?: avatar.load(R.drawable.avatar_placeholder)
+            // Attachment
+            attachmentPreview.isVisible = false
+            buttonPlayVideo.isVisible = false
 
             post.attachment?.let {
-                image.isVisible = false
-                buttonPlayVideo.isVisible = false
-
                 when (it.type) {
                     AttachmentType.IMAGE -> {
-                        image.load(it.url) {
+                        attachmentPreview.load(it.url) {
                             crossfade(true)
                         }
-                        image.isVisible = true
+                        attachmentPreview.isVisible = true
                     }
                     AttachmentType.VIDEO -> {
-                        image.load(it.url) {
+                        attachmentPreview.load(it.url) {
                             crossfade(true)
                             listener { _, _ ->
                                 buttonPlayVideo.isVisible = true
                             }
                         }
-                        image.isVisible = true
+                        attachmentPreview.isVisible = true
                     }
                     AttachmentType.AUDIO -> {}
                 }
-            } ?: run {
-                image.isVisible = false
-                buttonPlayVideo.isVisible = false
             }
         }
     }

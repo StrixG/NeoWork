@@ -75,7 +75,6 @@
                 android:contentDescription="@string/attached_photo_description"
                 android:maxHeight="@dimen/max_image_height"
                 android:scaleType="centerCrop"
-                android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/input_field"
                 app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Small"
                 tools:src="@tools:sample/backgrounds/scenic" />
@@ -104,9 +103,42 @@
                 android:id="@+id/attachment_preview_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:constraint_referenced_ids="attachment_preview,button_play_video,button_remove_attachment"
-                tools:visibility="visible" />
+                app:constraint_referenced_ids="attachment_preview,button_remove_attachment,button_play_video" />
+
+            <TextView
+                android:id="@+id/location_address"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/small_spacing"
+                android:layout_marginBottom="@dimen/small_spacing"
+                android:drawablePadding="@dimen/small_spacing"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/common_spacing"
+                android:paddingVertical="@dimen/small_spacing"
+                app:drawableStartCompat="@drawable/ic_place"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/button_remove_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/attachment_preview"
+                tools:text="Калининград, площадь Победы, 1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_remove_location"
+                style="?materialIconButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/small_spacing"
+                app:icon="@drawable/ic_close"
+                app:layout_constraintBottom_toBottomOf="@id/location_address"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/location_address"
+                app:layout_constraintTop_toTopOf="@id/location_address" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/location_preview_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="location_address,button_remove_location" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

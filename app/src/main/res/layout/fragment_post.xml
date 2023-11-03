@@ -112,13 +112,13 @@
                         app:constraint_referenced_ids="avatar,published" />
 
                     <ImageView
-                        android:id="@+id/image"
+                        android:id="@+id/attachment_preview"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/common_spacing"
                         android:adjustViewBounds="true"
                         android:contentDescription="@string/content_description_attached_photo"
                         android:maxHeight="@dimen/max_image_height"
-                        android:paddingBottom="@dimen/common_spacing"
                         android:scaleType="centerCrop"
                         android:visibility="gone"
                         app:layout_constraintBottom_toTopOf="@id/media_barrier"
@@ -133,10 +133,10 @@
                         android:contentDescription="@string/content_description_play_video"
                         android:src="@drawable/ic_play_circle"
                         android:visibility="gone"
-                        app:layout_constraintBottom_toBottomOf="@id/image"
-                        app:layout_constraintEnd_toEndOf="@id/image"
-                        app:layout_constraintStart_toStartOf="@id/image"
-                        app:layout_constraintTop_toTopOf="@id/image"
+                        app:layout_constraintBottom_toBottomOf="@id/attachment_preview"
+                        app:layout_constraintEnd_toEndOf="@id/attachment_preview"
+                        app:layout_constraintStart_toStartOf="@id/attachment_preview"
+                        app:layout_constraintTop_toTopOf="@id/attachment_preview"
                         tools:visibility="visible" />
 
                     <androidx.constraintlayout.widget.Barrier
@@ -144,7 +144,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         app:barrierDirection="bottom"
-                        app:constraint_referenced_ids="image" />
+                        app:constraint_referenced_ids="attachment_preview" />
 
                     <TextView
                         android:id="@+id/content"
@@ -185,23 +185,70 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/common_spacing"
                         android:layout_marginBottom="@dimen/small_spacing"
-                        app:layout_constraintBottom_toBottomOf="@id/buttons_barrier"
+                        app:layout_constraintBottom_toTopOf="@id/location_preview"
                         app:layout_constraintTop_toBottomOf="@id/likers" />
 
-                    <androidx.constraintlayout.widget.Barrier
-                        android:id="@+id/buttons_barrier"
+                    <com.yandex.mapkit.mapview.MapView
+                        android:id="@+id/location_preview"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/preview_map_height"
+                        android:foreground="?selectableItemBackground"
+                        app:layout_constraintBottom_toTopOf="@id/location_address"
+                        app:layout_constraintTop_toBottomOf="@id/mentioned" />
+
+                    <ImageView
+                        android:id="@+id/pin_shadow"
+                        android:layout_width="@dimen/pin_shadow_size_preview"
+                        android:layout_height="@dimen/pin_shadow_size_preview"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_pin_shadow"
+                        app:layout_constraintBottom_toBottomOf="@id/location_preview"
+                        app:layout_constraintEnd_toEndOf="@id/location_preview"
+                        app:layout_constraintStart_toStartOf="@id/location_preview"
+                        app:layout_constraintTop_toTopOf="@id/location_preview" />
+
+                    <ImageView
+                        android:id="@+id/pin"
+                        android:layout_width="@dimen/pin_size_preview"
+                        android:layout_height="@dimen/pin_size_preview"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_place"
+                        app:layout_constraintBottom_toBottomOf="@id/location_preview"
+                        app:layout_constraintEnd_toEndOf="@id/location_preview"
+                        app:layout_constraintStart_toStartOf="@id/location_preview"
+                        app:layout_constraintTop_toTopOf="@id/location_preview"
+                        app:tint="?attr/colorPrimary"
+                        tools:translationY="-32dp" />
+
+                    <TextView
+                        android:id="@+id/location_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/small_spacing"
+                        android:background="?colorSurfaceContainer"
+                        android:drawablePadding="@dimen/small_spacing"
+                        android:foreground="?selectableItemBackground"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="@dimen/common_spacing"
+                        android:paddingVertical="@dimen/small_spacing"
+                        tools:text="Калининград, площадь Победы, 1"
+                        app:drawableStartCompat="@drawable/ic_place"
+                        app:layout_constraintBottom_toTopOf="@id/comments_divider"
+                        app:layout_constraintTop_toBottomOf="@id/location_preview" />
+
+                    <androidx.constraintlayout.widget.Group
+                        android:id="@+id/location_preview_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/common_spacing"
-                        app:barrierDirection="bottom"
-                        app:constraint_referenced_ids="likers" />
+                        app:constraint_referenced_ids="location_preview,location_address,pin,pin_shadow" />
 
                     <com.google.android.material.divider.MaterialDivider
+                        android:id="@+id/comments_divider"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/common_spacing"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/buttons_barrier" />
+                        app:layout_constraintBottom_toTopOf="@id/comments_title"
+                        app:layout_constraintTop_toBottomOf="@id/location_address" />
 
                     <TextView
                         android:id="@+id/comments_title"
@@ -211,7 +258,7 @@
                         android:layout_marginVertical="8dp"
                         android:textAppearance="@style/TextAppearance.Material3.LabelMedium"
                         app:layout_constraintBottom_toTopOf="@id/comment_list_view"
-                        app:layout_constraintTop_toBottomOf="@id/buttons_barrier"
+                        app:layout_constraintTop_toBottomOf="@id/comments_divider"
                         app:layout_constraintVertical_bias="0"
                         tools:text="10 comments" />
 
@@ -223,7 +270,7 @@
                         android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/buttons_barrier"
+                        app:layout_constraintTop_toBottomOf="@id/location_address"
                         app:showAnimationBehavior="outward" />
 
                     <androidx.recyclerview.widget.RecyclerView

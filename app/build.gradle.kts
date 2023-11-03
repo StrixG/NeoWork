@@ -28,6 +28,7 @@ android {
 
         buildConfigField("String", "API_KEY", "\"${secrets.getProperty("API_KEY", "")}\"")
         buildConfigField("String", "BASE_URL", "\"http://94.228.125.136:8080\"")
+        buildConfigField("String", "MAPKIT_API_KEY", "\"${secrets.getProperty("MAPKIT_API_KEY", "")}\"")
     }
 
     buildTypes {
@@ -91,6 +92,10 @@ dependencies {
     ksp(libs.jetpack.hilt.compiler)
 
     implementation(libs.timber)
+    implementation(libs.yandex.mapkit)
+    implementation(libs.play.services.location)
+
+    debugImplementation(libs.leakcanary)
 
     coreLibraryDesugaring(libs.desugar)
 
