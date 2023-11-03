@@ -14,7 +14,7 @@ import com.obrekht.neowork.users.model.User
 
 interface UserInteractionListener {
     fun onClick(user: User, position: Int) {}
-    fun onCheckboxClick(user: User, isChecked: Boolean, position: Int) {}
+    fun onCheckedChange(user: User, isChecked: Boolean, position: Int) {}
 }
 
 class UserChooserAdapter(
@@ -51,19 +51,20 @@ class UserViewHolder(
     init {
         with(binding) {
             card.setOnClickListener {
+                checkbox.toggle()
                 user?.let {
                     interactionListener.onClick(it, bindingAdapterPosition)
                 }
             }
             card.setOnLongClickListener {
                 user?.let {
-                    checkbox.isChecked = !checkbox.isChecked
+                    checkbox.toggle()
                     true
                 } ?: false
             }
             checkbox.setOnCheckedChangeListener { _, state ->
                 user?.let {
-                    interactionListener.onCheckboxClick(it, state, bindingAdapterPosition)
+                    interactionListener.onCheckedChange(it, state, bindingAdapterPosition)
                 }
             }
         }

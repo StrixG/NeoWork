@@ -36,7 +36,7 @@ class UserChooserFragment : Fragment(R.layout.fragment_user_chooser) {
     private var adapter: UserChooserAdapter? = null
 
     private val interactionListener = object : UserInteractionListener {
-        override fun onCheckboxClick(user: User, isChecked: Boolean, position: Int) {
+        override fun onCheckedChange(user: User, isChecked: Boolean, position: Int) {
             viewModel.setUserSelected(user.id, isChecked)
         }
     }
