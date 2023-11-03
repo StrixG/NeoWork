@@ -153,6 +153,7 @@ class PostViewHolder(
             like.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
 
             // Attachment
+            attachmentPreview.load(null)
             attachmentPreview.isVisible = false
             buttonPlayVideo.isVisible = false
 

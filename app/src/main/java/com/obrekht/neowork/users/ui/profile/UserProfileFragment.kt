@@ -154,7 +154,7 @@ class UserProfileFragment : Fragment(R.layout.fragment_user_profile) {
                     placeholder(R.drawable.avatar_placeholder)
                     crossfade(true)
                 }
-            } ?: avatar.setImageResource(R.drawable.avatar_placeholder)
+            } ?: avatar.load(R.drawable.avatar_placeholder)
         }
     }
 

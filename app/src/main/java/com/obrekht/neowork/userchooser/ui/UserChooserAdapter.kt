@@ -80,7 +80,7 @@ class UserViewHolder(
                     placeholder(R.drawable.avatar_placeholder)
                     transformations(CircleCropTransformation())
                 }
-            } ?: avatar.setImageResource(R.drawable.avatar_placeholder)
+            } ?: avatar.load(R.drawable.avatar_placeholder)
 
             name.text = user.name
             login.text = user.login
