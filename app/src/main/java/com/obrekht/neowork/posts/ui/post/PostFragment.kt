@@ -55,7 +55,7 @@ import com.yandex.mapkit.search.SearchFactory
 import com.yandex.mapkit.search.SearchManagerType
 import com.yandex.mapkit.search.SearchOptions
 import com.yandex.mapkit.search.SearchType
-import com.yandex.mapkit.search.Session.SearchListener
+import com.yandex.mapkit.search.Session
 import com.yandex.runtime.Error
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.cancel
@@ -76,14 +76,14 @@ class PostFragment : Fragment(R.layout.fragment_post) {
     private var commentsAdapter: CommentsAdapter? = null
 
     private val searchManager = SearchFactory.getInstance()
-        .createSearchManager(SearchManagerType.COMBINED)
+        .createSearchManager(SearchManagerType.ONLINE)
 
     private val searchOptions = SearchOptions().apply {
         searchTypes = SearchType.GEO.value
         resultPageSize = 1
     }
 
-    private val searchSessionListener = object : SearchListener {
+    private val searchListener = object : Session.SearchListener {
         override fun onSearchResponse(response: Response) {
             val geoObject = response.collection.children.firstOrNull()?.obj
             binding.locationAddress.text = geoObject?.let {
@@ -400,7 +400,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                     placeholder(R.drawable.avatar_placeholder)
                     transformations(CircleCropTransformation())
                 }
-            } ?: avatar.setImageResource(R.drawable.avatar_placeholder)
+            } ?: avatar.load(R.drawable.avatar_placeholder)
 
             // Likers
             likers.buttonLike.setIconResource(
@@ -431,7 +431,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                     Point(latitude, longitude),
                     LOCATION_PREVIEW_DEFAULT_ZOOM.toInt(),
                     searchOptions,
-                    searchSessionListener
+                    searchListener
                 )
 
                 locationPreviewGroup.setAllOnClickListener {

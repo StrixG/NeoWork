@@ -127,4 +127,7 @@
     <string name="apply">Apply</string>
     <string name="loading">Loading…</string>
     <string name="location_address_unknown">Unknown address</string>
+    <string name="error_suggest">Failed to find suggestions.</string>
+    <string name="error_location_find_me">Failed to locate you.</string>
+    <string name="content_description_find_me">Find me</string>
 </resources>

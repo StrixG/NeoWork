@@ -29,7 +29,31 @@
         app:tint="?attr/colorPrimary"
         tools:translationY="-32dp" />
 
+    <TextView
+        android:id="@+id/location_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginHorizontal="@dimen/common_spacing"
+        android:background="@drawable/bg_location_address"
+        android:padding="@dimen/small_spacing"
+        android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|center_horizontal"
+        tools:text="улица Леонова, 45" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/button_apply"
+        style="?extendedFloatingActionButtonSurfaceStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_margin="@dimen/common_spacing"
+        android:text="@string/apply"
+        app:icon="@drawable/ic_done" />
+
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
@@ -45,22 +69,20 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/button_apply"
-        style="?attr/extendedFloatingActionButtonSurfaceStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_margin="@dimen/common_spacing"
-        android:text="@string/apply"
-        app:icon="@drawable/ic_done" />
-
     <com.google.android.material.search.SearchView
         android:id="@+id/search_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:hint="@string/hint_address_search"
         app:layout_anchor="@id/search_bar">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/suggest_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_geo_suggest" />
 
     </com.google.android.material.search.SearchView>
 
@@ -89,11 +111,26 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/common_spacing"
             android:layout_marginBottom="@dimen/common_spacing"
+            android:contentDescription="@string/content_description_find_me"
             android:padding="@dimen/find_me_button_padding"
             app:icon="@drawable/ic_my_location"
             app:iconSize="@dimen/find_me_icon_size"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/find_me_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:hideAnimationBehavior="outward"
+            app:indicatorSize="@dimen/find_me_progress_size"
+            app:layout_constraintBottom_toBottomOf="@id/button_find_me"
+            app:layout_constraintEnd_toEndOf="@id/button_find_me"
+            app:layout_constraintStart_toStartOf="@id/button_find_me"
+            app:layout_constraintTop_toTopOf="@id/button_find_me"
+            app:showAnimationBehavior="inward" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

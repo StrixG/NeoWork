@@ -70,7 +70,7 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
         get() = viewModel.uiState.value
 
     private val searchManager: SearchManager = SearchFactory.getInstance()
-        .createSearchManager(SearchManagerType.COMBINED)
+        .createSearchManager(SearchManagerType.ONLINE)
 
     private val searchOptions = SearchOptions().apply {
         searchTypes = SearchType.GEO.value

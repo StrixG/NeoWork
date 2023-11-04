@@ -33,4 +33,5 @@
     <dimen name="pin_size_preview">48dp</dimen>
     <dimen name="pin_shadow_size">32dp</dimen>
     <dimen name="pin_shadow_size_preview">24dp</dimen>
+    <dimen name="find_me_progress_size">64dp</dimen>
 </resources>

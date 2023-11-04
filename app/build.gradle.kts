@@ -62,6 +62,7 @@ android {
 
 dependencies {
     implementation(libs.coroutines)
+    implementation(libs.coroutines.play.services)
     implementation(libs.serialization)
     implementation(libs.jetpack.core)
     implementation(libs.appcompat)
