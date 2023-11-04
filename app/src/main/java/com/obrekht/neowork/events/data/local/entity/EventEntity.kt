@@ -40,13 +40,13 @@ data class EventEntity(
 
 fun EventEntity.toModel(users: Map<Long, UserPreview> = emptyMap()) = Event(
     eventId, authorId, author, authorAvatar, content, datetime, published, coords, type,
-    likeOwnerIds, likedByMe, speakerIds, participantIds, participatedByMe, attachment, link,
+    likeOwnerIds.toSet(), likedByMe, speakerIds.toSet(), participantIds.toSet(), participatedByMe, attachment, link,
     users
 )
 
 fun Event.toEntity() = EventEntity(
     id, authorId, author, authorAvatar, content, datetime, published, coords, type,
-    likeOwnerIds, likedByMe, speakerIds, participantsIds, participatedByMe,
+    likeOwnerIds.toList(), likedByMe, speakerIds.toList(), participantsIds.toList(), participatedByMe,
     attachment, link
 )
 
