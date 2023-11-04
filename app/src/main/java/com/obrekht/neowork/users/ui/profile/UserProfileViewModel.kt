@@ -39,8 +39,8 @@ class UserProfileViewModel @Inject constructor(
     val isOwnProfile: Boolean
         get() = uiState.value.isOwnProfile
 
-    private val _event = Channel<Event>()
-    val event: Flow<Event> = _event.receiveAsFlow()
+    private val _event = Channel<UiEvent>()
+    val event: Flow<UiEvent> = _event.receiveAsFlow()
 
     init {
         viewModelScope.launch {
@@ -71,10 +71,10 @@ class UserProfileViewModel @Inject constructor(
         } catch (e: Exception) {
             when (e) {
                 is HttpException -> {
-                    _event.send(Event.ErrorLoadUser)
+                    _event.send(UiEvent.ErrorLoadUser)
                 }
                 is ConnectException -> {
-                    _event.send(Event.ErrorConnection)
+                    _event.send(UiEvent.ErrorConnection)
                 }
 
                 else -> {
@@ -102,7 +102,7 @@ sealed interface DataState {
     data object Error : DataState
 }
 
-sealed interface Event {
-    data object ErrorLoadUser : Event
-    data object ErrorConnection : Event
+sealed interface UiEvent {
+    data object ErrorLoadUser : UiEvent
+    data object ErrorConnection : UiEvent
 }

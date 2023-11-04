@@ -298,17 +298,17 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
         Unit
     }
 
-    private fun handleEvent(event: Event) {
+    private fun handleEvent(event: UiEvent) {
         when (event) {
-            is Event.NavigateToMentionedUsersChooser -> {
+            is UiEvent.NavigateToMentionedUsersChooser -> {
                 navigateToUserChooser(REQUEST_KEY_MENTIONED_USERS, event.userIds)
             }
 
-            is Event.NavigateToLocationPicker -> {
+            is UiEvent.NavigateToLocationPicker -> {
                 navigateToLocationPicker(event.locationPoint)
             }
 
-            is Event.Saved -> {
+            is UiEvent.Saved -> {
                 with(findNavController()) {
                     previousBackStackEntry?.savedStateHandle?.set(KEY_SCROLL_TO_ID, args.id)
                     popBackStack()
@@ -317,8 +317,8 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
 
             else -> {
                 val message = when (event) {
-                    Event.ErrorEmptyContent -> editableConfig.messageErrorEmpty
-                    Event.ErrorSaving -> editableConfig.messageErrorSaving
+                    UiEvent.ErrorEmptyContent -> editableConfig.messageErrorEmpty
+                    UiEvent.ErrorSaving -> editableConfig.messageErrorSaving
                     else -> editableConfig.messageErrorLoading
                 }
                 with(binding) {

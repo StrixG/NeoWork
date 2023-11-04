@@ -123,15 +123,15 @@ class UserProfileFragment : Fragment(R.layout.fragment_user_profile) {
         }
     }
 
-    private fun handleEvent(event: Event) {
+    private fun handleEvent(event: UiEvent) {
         when (event) {
-            Event.ErrorLoadUser -> {
+            UiEvent.ErrorLoadUser -> {
                 showErrorSnackbar(R.string.error_loading_user) {
                     viewModel.refresh()
                 }
             }
 
-            Event.ErrorConnection -> {
+            UiEvent.ErrorConnection -> {
                 showErrorSnackbar(R.string.error_connection) {
                     viewModel.refresh()
                 }

@@ -49,8 +49,8 @@ class WallViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(WallUiState())
     val uiState: StateFlow<WallUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<Event>()
-    val event: Flow<Event> = _event.receiveAsFlow()
+    private val _event = Channel<UiEvent>()
+    val event: Flow<UiEvent> = _event.receiveAsFlow()
 
     private val likeJobs: HashMap<Long, Job> = hashMapOf()
 
@@ -89,7 +89,7 @@ class WallViewModel @Inject constructor(
                     wallRepository.likeById(post.id)
                 }
             } catch (e: HttpException) {
-                _event.send(Event.ErrorLiking)
+                _event.send(UiEvent.ErrorLiking)
             }
 
             likeJobs.remove(post.id)
@@ -100,7 +100,7 @@ class WallViewModel @Inject constructor(
         try {
             wallRepository.deleteById(postId)
         } catch (e: Exception) {
-            _event.send(Event.ErrorDeleting)
+            _event.send(UiEvent.ErrorDeleting)
         }
     }
 
@@ -145,7 +145,7 @@ sealed interface DataState {
     data object Error : DataState
 }
 
-sealed interface Event {
-    data object ErrorDeleting : Event
-    data object ErrorLiking: Event
+sealed interface UiEvent {
+    data object ErrorDeleting : UiEvent
+    data object ErrorLiking: UiEvent
 }

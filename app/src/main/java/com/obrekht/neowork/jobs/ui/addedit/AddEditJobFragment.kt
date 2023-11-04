@@ -137,17 +137,17 @@ class AddEditJobFragment : Fragment(R.layout.fragment_add_edit_job) {
         }
     }
 
-    private fun handleEvent(event: Event) {
+    private fun handleEvent(event: UiEvent) {
         when (event) {
-            Event.JobSaved -> {
+            UiEvent.JobSaved -> {
                 findNavController().popBackStack()
             }
 
-            Event.ErrorInvalidData -> {
+            UiEvent.ErrorInvalidData -> {
                 showErrorSnackbar(R.string.error_invalid_data)
             }
 
-            Event.ErrorSaving -> {
+            UiEvent.ErrorSaving -> {
                 showErrorSnackbar(R.string.error_saving_job)
             }
         }

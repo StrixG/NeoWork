@@ -279,15 +279,15 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
         }
     }
 
-    private fun handleEvent(event: Event) {
+    private fun handleEvent(event: UiEvent) {
         when (event) {
-            is Event.ErrorLikingPost -> {
+            is UiEvent.ErrorLikingPost -> {
                 showErrorSnackbar(R.string.error_liking) {
                     viewModel.toggleLikeById(event.postId)
                 }
             }
 
-            is Event.ErrorDeleting -> {
+            is UiEvent.ErrorDeleting -> {
                 showErrorSnackbar(R.string.error_deleting) {
                     viewModel.deleteById(event.postId)
                 }

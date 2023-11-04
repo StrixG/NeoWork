@@ -140,9 +140,9 @@ class JobsFragment : Fragment(R.layout.fragment_jobs) {
         }
     }
 
-    private fun handleEvent(event: Event) {
+    private fun handleEvent(event: UiEvent) {
         when (event) {
-            is Event.ErrorDeleting -> {
+            is UiEvent.ErrorDeleting -> {
                 showErrorSnackbar(R.string.error_deleting_job) {
                     viewModel.deleteJobById(event.jobId)
                 }

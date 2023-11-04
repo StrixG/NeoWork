@@ -38,8 +38,8 @@ class PostViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(PostUiState())
     val uiState: StateFlow<PostUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<Event>()
-    val event: Flow<Event> = _event.receiveAsFlow()
+    private val _event = Channel<UiEvent>()
+    val event: Flow<UiEvent> = _event.receiveAsFlow()
 
     val isLoggedIn: Boolean
         get() = uiState.value.isLoggedIn
@@ -55,7 +55,7 @@ class PostViewModel @Inject constructor(
             }.launchIn(this)
 
             postRepository.getPostStream(postId).onEach {
-                if (it == null) _event.send(Event.PostDeleted)
+                if (it == null) _event.send(UiEvent.PostDeleted)
             }.filterNotNull().combine(appAuth.state) { post, authState ->
                 post.copy(ownedByMe = post.authorId == authState.id)
             }.onEach { post ->
@@ -90,7 +90,7 @@ class PostViewModel @Inject constructor(
         }.onFailure { exception ->
             when (exception) {
                 is HttpException -> {
-                    _event.send(Event.PostDeleted)
+                    _event.send(UiEvent.PostDeleted)
                 }
 
                 else -> {
@@ -121,7 +121,7 @@ class PostViewModel @Inject constructor(
                     postRepository.likeById(postId)
                 }
             }?.onFailure {
-                _event.send(Event.ErrorLikingPost)
+                _event.send(UiEvent.ErrorLikingPost)
             }
 
             likeJob = null
@@ -131,9 +131,9 @@ class PostViewModel @Inject constructor(
     fun delete() = viewModelScope.launch {
         runCatching {
             postRepository.deleteById(postId)
-            _event.send(Event.PostDeleted)
+            _event.send(UiEvent.PostDeleted)
         }.onFailure {
-            _event.send(Event.ErrorRemovingPost)
+            _event.send(UiEvent.ErrorRemovingPost)
         }
     }
 
@@ -147,7 +147,7 @@ class PostViewModel @Inject constructor(
                 commentRepository.likeCommentById(comment.id)
             }
         }.onFailure {
-            _event.send(Event.ErrorLikingComment(comment.id))
+            _event.send(UiEvent.ErrorLikingComment(comment.id))
         }
     }
 
@@ -156,7 +156,7 @@ class PostViewModel @Inject constructor(
         val comment = commentList.find { it.id == commentId }
 
         comment?.let(::toggleCommentLike) ?: viewModelScope.launch {
-            _event.send(Event.ErrorLikingComment(commentId))
+            _event.send(UiEvent.ErrorLikingComment(commentId))
         }
     }
 
@@ -164,7 +164,7 @@ class PostViewModel @Inject constructor(
         runCatching {
             commentRepository.deleteCommentById(commentId)
         }.onFailure {
-            _event.send(Event.ErrorDeletingComment(commentId))
+            _event.send(UiEvent.ErrorDeletingComment(commentId))
         }
     }
 
@@ -184,10 +184,10 @@ class PostViewModel @Inject constructor(
         }.also {
             _uiState.update { it.copy(isCommentSending = false) }
         }.onSuccess {
-            _event.send(Event.CommentSent)
+            _event.send(UiEvent.CommentSent)
         }.onFailure {
             it.printStackTrace()
-            _event.send(Event.ErrorSendingComment)
+            _event.send(UiEvent.ErrorSendingComment)
         }
     }
 }
@@ -207,13 +207,13 @@ data class PostUiState(
     val isCommentSending: Boolean = false
 )
 
-sealed interface Event {
-    data object PostDeleted : Event
-    data object ErrorLikingPost : Event
-    data object ErrorRemovingPost : Event
+sealed interface UiEvent {
+    data object PostDeleted : UiEvent
+    data object ErrorLikingPost : UiEvent
+    data object ErrorRemovingPost : UiEvent
 
-    data object CommentSent : Event
-    class ErrorLikingComment(val commentId: Long) : Event
-    data object ErrorSendingComment : Event
-    class ErrorDeletingComment(val commentId: Long) : Event
+    data object CommentSent : UiEvent
+    class ErrorLikingComment(val commentId: Long) : UiEvent
+    data object ErrorSendingComment : UiEvent
+    class ErrorDeletingComment(val commentId: Long) : UiEvent
 }

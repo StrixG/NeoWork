@@ -65,8 +65,8 @@ class PostFeedViewModel @Inject constructor(
     val isLoggedIn: Boolean
         get() = uiState.value.isLoggedIn
 
-    private val _event = Channel<Event>()
-    val event: Flow<Event> = _event.receiveAsFlow()
+    private val _event = Channel<UiEvent>()
+    val event: Flow<UiEvent> = _event.receiveAsFlow()
 
     private val likeJobs: HashMap<Long, Job> = hashMapOf()
 
@@ -96,7 +96,7 @@ class PostFeedViewModel @Inject constructor(
                     repository.likeById(post.id)
                 }
             } catch (e: HttpException) {
-                _event.send(Event.ErrorLikingPost(post.id))
+                _event.send(UiEvent.ErrorLikingPost(post.id))
             }
 
             likeJobs.remove(post.id)
@@ -105,14 +105,14 @@ class PostFeedViewModel @Inject constructor(
 
     fun toggleLikeById(postId: Long) = viewModelScope.launch {
         val post = repository.getPost(postId)
-        post?.let(::toggleLike) ?: _event.send(Event.ErrorLikingPost(postId))
+        post?.let(::toggleLike) ?: _event.send(UiEvent.ErrorLikingPost(postId))
     }
 
     fun deleteById(postId: Long) = viewModelScope.launch {
         try {
             repository.deleteById(postId)
         } catch (e: Exception) {
-            _event.send(Event.ErrorDeleting(postId))
+            _event.send(UiEvent.ErrorDeleting(postId))
         }
     }
 
@@ -147,7 +147,7 @@ data class FeedUiState(
     val newerCount: Int = 0
 )
 
-sealed interface Event {
-    class ErrorLikingPost(val postId: Long) : Event
-    class ErrorDeleting(val postId: Long) : Event
+sealed interface UiEvent {
+    class ErrorLikingPost(val postId: Long) : UiEvent
+    class ErrorDeleting(val postId: Long) : UiEvent
 }

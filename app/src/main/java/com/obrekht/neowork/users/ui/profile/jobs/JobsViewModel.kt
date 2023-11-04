@@ -34,8 +34,8 @@ class JobsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(JobsUiState())
     val uiState: StateFlow<JobsUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<Event>()
-    val event: Flow<Event> = _event.receiveAsFlow()
+    private val _event = Channel<UiEvent>()
+    val event: Flow<UiEvent> = _event.receiveAsFlow()
 
     init {
         refresh()
@@ -67,7 +67,7 @@ class JobsViewModel @Inject constructor(
         try {
             jobRepository.deleteById(jobId)
         } catch (e: Exception) {
-            _event.send(Event.ErrorDeleting(jobId))
+            _event.send(UiEvent.ErrorDeleting(jobId))
         }
     }
 
@@ -84,6 +84,6 @@ sealed interface DataState {
     data object Error : DataState
 }
 
-sealed interface Event {
-    data class ErrorDeleting(val jobId: Long) : Event
+sealed interface UiEvent {
+    data class ErrorDeleting(val jobId: Long) : UiEvent
 }

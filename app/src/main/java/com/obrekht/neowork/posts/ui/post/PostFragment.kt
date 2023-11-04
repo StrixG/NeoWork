@@ -332,42 +332,42 @@ class PostFragment : Fragment(R.layout.fragment_post) {
         }
     }
 
-    private fun handleEvent(event: Event) {
+    private fun handleEvent(event: UiEvent) {
         when (event) {
-            Event.ErrorLikingPost -> {
+            UiEvent.ErrorLikingPost -> {
                 showErrorSnackbar(R.string.error_liking) {
                     viewModel.toggleLike()
                 }
             }
 
-            Event.ErrorRemovingPost -> {
+            UiEvent.ErrorRemovingPost -> {
                 showErrorSnackbar(R.string.error_deleting) {
                     viewModel.delete()
                 }
             }
 
-            Event.PostDeleted -> {
+            UiEvent.PostDeleted -> {
                 findNavController().popBackStack()
                 lifecycleScope.cancel()
             }
 
-            is Event.ErrorLikingComment -> {
+            is UiEvent.ErrorLikingComment -> {
                 showErrorSnackbar(R.string.error_liking_comment) {
                     viewModel.toggleCommentLikeById(event.commentId)
                 }
             }
 
-            Event.ErrorSendingComment -> {
+            UiEvent.ErrorSendingComment -> {
                 showErrorSnackbar(R.string.error_sending_comment)
             }
 
-            is Event.ErrorDeletingComment -> {
+            is UiEvent.ErrorDeletingComment -> {
                 showErrorSnackbar(R.string.error_deleting_comment) {
                     viewModel.deleteCommentById(event.commentId)
                 }
             }
 
-            Event.CommentSent -> {
+            UiEvent.CommentSent -> {
                 with(binding) {
                     commentEditText.text?.clear()
                     commentEditText.hideKeyboard()

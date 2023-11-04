@@ -29,8 +29,8 @@ class AddEditJobViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AddEditJobUiState())
     val uiState: StateFlow<AddEditJobUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<Event>()
-    val event: Flow<Event> = _event.receiveAsFlow()
+    private val _event = Channel<UiEvent>()
+    val event: Flow<UiEvent> = _event.receiveAsFlow()
 
     private var initialJob: Job = Job()
 
@@ -65,7 +65,7 @@ class AddEditJobViewModel @Inject constructor(
     fun save() = viewModelScope.launch {
         viewModelScope.launch {
             if (!uiState.value.formState.isDataValid) {
-                _event.send(Event.ErrorInvalidData)
+                _event.send(UiEvent.ErrorInvalidData)
             } else {
                 try {
                     val formState = uiState.value.formState
@@ -79,10 +79,10 @@ class AddEditJobViewModel @Inject constructor(
                     )
                     jobRepository.save(job)
 
-                    _event.send(Event.JobSaved)
+                    _event.send(UiEvent.JobSaved)
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    _event.send(Event.ErrorSaving)
+                    _event.send(UiEvent.ErrorSaving)
                 }
             }
         }
@@ -137,8 +137,8 @@ data class AddEditJobUiState(
     val endDate: Instant? = null
 )
 
-sealed interface Event {
-    data object ErrorInvalidData : Event
-    data object ErrorSaving : Event
-    data object JobSaved : Event
+sealed interface UiEvent {
+    data object ErrorInvalidData : UiEvent
+    data object ErrorSaving : UiEvent
+    data object JobSaved : UiEvent
 }

@@ -47,8 +47,8 @@ class EditorViewModel @Inject constructor(
     private val _attachment = MutableStateFlow<AttachmentModel?>(null)
     val attachment: StateFlow<AttachmentModel?> = _attachment.asStateFlow()
 
-    private val _event = Channel<Event>()
-    val event: Flow<Event> = _event.receiveAsFlow()
+    private val _event = Channel<UiEvent>()
+    val event: Flow<UiEvent> = _event.receiveAsFlow()
 
     init {
         if (args.id == 0L) {
@@ -89,7 +89,7 @@ class EditorViewModel @Inject constructor(
 
     fun save(content: String) = viewModelScope.launch {
         if (content.isBlank()) {
-            _event.send(Event.ErrorEmptyContent)
+            _event.send(UiEvent.ErrorEmptyContent)
         } else {
             runCatching {
                 when (args.editableType) {
@@ -116,10 +116,10 @@ class EditorViewModel @Inject constructor(
                 clearEdited()
                 removeAttachment()
 
-                _event.send(Event.Saved)
+                _event.send(UiEvent.Saved)
             }.onFailure {
                 it.printStackTrace()
-                _event.send(Event.ErrorSaving)
+                _event.send(UiEvent.ErrorSaving)
             }
         }
     }
@@ -182,7 +182,7 @@ class EditorViewModel @Inject constructor(
     fun navigateToMentionedUsersChooser() = viewModelScope.launch {
         when (val editable = edited.value) {
             is Post -> _event.send(
-                Event.NavigateToMentionedUsersChooser(editable.mentionIds.toLongArray())
+                UiEvent.NavigateToMentionedUsersChooser(editable.mentionIds.toLongArray())
             )
         }
     }
@@ -194,7 +194,7 @@ class EditorViewModel @Inject constructor(
                     LocationPoint(it.lat, it.long)
                 }
 
-                _event.send(Event.NavigateToLocationPicker(locationPoint))
+                _event.send(UiEvent.NavigateToLocationPicker(locationPoint))
             }
         }
     }
@@ -212,10 +212,10 @@ data class AttachmentModel(
     val type: AttachmentType
 )
 
-sealed interface Event {
-    class NavigateToMentionedUsersChooser(val userIds: LongArray) : Event
-    class NavigateToLocationPicker(val locationPoint: LocationPoint? = null) : Event
-    data object Saved : Event
-    data object ErrorEmptyContent : Event
-    data object ErrorSaving : Event
+sealed interface UiEvent {
+    class NavigateToMentionedUsersChooser(val userIds: LongArray) : UiEvent
+    class NavigateToLocationPicker(val locationPoint: LocationPoint? = null) : UiEvent
+    data object Saved : UiEvent
+    data object ErrorEmptyContent : UiEvent
+    data object ErrorSaving : UiEvent
 }
