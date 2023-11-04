@@ -64,11 +64,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/common_spacing"
-            android:contentDescription="@string/description_post_menu"
+            android:contentDescription="@string/description_event_menu"
             app:layout_constraintBottom_toBottomOf="@id/top_barrier"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tooltipText="@string/description_post_menu" />
+            app:tooltipText="@string/description_event_menu" />
 
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/top_barrier"
@@ -87,7 +87,7 @@
             android:maxHeight="@dimen/max_image_height"
             android:scaleType="centerCrop"
             android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/content"
+            app:layout_constraintBottom_toTopOf="@id/type"
             app:layout_constraintTop_toBottomOf="@id/top_barrier"
             tools:src="@tools:sample/backgrounds/scenic"
             tools:visibility="visible" />
@@ -113,8 +113,8 @@
             app:constraint_referenced_ids="attachment_preview" />
 
         <TextView
-            android:id="@+id/content"
-            style="@style/TextAppearance.Material3.BodyMedium"
+            android:id="@+id/type"
+            style="@style/TextAppearance.Material3.BodyLarge"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/common_spacing"
@@ -124,6 +124,35 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/media_barrier"
+            tools:text="Онлайн" />
+
+        <TextView
+            android:id="@+id/date"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/common_spacing"
+            android:autoLink="web"
+            android:ellipsize="end"
+            android:maxLines="3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/type"
+            tools:text="28 июня, 19:00" />
+
+        <TextView
+            android:id="@+id/content"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/common_spacing"
+            android:layout_marginTop="@dimen/common_spacing"
+            android:autoLink="web"
+            android:ellipsize="end"
+            android:maxLines="3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/date"
             tools:text="@sample/posts.json/data/content" />
 
         <com.google.android.material.button.MaterialButton
@@ -150,6 +179,20 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/like"
             app:layout_constraintTop_toBottomOf="@id/content" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/participants"
+            style="@style/Widget.App.ItemButton.TextIcon.Participants"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/small_spacing"
+            android:layout_marginStart="@dimen/small_spacing"
+            android:layout_marginEnd="@dimen/common_spacing"
+            android:contentDescription="@string/description_participants"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/content"
+            tools:text="5" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

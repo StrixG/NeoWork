@@ -130,4 +130,15 @@
     <string name="error_suggest">Failed to find suggestions.</string>
     <string name="error_location_find_me">Failed to locate you.</string>
     <string name="content_description_find_me">Find me</string>
+    <string name="content_description_add_event">Add event</string>
+    <string name="no_events">There are no events yet.</string>
+    <string name="description_participants">Participants</string>
+    <string name="description_event_menu">Event menu</string>
+    <string name="event_type_offline">Offline</string>
+    <string name="event_type_online">Online</string>
+    <string name="chooser_share_event">Share the event</string>
+    <string name="hint_event_edit">Describe the event…</string>
+    <string name="error_saving_event">An error occurred while saving the event</string>
+    <string name="error_participating">Failed to toggle participation status.</string>
+    <string name="event_type_label">Type</string>
 </resources>

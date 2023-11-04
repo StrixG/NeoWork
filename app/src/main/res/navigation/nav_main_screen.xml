@@ -12,6 +12,12 @@
         tools:layout="@layout/fragment_post_feed" />
 
     <fragment
+        android:id="@+id/event_feed_fragment"
+        android:name="com.obrekht.neowork.events.ui.feed.EventFeedFragment"
+        android:label="@string/event_feed_label"
+        tools:layout="@layout/fragment_event_feed" />
+
+    <fragment
         android:id="@+id/users_fragment"
         android:name="com.obrekht.neowork.users.ui.allusers.AllUsersFragment"
         android:label="@string/user_list_label"

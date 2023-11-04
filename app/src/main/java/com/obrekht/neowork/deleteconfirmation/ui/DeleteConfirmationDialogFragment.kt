@@ -41,5 +41,6 @@ class DeleteConfirmationDialogFragment : DialogFragment() {
 enum class DeleteElementType {
     POST,
     COMMENT,
-    JOB
+    JOB,
+    EVENT
 }

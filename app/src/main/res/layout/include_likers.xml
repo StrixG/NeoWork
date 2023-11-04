@@ -16,7 +16,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_like"
-        style="@style/Widget.App.PostButton.Like"
+        style="@style/Widget.App.ItemButton.TextIcon.Like"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/small_spacing"

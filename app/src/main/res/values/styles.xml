@@ -7,16 +7,23 @@
         <item name="icon">@drawable/ic_menu</item>
     </style>
 
-    <style name="Widget.App.PostButton" parent="Widget.Material3.Button.TextButton.Icon">
-        <item name="cornerRadius">24dp</item>
-        <item name="android:minWidth">@dimen/icon_button_min_size</item>
+    <style name="Widget.App.ItemButton.TextIcon" parent="Widget.Material3.Button.TextButton.Icon">
+        <item name="android:minWidth">0dp</item>
     </style>
 
-    <style name="Widget.App.PostButton.Like">
+    <style name="Widget.App.ItemButton.Icon" parent="Widget.Material3.Button.IconButton">
+        <item name="iconSize">18dp</item>
+    </style>
+
+    <style name="Widget.App.ItemButton.TextIcon.Like">
         <item name="icon">@drawable/ic_like</item>
     </style>
 
-    <style name="Widget.App.PostButton.Share">
+    <style name="Widget.App.ItemButton.TextIcon.Participants">
+        <item name="icon">@drawable/ic_people_outline</item>
+    </style>
+
+    <style name="Widget.App.ItemButton.Icon.Share">
         <item name="icon">@drawable/ic_share</item>
     </style>
 
