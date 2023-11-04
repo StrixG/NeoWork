@@ -50,20 +50,20 @@ class PostFeedRemoteMediator @Inject constructor(
             if (!response.isSuccessful) {
                 throw HttpException(response)
             }
-            val post = response.body() ?: throw HttpException(response)
+            val posts = response.body() ?: throw HttpException(response)
 
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {
                     postDao.deleteAll()
                 }
-                postDao.upsertWithData(post.toEntityData())
+                postDao.upsertWithData(posts.toEntityData())
 
-                val previewMap = post.fold(mutableMapOf<Long, UserPreview>()) { acc, value ->
+                val previewMap = posts.fold(mutableMapOf<Long, UserPreview>()) { acc, value ->
                     acc.apply { putAll(value.users) }
                 }
                 userPreviewDao.upsert(previewMap.toEntity())
             }
-            MediatorResult.Success(endOfPaginationReached = post.isEmpty())
+            MediatorResult.Success(endOfPaginationReached = posts.isEmpty())
         }.getOrElse { exception ->
             when (exception) {
                 is IOException, is HttpException -> MediatorResult.Error(exception)
@@ -71,9 +71,5 @@ class PostFeedRemoteMediator @Inject constructor(
                 else -> throw exception
             }
         }
-    }
-
-    override suspend fun initialize(): InitializeAction {
-        return super.initialize()
     }
 }
