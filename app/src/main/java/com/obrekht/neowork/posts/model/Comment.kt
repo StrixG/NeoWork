@@ -16,7 +16,7 @@ data class Comment(
     val authorAvatar: String? = null,
     val content: String = "",
     val published: Instant? = null,
-    val likeOwnerIds: List<Long> = emptyList(),
+    val likeOwnerIds: Set<Long> = emptySet(),
     val likedByMe: Boolean = false,
     val ownedByMe: Boolean = false
 )

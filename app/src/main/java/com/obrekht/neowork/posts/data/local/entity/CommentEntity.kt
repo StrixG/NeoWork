@@ -26,7 +26,7 @@ data class CommentEntity(
     val authorAvatar: String? = null,
     val content: String,
     val published: Instant?,
-    val likeOwnerIds: List<Long>
+    val likeOwnerIds: Set<Long>
 )
 
 fun CommentEntity.toModel() = Comment(

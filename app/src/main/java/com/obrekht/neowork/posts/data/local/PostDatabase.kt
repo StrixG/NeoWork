@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.obrekht.neowork.core.data.typeconverter.InstantTypeConverter
-import com.obrekht.neowork.core.data.typeconverter.ListOfLongTypeConverter
+import com.obrekht.neowork.core.data.typeconverter.SetOfLongTypeConverter
 import com.obrekht.neowork.posts.data.local.dao.CommentDao
 import com.obrekht.neowork.posts.data.local.dao.PostDao
 import com.obrekht.neowork.posts.data.local.entity.CommentEntity
@@ -18,9 +18,9 @@ import com.obrekht.neowork.posts.data.local.entity.PostLikeOwnerEntity
         CommentEntity::class,
         PostLikeOwnerEntity::class,
         MentionEntity::class
-    ], version = 1
+    ], version = 2
 )
-@TypeConverters(InstantTypeConverter::class, ListOfLongTypeConverter::class)
+@TypeConverters(InstantTypeConverter::class, SetOfLongTypeConverter::class)
 abstract class PostDatabase : RoomDatabase() {
     abstract fun postDao(): PostDao
     abstract fun commentDao(): CommentDao

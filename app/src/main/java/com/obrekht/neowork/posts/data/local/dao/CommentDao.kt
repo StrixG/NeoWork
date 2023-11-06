@@ -45,7 +45,7 @@ interface CommentDao {
                 add(userId)
             }
             upsert(it.copy(
-                likeOwnerIds = likeOwnerIds.toList()
+                likeOwnerIds = likeOwnerIds
             ))
         }
     }
@@ -57,7 +57,7 @@ interface CommentDao {
                 remove(userId)
             }
             upsert(it.copy(
-                likeOwnerIds = likeOwnerIds.toList()
+                likeOwnerIds = likeOwnerIds
             ))
         }
     }

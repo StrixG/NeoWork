@@ -4,10 +4,10 @@ import androidx.room.TypeConverter
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class ListOfLongTypeConverter {
+class SetOfLongTypeConverter {
     @TypeConverter
-    fun jsonStringToList(json: String): List<Long> = Json.decodeFromString(json)
+    fun jsonStringToSet(json: String): Set<Long> = Json.decodeFromString(json)
 
     @TypeConverter
-    fun listToJsonString(list: List<Long>): String = Json.encodeToString(list)
+    fun setToJsonString(set: Set<Long>): String = Json.encodeToString(set)
 }
