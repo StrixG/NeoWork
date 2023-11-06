@@ -225,6 +225,7 @@ class EditorViewModel @Inject constructor(
         _edited.update {
             when (it) {
                 is Post -> it.copy(coords = coordinates)
+                is Event -> it.copy(coords =  coordinates)
                 else -> it
             }
         }
