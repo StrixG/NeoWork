@@ -3,6 +3,7 @@ package com.obrekht.neowork.events.ui.common
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -117,7 +118,7 @@ class EventViewHolder(
             share.setOnClickListener {
                 event?.let(interactionListener::onShare)
             }
-            participants.setOnClickListener {
+            participate.setOnClickListener {
                 event?.let(interactionListener::onParticipate)
             }
 
@@ -166,14 +167,21 @@ class EventViewHolder(
             like.text = StringUtils.getCompactNumber(event.likeOwnerIds.size)
 
             // Participation
-            participants.setIconResource(
+            participate.setIconResource(
                 if (event.participatedByMe) {
                     R.drawable.ic_person_check
                 } else {
                     R.drawable.ic_people_outline
                 }
             )
-            participants.text = StringUtils.getCompactNumber(event.participantsIds.size)
+            TooltipCompat.setTooltipText(participate, participate.resources.getString(
+                if (event.participatedByMe) {
+                    R.string.do_not_participate
+                } else {
+                    R.string.participate
+                }
+            ))
+            participate.text = StringUtils.getCompactNumber(event.participantsIds.size)
 
             // Attachment
             attachmentPreview.load(null)

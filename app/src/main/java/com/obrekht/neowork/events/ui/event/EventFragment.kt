@@ -9,6 +9,7 @@ import android.view.View
 import android.view.View.OnClickListener
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.widget.TooltipCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
@@ -350,6 +351,13 @@ class EventFragment : Fragment(R.layout.fragment_event) {
                     R.drawable.ic_people_outline
                 }
             )
+            TooltipCompat.setTooltipText(participants.button, getString(
+                if (event.participatedByMe) {
+                    R.string.do_not_participate
+                } else {
+                    R.string.participate
+                }
+            ))
             participants.button.text = StringUtils.getCompactNumber(event.participantsIds.size)
 
             val participantPreviewList = event.users.filterKeys { event.participantsIds.contains(it) }

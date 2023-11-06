@@ -151,4 +151,6 @@
     <string name="participants">Participants</string>
     <string name="error_loading_event">Something went wrong. Failed to load the event.</string>
     <string name="speakers">Speakers</string>
+    <string name="do_not_participate">Don\'t participate</string>
+    <string name="participate">Participate</string>
 </resources>
