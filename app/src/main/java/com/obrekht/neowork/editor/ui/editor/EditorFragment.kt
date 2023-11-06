@@ -245,7 +245,6 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
             viewLifecycleOwner.repeatOnStarted {
                 viewModel.attachment.onEach { attachment ->
                     attachmentPreviewGroup.isVisible = false
-                    buttonPlayVideo.isVisible = false
 
                     attachment?.let {
                         val uri = attachment.uri ?: attachment.file?.toUri()
@@ -255,6 +254,7 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                                     crossfade(true)
                                 }
                                 attachmentPreviewGroup.isVisible = true
+                                buttonPlayVideo.isVisible = false
                             }
 
                             AttachmentType.VIDEO -> {
