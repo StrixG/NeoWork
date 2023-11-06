@@ -151,10 +151,12 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                         viewModel.navigateToUserChooser(UserChooserCategory.MENTIONS)
                         true
                     }
+
                     EditableType.EVENT -> {
                         viewModel.navigateToUserChooser(UserChooserCategory.SPEAKERS)
                         true
                     }
+
                     else -> false
                 }
             }
@@ -179,13 +181,13 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         setFragmentResultListener(UserChooserCategory.MENTIONS.requestKey) { _, bundle ->
             bundle.getLongArray(UserChooserFragment.RESULT_CHOSEN_USER_IDS)?.let { chosenUserIds ->
-                viewModel.setMentionedUserIds(chosenUserIds.toSet())
+                viewModel.setChosenUserIds(chosenUserIds.toSet())
             }
         }
 
         setFragmentResultListener(UserChooserCategory.SPEAKERS.requestKey) { _, bundle ->
             bundle.getLongArray(UserChooserFragment.RESULT_CHOSEN_USER_IDS)?.let { chosenUserIds ->
-                viewModel.setSpeakerIds(chosenUserIds.toSet())
+                viewModel.setChosenUserIds(chosenUserIds.toSet())
             }
         }
 
@@ -224,6 +226,9 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
 
             buttonRemoveAttachment.setOnClickListener {
                 viewModel.removeAttachment()
+            }
+            buttonRemoveChosenUsers.setOnClickListener {
+                viewModel.setChosenUserIds(emptySet())
             }
             buttonRemoveLocation.setOnClickListener {
                 viewModel.setLocationCoordinates(null)
@@ -273,6 +278,24 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                 }.launchIn(this)
 
                 viewModel.edited.onEach { editable ->
+                    when (editable) {
+                        is Post -> {
+                            val count = editable.mentionIds.size
+                            chosenUsersGroup.isVisible = count > 0
+                            chosenUsers.text = resources.getQuantityString(
+                                R.plurals.mentions, count, count
+                            )
+                        }
+
+                        is Event -> {
+                            val count = editable.speakerIds.size
+                            chosenUsersGroup.isVisible = count > 0
+                            chosenUsers.text = resources.getQuantityString(
+                                R.plurals.speakers, count, count
+                            )
+                        }
+                    }
+
                     val coordinates = when (editable) {
                         is Post -> editable.coords
                         is Event -> editable.coords

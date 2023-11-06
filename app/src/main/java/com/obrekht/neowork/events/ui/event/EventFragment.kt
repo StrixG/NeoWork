@@ -152,6 +152,10 @@ class EventFragment : Fragment(R.layout.fragment_event) {
         navigateToUserProfile(userId)
     }
 
+    private val speakersMoreClickListener: UserPreviewMoreClickListener = {
+        navigateToUserList(event.speakerIds, getString(R.string.speakers))
+    }
+
     private val likersMoreClickListener: UserPreviewMoreClickListener = {
         navigateToUserList(event.likeOwnerIds, getString(R.string.likers))
     }
@@ -185,6 +189,9 @@ class EventFragment : Fragment(R.layout.fragment_event) {
             avatar.setOnClickListener {
                 event.let(interactionListener::onAvatarClick)
             }
+
+            speakers.preview.setOnPreviewClickListener(userPreviewClickListener)
+            speakers.preview.setOnMoreClickListener(speakersMoreClickListener)
 
             likers.setButtonClickListener() {
                 event.let(interactionListener::onLike)
@@ -314,6 +321,10 @@ class EventFragment : Fragment(R.layout.fragment_event) {
                 }
             } ?: avatar.load(R.drawable.avatar_placeholder)
 
+            // Speakers
+            val speakerPreviewList = event.users.filterKeys { event.speakerIds.contains(it) }
+            speakers.preview.setPreviews(speakerPreviewList)
+
             // Likers
             likers.button.setIconResource(
                 if (event.likedByMe) {
@@ -324,8 +335,8 @@ class EventFragment : Fragment(R.layout.fragment_event) {
             )
             likers.button.text = StringUtils.getCompactNumber(event.likeOwnerIds.size)
 
-            val likerList = event.users.filterKeys { event.likeOwnerIds.contains(it) }
-            likers.preview.setPreviews(likerList)
+            val likerPreviewList = event.users.filterKeys { event.likeOwnerIds.contains(it) }
+            likers.setUserPreviews(likerPreviewList)
 
             // Participants
             participants.button.setIconResource(
@@ -337,8 +348,8 @@ class EventFragment : Fragment(R.layout.fragment_event) {
             )
             participants.button.text = StringUtils.getCompactNumber(event.participantsIds.size)
 
-            val participantList = event.users.filterKeys { event.participantsIds.contains(it) }
-            participants.setUserPreviews(participantList)
+            val participantPreviewList = event.users.filterKeys { event.participantsIds.contains(it) }
+            participants.setUserPreviews(participantPreviewList)
 
             // Location
             event.coords?.let { (latitude, longitude) ->

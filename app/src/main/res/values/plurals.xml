@@ -8,4 +8,20 @@
             %d comments
         </item>
     </plurals>
+    <plurals name="mentions">
+        <item quantity="one">
+            %d mention
+        </item>
+        <item quantity="other">
+            %d mentions
+        </item>
+    </plurals>
+    <plurals name="speakers">
+        <item quantity="one">
+            %d speaker
+        </item>
+        <item quantity="other">
+            %d speakers
+        </item>
+    </plurals>
 </resources>

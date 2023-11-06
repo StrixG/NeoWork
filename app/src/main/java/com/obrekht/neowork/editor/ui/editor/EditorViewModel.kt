@@ -201,20 +201,10 @@ class EditorViewModel @Inject constructor(
         }
     }
 
-    fun setMentionedUserIds(userIds: Set<Long>) {
+    fun setChosenUserIds(userIds: Set<Long>) {
         _edited.update {
             when (it) {
                 is Post -> it.copy(mentionIds = userIds)
-                else -> it
-            }
-        }
-    }
-
-    fun setSpeakerIds(userIds: Set<Long>) {
-        if (_edited.value !is Event) return
-
-        _edited.update {
-            when (it) {
                 is Event -> it.copy(speakerIds = userIds)
                 else -> it
             }

@@ -63,7 +63,7 @@
     <string name="error_deleting_comment">Something went wrong. Failed to delete the comment.</string>
     <string name="likers">Likers</string>
     <string name="menu_share">Share</string>
-    <string name="description_back_to_post">Back to post</string>
+    <string name="content_description_back">Back</string>
     <string name="hint_post_edit">Write a post…</string>
     <string name="hint_comment_edit">Write a comment…</string>
     <string name="attached_photo_description">Attached photo</string>
@@ -150,4 +150,5 @@
     <string name="title_event">Event</string>
     <string name="participants">Participants</string>
     <string name="error_loading_event">Something went wrong. Failed to load the event.</string>
+    <string name="speakers">Speakers</string>
 </resources>

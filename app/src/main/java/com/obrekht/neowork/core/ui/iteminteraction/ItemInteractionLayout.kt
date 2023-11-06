@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.withStyledAttributes
+import androidx.core.view.isVisible
 import com.obrekht.neowork.R
 import com.obrekht.neowork.databinding.ViewItemInteractionBinding
 import com.obrekht.neowork.userpreview.model.UserPreview
@@ -22,6 +23,7 @@ class ItemInteractionLayout @JvmOverloads constructor(
 
     init {
         context.withStyledAttributes(attrs, R.styleable.ItemInteractionLayout) {
+            binding.button.isVisible = getBoolean(R.styleable.ItemInteractionLayout_showButton, true)
             binding.title.text = getString(R.styleable.ItemInteractionLayout_title)
             val iconId = getResourceId(R.styleable.ItemInteractionLayout_buttonIcon, 0)
             if (iconId != 0) {

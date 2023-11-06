@@ -193,15 +193,26 @@
                     app:constraint_referenced_ids="content" />
 
                 <com.obrekht.neowork.core.ui.iteminteraction.ItemInteractionLayout
+                    android:id="@+id/speakers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/common_spacing"
+                    android:layout_marginTop="@dimen/common_spacing"
+                    android:layout_marginBottom="@dimen/small_spacing"
+                    app:layout_constraintBottom_toTopOf="@id/likers"
+                    app:layout_constraintTop_toBottomOf="@id/content_barrier"
+                    app:showButton="false"
+                    app:title="@string/speakers" />
+
+                <com.obrekht.neowork.core.ui.iteminteraction.ItemInteractionLayout
                     android:id="@+id/likers"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/common_spacing"
-                    android:layout_marginTop="@dimen/common_spacing"
+                    android:layout_marginHorizontal="@dimen/common_spacing"
                     android:layout_marginBottom="@dimen/small_spacing"
                     app:buttonIcon="@drawable/ic_like"
                     app:layout_constraintBottom_toTopOf="@id/participants"
-                    app:layout_constraintTop_toBottomOf="@id/content_barrier"
+                    app:layout_constraintTop_toBottomOf="@id/speakers"
                     app:title="@string/likers" />
 
                 <com.obrekht.neowork.core.ui.iteminteraction.ItemInteractionLayout
