@@ -185,10 +185,12 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/common_spacing"
                         android:layout_marginBottom="@dimen/small_spacing"
+                        android:visibility="gone"
                         app:buttonIcon="@drawable/ic_people_outline"
                         app:layout_constraintBottom_toTopOf="@id/location_preview"
                         app:layout_constraintTop_toBottomOf="@id/likers"
-                        app:title="@string/mentioned" />
+                        app:title="@string/mentioned"
+                        tools:visibility="visible" />
 
                     <com.yandex.mapkit.mapview.MapView
                         android:id="@+id/location_preview"
@@ -242,7 +244,9 @@
                         android:id="@+id/location_preview_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:constraint_referenced_ids="location_preview,location_address,pin,pin_shadow" />
+                        android:visibility="gone"
+                        app:constraint_referenced_ids="location_preview,location_address,pin,pin_shadow"
+                        tools:visibility="visible" />
 
                     <com.google.android.material.divider.MaterialDivider
                         android:id="@+id/comments_divider"
