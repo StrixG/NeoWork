@@ -1,4 +1,4 @@
-package com.obrekht.neowork.core.ui
+package com.obrekht.neowork.core.ui.mainscreen
 
 import android.os.Bundle
 import android.view.View
@@ -22,10 +22,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainFragment : Fragment(R.layout.fragment_main) {
+class MainScreenFragment : Fragment(R.layout.fragment_main) {
 
     private val binding by viewBinding(FragmentMainBinding::bind)
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainScreenViewModel by viewModels()
 
     private val appBarClickListener = Toolbar.OnMenuItemClickListener {
         when (it.itemId) {

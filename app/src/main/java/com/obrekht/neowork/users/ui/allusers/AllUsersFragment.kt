@@ -14,7 +14,7 @@ import androidx.paging.CombinedLoadStates
 import androidx.paging.LoadState
 import com.google.android.material.snackbar.Snackbar
 import com.obrekht.neowork.R
-import com.obrekht.neowork.core.ui.MainFragment
+import com.obrekht.neowork.core.ui.mainscreen.MainScreenFragment
 import com.obrekht.neowork.databinding.FragmentAllUsersBinding
 import com.obrekht.neowork.userlist.ui.UserClickListener
 import com.obrekht.neowork.userlist.ui.UserListAdapter
@@ -44,8 +44,8 @@ class AllUsersFragment : Fragment(R.layout.fragment_all_users) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setFragmentResult(
-            MainFragment.REQUEST_KEY_SCROLL_TARGET,
-            bundleOf(MainFragment.RESULT_TARGET_VIEW_ID to R.id.user_list_view)
+            MainScreenFragment.REQUEST_KEY_SCROLL_TARGET,
+            bundleOf(MainScreenFragment.RESULT_TARGET_VIEW_ID to R.id.user_list_view)
         )
 
         view.setBarsInsetsListener {

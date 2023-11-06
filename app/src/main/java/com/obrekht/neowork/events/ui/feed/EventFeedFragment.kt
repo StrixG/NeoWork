@@ -20,7 +20,7 @@ import com.obrekht.neowork.R
 import com.obrekht.neowork.auth.ui.navigateToLogIn
 import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
 import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
-import com.obrekht.neowork.core.ui.MainFragment
+import com.obrekht.neowork.core.ui.mainscreen.MainScreenFragment
 import com.obrekht.neowork.core.ui.findRootNavController
 import com.obrekht.neowork.databinding.FragmentEventFeedBinding
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment
@@ -108,8 +108,8 @@ class EventFeedFragment : Fragment(R.layout.fragment_event_feed) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setFragmentResult(
-            MainFragment.REQUEST_KEY_SCROLL_TARGET,
-            bundleOf(MainFragment.RESULT_TARGET_VIEW_ID to R.id.event_list_view)
+            MainScreenFragment.REQUEST_KEY_SCROLL_TARGET,
+            bundleOf(MainScreenFragment.RESULT_TARGET_VIEW_ID to R.id.event_list_view)
         )
 
         binding.eventListView.setBarsInsetsListener {
