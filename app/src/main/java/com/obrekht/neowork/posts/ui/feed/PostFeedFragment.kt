@@ -60,7 +60,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
     private val binding by viewBinding(FragmentPostFeedBinding::bind)
     private val viewModel: PostFeedViewModel by viewModels()
 
-    private val uiState: FeedUiState
+    private val uiState: PostFeedUiState
         get() = viewModel.uiState.value
 
     private var snackbar: Snackbar? = null
@@ -210,7 +210,7 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
         super.onDestroyView()
     }
 
-    private fun handleState(state: FeedUiState) {
+    private fun handleState(state: PostFeedUiState) {
         with(binding) {
             if (state.dataState == DataState.Success) {
                 if (state.newerCount > 0) {
@@ -226,57 +226,57 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
     }
 
     private fun handleLoadState(state: CombinedLoadStates): Unit = with(binding) {
-        adapter?.let { adapter ->
-            if (state.refresh is LoadState.NotLoading) {
-                viewModel.updateDataState(DataState.Success)
+        val adapter = adapter ?: return
 
-                if (state.append.endOfPaginationReached) {
-                    emptyText.isVisible = adapter.itemCount == 0
-                }
-            } else {
-                emptyText.isVisible = false
+        if (state.refresh is LoadState.NotLoading) {
+            viewModel.updateDataState(DataState.Success)
+
+            if (state.append.endOfPaginationReached) {
+                emptyText.isVisible = adapter.itemCount == 0
             }
-
-            if (state.refresh is LoadState.Loading) {
-                viewModel.updateDataState(DataState.Loading)
-
-                snackbar?.dismiss()
-                if (adapter.itemCount == 0) {
-                    progress.show()
-                    swipeRefresh.isEnabled = false
-                } else {
-                    progress.hide()
-                    swipeRefresh.isRefreshing = true
-                }
-            } else if (state.source.refresh !is LoadState.Loading) {
-                progress.hide()
-                swipeRefresh.isEnabled = true
-                swipeRefresh.isRefreshing = false
-            }
-
-            (state.refresh as? LoadState.Error)?.let {
-                viewModel.updateDataState(DataState.Error)
-
-                when (it.error) {
-                    is HttpException -> showErrorSnackbar(R.string.error_loading_users) {
-                        refresh()
-                    }
-
-                    is ConnectException -> showErrorSnackbar(R.string.error_connection) {
-                        refresh()
-                    }
-
-                    else -> showErrorSnackbar(R.string.error_loading) {
-                        refresh()
-                    }
-                }
-                errorGroup.isVisible = adapter.itemCount == 0
-            } ?: {
-                errorGroup.isVisible = false
-            }
-
-            Unit
+        } else {
+            emptyText.isVisible = false
         }
+
+        if (state.refresh is LoadState.Loading) {
+            viewModel.updateDataState(DataState.Loading)
+
+            snackbar?.dismiss()
+            if (adapter.itemCount == 0) {
+                progress.show()
+                swipeRefresh.isEnabled = false
+            } else {
+                progress.hide()
+                swipeRefresh.isRefreshing = true
+            }
+        } else if (state.source.refresh !is LoadState.Loading) {
+            progress.hide()
+            swipeRefresh.isEnabled = true
+            swipeRefresh.isRefreshing = false
+        }
+
+        (state.refresh as? LoadState.Error)?.let {
+            viewModel.updateDataState(DataState.Error)
+
+            when (it.error) {
+                is HttpException -> showErrorSnackbar(R.string.error_loading_users) {
+                    refresh()
+                }
+
+                is ConnectException -> showErrorSnackbar(R.string.error_connection) {
+                    refresh()
+                }
+
+                else -> showErrorSnackbar(R.string.error_loading) {
+                    refresh()
+                }
+            }
+            errorGroup.isVisible = adapter.itemCount == 0
+        } ?: {
+            errorGroup.isVisible = false
+        }
+
+        Unit
     }
 
     private fun handleEvent(event: UiEvent) {

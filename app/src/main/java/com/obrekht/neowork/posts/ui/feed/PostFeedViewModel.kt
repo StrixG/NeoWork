@@ -59,8 +59,8 @@ class PostFeedViewModel @Inject constructor(
         .cachedIn(viewModelScope)
         .flowOn(Dispatchers.Default)
 
-    private val _uiState = MutableStateFlow(FeedUiState())
-    val uiState: StateFlow<FeedUiState> = _uiState
+    private val _uiState = MutableStateFlow(PostFeedUiState())
+    val uiState: StateFlow<PostFeedUiState> = _uiState
 
     val isLoggedIn: Boolean
         get() = uiState.value.isLoggedIn
@@ -141,7 +141,7 @@ sealed interface DataState {
     data object Error : DataState
 }
 
-data class FeedUiState(
+data class PostFeedUiState(
     val isLoggedIn: Boolean = false,
     val dataState: DataState = DataState.Success,
     val newerCount: Int = 0
