@@ -322,8 +322,12 @@ class EventFragment : Fragment(R.layout.fragment_event) {
             } ?: avatar.load(R.drawable.avatar_placeholder)
 
             // Speakers
-            val speakerPreviewList = event.users.filterKeys { event.speakerIds.contains(it) }
-            speakers.preview.setPreviews(speakerPreviewList)
+            val speakerCount = event.speakerIds.size
+            if (speakerCount > 0) {
+                val speakerPreviewList = event.users.filterKeys { event.speakerIds.contains(it) }
+                speakers.preview.setPreviews(speakerPreviewList)
+            }
+            speakers.isVisible = speakerCount > 0
 
             // Likers
             likers.button.setIconResource(

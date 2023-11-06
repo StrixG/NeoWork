@@ -418,12 +418,11 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             // Mentioned
             val mentionedCount = post.mentionIds.size
             if (mentionedCount > 0) {
-                mentioned.button.text = StringUtils.getCompactNumber(post.mentionIds.size)
+                val mentionList = post.users.filterKeys { post.mentionIds.contains(it) }
+                mentioned.preview.setPreviews(mentionList)
+                mentioned.button.text = StringUtils.getCompactNumber(mentionedCount)
             }
             mentioned.isVisible = mentionedCount > 0
-
-            val mentionList = post.users.filterKeys { post.mentionIds.contains(it) }
-            mentioned.preview.setPreviews(mentionList)
 
             // Location
             post.coords?.let { (latitude, longitude) ->
