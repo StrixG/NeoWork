@@ -30,7 +30,6 @@ import com.obrekht.neowork.events.model.EventType
 import com.obrekht.neowork.events.ui.common.EventInteractionListener
 import com.obrekht.neowork.events.ui.navigateToEventEditor
 import com.obrekht.neowork.events.ui.shareEvent
-import com.obrekht.neowork.posts.ui.post.PostFragmentDirections
 import com.obrekht.neowork.userlist.ui.navigateToUserList
 import com.obrekht.neowork.userpreview.ui.UserPreviewClickListener
 import com.obrekht.neowork.userpreview.ui.UserPreviewMoreClickListener
@@ -40,6 +39,7 @@ import com.obrekht.neowork.utils.TimeUtils
 import com.obrekht.neowork.utils.isLightTheme
 import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.setAllOnClickListener
+import com.obrekht.neowork.utils.setBarsInsetsListener
 import com.obrekht.neowork.utils.viewBinding
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -164,6 +164,13 @@ class EventFragment : Fragment(R.layout.fragment_event) {
         setupResultListeners()
 
         with(binding) {
+            nestedScrollView.setBarsInsetsListener { insets ->
+                setPadding(
+                    paddingLeft, paddingTop, paddingRight,
+                    insets.bottom
+                )
+            }
+
             appBar.statusBarForeground =
                 MaterialShapeDrawable.createWithElevationOverlay(requireContext())
 
@@ -241,7 +248,7 @@ class EventFragment : Fragment(R.layout.fragment_event) {
         }
 
         if (state.state == State.Error) {
-            showErrorSnackbar(R.string.error_loading_post) {
+            showErrorSnackbar(R.string.error_loading_event) {
                 viewModel.refresh()
             }
         }
