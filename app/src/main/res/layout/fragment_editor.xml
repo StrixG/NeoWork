@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:menu="@menu/menu_editor"
-                app:navigationContentDescription="@string/description_back_to_post"
+                app:navigationContentDescription="@string/content_description_back"
                 app:navigationIcon="@drawable/ic_arrow_back" />
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -106,11 +106,45 @@
                 app:constraint_referenced_ids="attachment_preview,button_remove_attachment,button_play_video" />
 
             <TextView
+                android:id="@+id/chosen_users"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/small_spacing"
+                android:layout_marginTop="@dimen/small_spacing"
+                android:drawablePadding="@dimen/small_spacing"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/common_spacing"
+                android:paddingVertical="@dimen/small_spacing"
+                app:drawableStartCompat="@drawable/ic_people_outline"
+                app:layout_constraintBottom_toTopOf="@id/location_address"
+                app:layout_constraintEnd_toStartOf="@id/button_remove_chosen_users"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/attachment_preview"
+                tools:text="10 mentions" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_remove_chosen_users"
+                style="?materialIconButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/small_spacing"
+                app:icon="@drawable/ic_close"
+                app:layout_constraintBottom_toBottomOf="@id/chosen_users"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/chosen_users"
+                app:layout_constraintTop_toTopOf="@id/chosen_users" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/chosen_users_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="chosen_users,button_remove_chosen_users" />
+
+            <TextView
                 android:id="@+id/location_address"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/small_spacing"
-                android:layout_marginBottom="@dimen/small_spacing"
                 android:drawablePadding="@dimen/small_spacing"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="@dimen/common_spacing"
@@ -119,7 +153,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/button_remove_location"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/attachment_preview"
+                app:layout_constraintTop_toBottomOf="@id/chosen_users"
                 tools:text="Калининград, площадь Победы, 1" />
 
             <com.google.android.material.button.MaterialButton
@@ -157,7 +191,7 @@
         style="?attr/floatingActionButtonSecondaryStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_event_time"
-        app:layout_anchor="@id/bottom_app_bar" />
+        app:layout_anchor="@id/bottom_app_bar"
+        app:srcCompat="@drawable/ic_event_time" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
