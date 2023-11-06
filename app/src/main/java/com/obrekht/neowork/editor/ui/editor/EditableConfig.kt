@@ -23,6 +23,11 @@ data class EditableConfig(
                 doesSupportAttachments = false,
                 hintInputField = R.string.hint_comment_edit,
                 messageErrorSaving = R.string.error_saving_comment
+            ),
+            EditableType.EVENT to EditableConfig(
+                doesSupportAttachments = true,
+                hintInputField = R.string.hint_event_edit,
+                messageErrorSaving = R.string.error_saving_event
             )
         )
 

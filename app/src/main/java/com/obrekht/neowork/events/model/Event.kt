@@ -15,12 +15,13 @@ data class Event(
     val id: Long = 0,
     val authorId: Long = 0,
     val author: String = "",
+    val authorJob: String? = null,
     val authorAvatar: String? = null,
     val content: String = "",
     val datetime: Instant? = null,
     val published: Instant? = null,
     val coords: Coordinates? = null,
-    val type: EventType = EventType.OFFLINE,
+    val type: EventType = EventType.ONLINE,
     val likeOwnerIds: Set<Long> = emptySet(),
     val likedByMe: Boolean = false,
     val speakerIds: Set<Long> = emptySet(),
@@ -33,7 +34,7 @@ data class Event(
 )
 
 enum class EventType {
-    OFFLINE,
-    ONLINE
+    ONLINE,
+    OFFLINE
 }
 

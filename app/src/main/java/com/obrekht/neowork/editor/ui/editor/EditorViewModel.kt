@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.core.model.Coordinates
+import com.obrekht.neowork.events.data.repository.EventRepository
+import com.obrekht.neowork.events.model.Event
+import com.obrekht.neowork.events.model.EventType
 import com.obrekht.neowork.map.model.LocationPoint
 import com.obrekht.neowork.media.data.MediaCache
 import com.obrekht.neowork.media.model.MediaUpload
@@ -21,24 +24,28 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import javax.inject.Inject
 
 @HiltViewModel
 class EditorViewModel @Inject constructor(
     private val postRepository: PostRepository,
     private val commentRepository: CommentRepository,
+    private val eventRepository: EventRepository,
     private val mediaCache: MediaCache,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val args = EditorFragmentArgs.fromSavedStateHandle(savedStateHandle)
 
-    private val _edited = MutableStateFlow(getEmptyEditable())
+    private val _edited = MutableStateFlow(getDefaultEditable())
     val edited: StateFlow<Any> = _edited.asStateFlow()
 
     private val _uiState = MutableStateFlow(EditorUiState())
@@ -49,6 +56,9 @@ class EditorViewModel @Inject constructor(
 
     private val _event = Channel<UiEvent>()
     val event: Flow<UiEvent> = _event.receiveAsFlow()
+
+    private val formatter =
+        DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withZone(ZoneId.systemDefault())
 
     init {
         if (args.id == 0L) {
@@ -70,12 +80,25 @@ class EditorViewModel @Inject constructor(
                             }
                         }
 
-                    EditableType.COMMENT -> commentRepository.getCommentStream(args.id)
-                        .firstOrNull()
+                    EditableType.COMMENT -> commentRepository.getComment(args.id)
                         ?.let { comment ->
                             _edited.value = comment
                             _uiState.update {
                                 it.copy(shouldInitialize = true, initialContent = comment.content)
+                            }
+                        }
+
+                    EditableType.EVENT -> eventRepository.getEvent(args.id)
+                        ?.let { event ->
+                            _edited.value = event
+                            _uiState.update {
+                                it.copy(shouldInitialize = true, initialContent = event.content)
+                            }
+                            event.attachment?.let {
+                                _attachment.value = AttachmentModel(
+                                    uri = it.url.toUri(),
+                                    type = it.type
+                                )
                             }
                         }
                 }
@@ -110,6 +133,18 @@ class EditorViewModel @Inject constructor(
                             content = content.trim()
                         )
                         commentRepository.save(comment)
+                    }
+
+                    EditableType.EVENT -> {
+                        val event = (edited.value as Event).copy(
+                            content = content.trim()
+                        )
+                        val mediaUpload = _attachment.value?.let {
+                            it.file?.let { file ->
+                                MediaUpload(file, it.type)
+                            }
+                        }
+                        eventRepository.save(event, mediaUpload)
                     }
                 }
 
@@ -148,12 +183,39 @@ class EditorViewModel @Inject constructor(
         }
     }
 
+    fun setEventType(type: EventType) {
+        _edited.update {
+            when (it) {
+                is Event -> it.copy(type = type)
+                else -> it
+            }
+        }
+    }
+
+    fun setEventDateTime(instant: Instant) {
+        _edited.update {
+            when (it) {
+                is Event -> it.copy(datetime = instant)
+                else -> it
+            }
+        }
+    }
+
     fun setMentionedUserIds(userIds: Set<Long>) {
         _edited.update {
             when (it) {
-                is Post -> {
-                    it.copy(mentionIds = userIds)
-                }
+                is Post -> it.copy(mentionIds = userIds)
+                else -> it
+            }
+        }
+    }
+
+    fun setSpeakerIds(userIds: Set<Long>) {
+        if (_edited.value !is Event) return
+
+        _edited.update {
+            when (it) {
+                is Event -> it.copy(speakerIds = userIds)
                 else -> it
             }
         }
@@ -162,48 +224,65 @@ class EditorViewModel @Inject constructor(
     fun setLocationCoordinates(coordinates: Coordinates?) {
         _edited.update {
             when (it) {
-                is Post -> {
-                    it.copy(coords = coordinates)
-                }
+                is Post -> it.copy(coords = coordinates)
                 else -> it
             }
         }
     }
 
     private fun clearEdited() {
-        _edited.value = getEmptyEditable()
+        _edited.value = getDefaultEditable()
     }
 
-    private fun getEmptyEditable(): Any = when (args.editableType) {
+    private fun getDefaultEditable(): Any = when (args.editableType) {
         EditableType.POST -> Post()
         EditableType.COMMENT -> Comment()
+        EditableType.EVENT -> Event(
+            type = EventType.ONLINE,
+            datetime = Instant.now()
+        )
     }
 
-    fun navigateToMentionedUsersChooser() = viewModelScope.launch {
-        when (val editable = edited.value) {
-            is Post -> _event.send(
-                UiEvent.NavigateToMentionedUsersChooser(editable.mentionIds.toLongArray())
+    fun validateEventDateTime(dateTime: String) {
+        val isValid = runCatching {
+            formatter.parse(dateTime)
+        }.isSuccess
+
+        _uiState.update {
+            it.copy(
+                isEventDateTimeValid = isValid
             )
         }
     }
 
-    fun navigateToLocationPicker() = viewModelScope.launch {
-        when (val editable = edited.value) {
-            is Post -> {
-                val locationPoint = editable.coords?.let {
-                    LocationPoint(it.lat, it.long)
-                }
-
-                _event.send(UiEvent.NavigateToLocationPicker(locationPoint))
-            }
+    fun navigateToUserChooser(category: UserChooserCategory) = viewModelScope.launch {
+        val userIds = when (val editable = edited.value) {
+            is Post -> editable.mentionIds
+            is Event -> editable.speakerIds
+            else -> emptyList()
         }
+        _event.send(UiEvent.NavigateToUserChooser(category, userIds.toLongArray()))
+    }
+
+    fun navigateToLocationPicker() = viewModelScope.launch {
+        val coordinates = when (val editable = edited.value) {
+            is Post -> editable.coords
+            is Event -> editable.coords
+            else -> null
+        }
+        val locationPoint = coordinates?.let {
+            LocationPoint(it.lat, it.long)
+        }
+
+        _event.send(UiEvent.NavigateToLocationPicker(locationPoint))
     }
 }
 
 data class EditorUiState(
     val initialContent: String = "",
     val shouldInitialize: Boolean = false,
-    val initialized: Boolean = false
+    val initialized: Boolean = false,
+    val isEventDateTimeValid: Boolean = false
 )
 
 data class AttachmentModel(
@@ -213,9 +292,17 @@ data class AttachmentModel(
 )
 
 sealed interface UiEvent {
-    class NavigateToMentionedUsersChooser(val userIds: LongArray) : UiEvent
+    class NavigateToUserChooser(val category: UserChooserCategory, val userIds: LongArray) : UiEvent
     class NavigateToLocationPicker(val locationPoint: LocationPoint? = null) : UiEvent
     data object Saved : UiEvent
     data object ErrorEmptyContent : UiEvent
     data object ErrorSaving : UiEvent
+}
+
+enum class UserChooserCategory {
+    MENTIONS,
+    SPEAKERS;
+
+    val requestKey: String
+        get() = "userChooser_$name"
 }

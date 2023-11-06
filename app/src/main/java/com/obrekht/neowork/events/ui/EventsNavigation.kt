@@ -2,7 +2,10 @@ package com.obrekht.neowork.events.ui
 
 import android.content.Intent
 import androidx.fragment.app.Fragment
+import com.obrekht.neowork.NavGraphDirections
 import com.obrekht.neowork.R
+import com.obrekht.neowork.core.ui.findRootNavController
+import com.obrekht.neowork.editor.ui.editor.EditableType
 import com.obrekht.neowork.events.model.Event
 
 fun Fragment.navigateToEvent(eventId: Long) {
@@ -12,12 +15,11 @@ fun Fragment.navigateToEvent(eventId: Long) {
 }
 
 fun Fragment.navigateToEventEditor(eventId: Long = 0) {
-    // TODO: Open event editor
-//    val action = NavGraphDirections.actionOpenEditor().apply {
-//        this.id = eventId
-//        this.editableType = EditableType.EVENT
-//    }
-//    findRootNavController().navigate(action)
+    val action = NavGraphDirections.actionOpenEditor().apply {
+        this.id = eventId
+        this.editableType = EditableType.EVENT
+    }
+    findRootNavController().navigate(action)
 }
 
 fun Fragment.shareEvent(event: Event) {

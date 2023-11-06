@@ -32,7 +32,7 @@ interface EventApiService {
     @GET("events/{id}")
     suspend fun getById(@Path("id") eventId: Long): Response<Event>
 
-    @POST("com/obrekht/neowork/events")
+    @POST("events")
     suspend fun save(@Body event: Event): Response<Event>
 
     @DELETE("events/{id}")

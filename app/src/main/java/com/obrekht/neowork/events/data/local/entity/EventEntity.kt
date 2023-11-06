@@ -16,6 +16,7 @@ data class EventEntity(
     val eventId: Long,
     val authorId: Long,
     val author: String,
+    val authorJob: String? = null,
     val authorAvatar: String? = null,
     val content: String,
     val datetime: Instant?,
@@ -23,10 +24,10 @@ data class EventEntity(
     @Embedded
     val coords: Coordinates? = null,
     val type: EventType = EventType.OFFLINE,
-    val likeOwnerIds: List<Long> = emptyList(),
+    val likeOwnerIds: Set<Long> = emptySet(),
     val likedByMe: Boolean = false,
-    val speakerIds: List<Long> = emptyList(),
-    val participantIds: List<Long> = emptyList(),
+    val speakerIds: Set<Long> = emptySet(),
+    val participantIds: Set<Long> = emptySet(),
     val participatedByMe: Boolean = false,
     @Embedded("attachment")
     val attachment: Attachment? = null,
@@ -39,14 +40,14 @@ data class EventEntity(
 }
 
 fun EventEntity.toModel(users: Map<Long, UserPreview> = emptyMap()) = Event(
-    eventId, authorId, author, authorAvatar, content, datetime, published, coords, type,
-    likeOwnerIds.toSet(), likedByMe, speakerIds.toSet(), participantIds.toSet(), participatedByMe, attachment, link,
+    eventId, authorId, author, authorJob, authorAvatar, content, datetime, published, coords, type,
+    likeOwnerIds, likedByMe, speakerIds, participantIds, participatedByMe, attachment, link,
     users
 )
 
 fun Event.toEntity() = EventEntity(
-    id, authorId, author, authorAvatar, content, datetime, published, coords, type,
-    likeOwnerIds.toList(), likedByMe, speakerIds.toList(), participantsIds.toList(), participatedByMe,
+    id, authorId, author, authorJob, authorAvatar, content, datetime, published, coords, type,
+    likeOwnerIds, likedByMe, speakerIds, participantsIds, participatedByMe,
     attachment, link
 )
 

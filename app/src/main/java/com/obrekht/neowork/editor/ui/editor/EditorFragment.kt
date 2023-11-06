@@ -13,7 +13,7 @@ import androidx.core.view.marginBottom
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
-import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
@@ -26,6 +26,7 @@ import com.obrekht.neowork.R
 import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.core.model.Coordinates
 import com.obrekht.neowork.databinding.FragmentEditorBinding
+import com.obrekht.neowork.events.model.Event
 import com.obrekht.neowork.map.navigateToLocationPicker
 import com.obrekht.neowork.map.ui.LocationPickerFragment
 import com.obrekht.neowork.posts.model.Post
@@ -52,14 +53,14 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-private const val REQUEST_KEY_MENTIONED_USERS = "mentionedUsers"
 private const val IMAGE_COMPRESS_SIZE = 2048
 private const val LOCATION_PREVIEW_DEFAULT_ZOOM = 15f
 
 @AndroidEntryPoint
 class EditorFragment : Fragment(R.layout.fragment_editor) {
     private val binding by viewBinding(FragmentEditorBinding::bind)
-    private val viewModel: EditorViewModel by viewModels()
+    private val viewModel: EditorViewModel
+            by hiltNavGraphViewModels(R.id.editor_fragment)
     private val args: EditorFragmentArgs by navArgs()
 
     private val editableConfig by lazy {
@@ -144,9 +145,18 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                 true
             }
 
-            R.id.add_mentions -> {
-                viewModel.navigateToMentionedUsersChooser()
-                true
+            R.id.add_users -> {
+                when (args.editableType) {
+                    EditableType.POST -> {
+                        viewModel.navigateToUserChooser(UserChooserCategory.MENTIONS)
+                        true
+                    }
+                    EditableType.EVENT -> {
+                        viewModel.navigateToUserChooser(UserChooserCategory.SPEAKERS)
+                        true
+                    }
+                    else -> false
+                }
             }
 
             R.id.add_location -> {
@@ -167,9 +177,15 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
-        setFragmentResultListener(REQUEST_KEY_MENTIONED_USERS) { _, bundle ->
+        setFragmentResultListener(UserChooserCategory.MENTIONS.requestKey) { _, bundle ->
             bundle.getLongArray(UserChooserFragment.RESULT_CHOSEN_USER_IDS)?.let { chosenUserIds ->
                 viewModel.setMentionedUserIds(chosenUserIds.toSet())
+            }
+        }
+
+        setFragmentResultListener(UserChooserCategory.SPEAKERS.requestKey) { _, bundle ->
+            bundle.getLongArray(UserChooserFragment.RESULT_CHOSEN_USER_IDS)?.let { chosenUserIds ->
+                viewModel.setSpeakerIds(chosenUserIds.toSet())
             }
         }
 
@@ -212,6 +228,16 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
             buttonRemoveLocation.setOnClickListener {
                 viewModel.setLocationCoordinates(null)
             }
+
+            if (args.editableType == EditableType.EVENT) {
+                buttonEventOptions.setOnClickListener {
+                    val action = EditorFragmentDirections.actionOpenEventOptions()
+                    findNavController().navigate(action)
+                }
+                buttonEventOptions.isVisible = true
+            } else {
+                buttonEventOptions.isVisible = false
+            }
         }
         bottomAppBar.isVisible = editableConfig.doesSupportAttachments
 
@@ -247,20 +273,20 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                 }.launchIn(this)
 
                 viewModel.edited.onEach { editable ->
-                    when (editable) {
-                        is Post -> {
-
-                            locationPreviewGroup.isVisible = editable.coords != null
-                            editable.coords?.let { (latitude, longitude) ->
-                                locationAddress.text = getString(R.string.loading)
-                                searchManager.submit(
-                                    Point(latitude, longitude),
-                                    LOCATION_PREVIEW_DEFAULT_ZOOM.toInt(),
-                                    searchOptions,
-                                    searchSessionListener
-                                )
-                            }
-                        }
+                    val coordinates = when (editable) {
+                        is Post -> editable.coords
+                        is Event -> editable.coords
+                        else -> null
+                    }
+                    locationPreviewGroup.isVisible = (coordinates != null)
+                    coordinates?.let { (latitude, longitude) ->
+                        locationAddress.text = getString(R.string.loading)
+                        searchManager.submit(
+                            Point(latitude, longitude),
+                            LOCATION_PREVIEW_DEFAULT_ZOOM.toInt(),
+                            searchOptions,
+                            searchSessionListener
+                        )
                     }
                 }.launchIn(this)
 
@@ -300,8 +326,8 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
 
     private fun handleEvent(event: UiEvent) {
         when (event) {
-            is UiEvent.NavigateToMentionedUsersChooser -> {
-                navigateToUserChooser(REQUEST_KEY_MENTIONED_USERS, event.userIds)
+            is UiEvent.NavigateToUserChooser -> {
+                navigateToUserChooser(event.category.requestKey, event.userIds)
             }
 
             is UiEvent.NavigateToLocationPicker -> {

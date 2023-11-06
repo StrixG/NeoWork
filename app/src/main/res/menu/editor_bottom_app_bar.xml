@@ -14,7 +14,7 @@
         android:title="@string/attach_media"
         app:showAsAction="always" />
     <item
-        android:id="@+id/add_mentions"
+        android:id="@+id/add_users"
         android:icon="@drawable/ic_people"
         android:title="@string/add_mentions"
         app:showAsAction="always" />

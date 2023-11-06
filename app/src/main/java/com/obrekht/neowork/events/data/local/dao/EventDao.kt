@@ -59,7 +59,7 @@ interface EventDao {
         getById(eventId)?.let {
             val participantIds = it.participantIds.toMutableSet()
             participantIds.add(userId)
-            upsert(it.copy(participantIds = participantIds.toList()))
+            upsert(it.copy(participantIds = participantIds))
         }
     }
 
@@ -68,7 +68,7 @@ interface EventDao {
         getById(eventId)?.let {
             val participantIds = it.participantIds.toMutableSet()
             participantIds.remove(userId)
-            upsert(it.copy(participantIds = participantIds.toList()))
+            upsert(it.copy(participantIds = participantIds))
         }
     }
 
@@ -77,7 +77,7 @@ interface EventDao {
         getById(eventId)?.let {
             val likeOwnerIds = it.likeOwnerIds.toMutableSet()
             likeOwnerIds.add(userId)
-            upsert(it.copy(likeOwnerIds = likeOwnerIds.toList()))
+            upsert(it.copy(likeOwnerIds = likeOwnerIds))
         }
     }
 
@@ -86,7 +86,7 @@ interface EventDao {
         getById(eventId)?.let {
             val likeOwnerIds = it.likeOwnerIds.toMutableSet()
             likeOwnerIds.remove(userId)
-            upsert(it.copy(likeOwnerIds = likeOwnerIds.toList()))
+            upsert(it.copy(likeOwnerIds = likeOwnerIds))
         }
     }
 }

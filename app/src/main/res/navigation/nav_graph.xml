@@ -63,11 +63,10 @@
             android:name="editableType"
             android:defaultValue="POST"
             app:argType="com.obrekht.neowork.editor.ui.editor.EditableType" />
+
         <action
-            android:id="@+id/action_showPostInFeed"
-            app:destination="@id/post_feed_fragment"
-            app:launchSingleTop="true"
-            app:popUpTo="@id/post_feed_fragment" />
+            android:id="@+id/action_openEventOptions"
+            app:destination="@id/event_options" />
     </fragment>
 
     <action
@@ -78,6 +77,11 @@
         app:launchSingleTop="true"
         app:popEnterAnim="@anim/nav_default_pop_enter_anim"
         app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+    <dialog
+        android:id="@+id/event_options"
+        android:name="com.obrekht.neowork.editor.ui.editor.EditorEventOptionsDialogFragment"
+        tools:layout="@layout/bottom_sheet_event_options" />
 
     <include app:graph="@navigation/nav_post_details" />
 

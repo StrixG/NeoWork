@@ -152,4 +152,12 @@
         android:fitsSystemWindows="true"
         app:menu="@menu/editor_bottom_app_bar" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_event_options"
+        style="?attr/floatingActionButtonSecondaryStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_event_time"
+        app:layout_anchor="@id/bottom_app_bar" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -141,4 +141,10 @@
     <string name="error_saving_event">An error occurred while saving the event</string>
     <string name="error_participating">Failed to toggle participation status.</string>
     <string name="event_type_label">Type</string>
+    <string name="hint_date">Date</string>
+    <string name="event_date">Event date</string>
+    <string name="next">Next</string>
+    <string name="select_event_date">Select event date</string>
+    <string name="select_event_time">Select event time</string>
+    <string name="error_invalid_datetime">Invalid date and time format</string>
 </resources>
