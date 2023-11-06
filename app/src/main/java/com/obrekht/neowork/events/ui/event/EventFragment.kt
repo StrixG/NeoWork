@@ -1,9 +1,8 @@
-package com.obrekht.neowork.posts.ui.post
+package com.obrekht.neowork.events.ui.event
 
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
-import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -21,31 +20,26 @@ import coil.transform.CircleCropTransformation
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.obrekht.neowork.R
-import com.obrekht.neowork.auth.ui.navigateToLogIn
-import com.obrekht.neowork.auth.ui.navigateToSignUp
 import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
-import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
 import com.obrekht.neowork.core.model.AttachmentType
-import com.obrekht.neowork.databinding.FragmentPostBinding
+import com.obrekht.neowork.databinding.FragmentEventBinding
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType
-import com.obrekht.neowork.posts.model.Comment
-import com.obrekht.neowork.posts.model.Post
-import com.obrekht.neowork.posts.ui.common.PostInteractionListener
-import com.obrekht.neowork.posts.ui.navigateToPostEditor
-import com.obrekht.neowork.posts.ui.sharePost
+import com.obrekht.neowork.events.model.Event
+import com.obrekht.neowork.events.model.EventType
+import com.obrekht.neowork.events.ui.common.EventInteractionListener
+import com.obrekht.neowork.events.ui.navigateToEventEditor
+import com.obrekht.neowork.events.ui.shareEvent
+import com.obrekht.neowork.posts.ui.post.PostFragmentDirections
 import com.obrekht.neowork.userlist.ui.navigateToUserList
 import com.obrekht.neowork.userpreview.ui.UserPreviewClickListener
 import com.obrekht.neowork.userpreview.ui.UserPreviewMoreClickListener
 import com.obrekht.neowork.users.ui.navigateToUserProfile
 import com.obrekht.neowork.utils.StringUtils
 import com.obrekht.neowork.utils.TimeUtils
-import com.obrekht.neowork.utils.hideKeyboard
 import com.obrekht.neowork.utils.isLightTheme
-import com.obrekht.neowork.utils.makeLinks
 import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.setAllOnClickListener
-import com.obrekht.neowork.utils.setBarsInsetsListener
 import com.obrekht.neowork.utils.viewBinding
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -66,14 +60,13 @@ import kotlinx.coroutines.launch
 private const val LOCATION_PREVIEW_DEFAULT_ZOOM = 15f
 
 @AndroidEntryPoint
-class PostFragment : Fragment(R.layout.fragment_post) {
-    private val binding by viewBinding(FragmentPostBinding::bind)
-    private val viewModel: PostViewModel
-            by hiltNavGraphViewModels(R.id.post_graph)
+class EventFragment : Fragment(R.layout.fragment_event) {
+    private val binding by viewBinding(FragmentEventBinding::bind)
+    private val viewModel: EventViewModel
+            by hiltNavGraphViewModels(R.id.event_fragment)
 
-    private lateinit var post: Post
+    private lateinit var event: Event
     private var snackbar: Snackbar? = null
-    private var commentsAdapter: CommentsAdapter? = null
 
     private val searchManager = SearchFactory.getInstance()
         .createSearchManager(SearchManagerType.ONLINE)
@@ -96,12 +89,12 @@ class PostFragment : Fragment(R.layout.fragment_post) {
         }
     }
 
-    private val interactionListener = object : PostInteractionListener {
-        override fun onAvatarClick(post: Post) {
-            navigateToUserProfile(post.authorId)
+    private val interactionListener = object : EventInteractionListener {
+        override fun onAvatarClick(event: Event) {
+            navigateToUserProfile(event.authorId)
         }
 
-        override fun onLike(post: Post) {
+        override fun onLike(event: Event) {
             if (viewModel.isLoggedIn) {
                 viewModel.toggleLike()
             } else {
@@ -109,40 +102,27 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             }
         }
 
-        override fun onShare(post: Post) {
-            sharePost(post)
+        override fun onShare(event: Event) {
+            shareEvent(event)
         }
 
-        override fun onEdit(post: Post) {
+        override fun onParticipate(event: Event) {
             if (viewModel.isLoggedIn) {
-                navigateToPostEditor(post.id)
-            }
-        }
-
-        override fun onDelete(post: Post) {
-            if (viewModel.isLoggedIn) {
-                showDeleteConfirmation(post.id)
-            }
-        }
-    }
-
-    private val commentInteractionListener = object : CommentInteractionListener {
-        override fun onClick(comment: Comment) {
-            with(findNavController()) {
-                if (currentDestination?.id != R.id.post_fragment) return
-
-                val action = PostFragmentDirections.actionOpenCommentOptions(
-                    comment.id, comment.ownedByMe
-                )
-                navigate(action)
-            }
-        }
-
-        override fun onLike(comment: Comment) {
-            if (viewModel.isLoggedIn) {
-                viewModel.toggleCommentLike(comment)
+                viewModel.toggleParticipation()
             } else {
                 showSuggestAuthDialog()
+            }
+        }
+
+        override fun onEdit(event: Event) {
+            if (viewModel.isLoggedIn) {
+                navigateToEventEditor(event.id)
+            }
+        }
+
+        override fun onDelete(event: Event) {
+            if (viewModel.isLoggedIn) {
+                showDeleteConfirmation(event.id)
             }
         }
     }
@@ -150,17 +130,17 @@ class PostFragment : Fragment(R.layout.fragment_post) {
     private val menuClickListener = Toolbar.OnMenuItemClickListener {
         when (it.itemId) {
             R.id.share -> {
-                post.let(interactionListener::onShare)
+                event.let(interactionListener::onShare)
                 true
             }
 
             R.id.edit -> {
-                post.let(interactionListener::onEdit)
+                event.let(interactionListener::onEdit)
                 true
             }
 
             R.id.delete -> {
-                post.let(interactionListener::onDelete)
+                event.let(interactionListener::onDelete)
                 true
             }
 
@@ -173,24 +153,17 @@ class PostFragment : Fragment(R.layout.fragment_post) {
     }
 
     private val likersMoreClickListener: UserPreviewMoreClickListener = {
-        navigateToUserList(post.likeOwnerIds, getString(R.string.likers))
+        navigateToUserList(event.likeOwnerIds, getString(R.string.likers))
     }
 
-    private val mentionedMoreClickListener: UserPreviewMoreClickListener = {
-        navigateToUserList(post.mentionIds, getString(R.string.mentioned))
+    private val participantsMoreClickListener: UserPreviewMoreClickListener = {
+        navigateToUserList(event.participantsIds, getString(R.string.mentioned))
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupResultListeners()
 
         with(binding) {
-            commentInputContainer.setBarsInsetsListener { insets ->
-                setPadding(
-                    paddingLeft, paddingTop, paddingRight,
-                    insets.bottom
-                )
-            }
-
             appBar.statusBarForeground =
                 MaterialShapeDrawable.createWithElevationOverlay(requireContext())
 
@@ -203,39 +176,20 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             }
 
             avatar.setOnClickListener {
-                post.let(interactionListener::onAvatarClick)
+                event.let(interactionListener::onAvatarClick)
             }
 
-            likers.setButtonClickListener {
-                post.let(interactionListener::onLike)
+            likers.setButtonClickListener() {
+                event.let(interactionListener::onLike)
             }
             likers.preview.setOnPreviewClickListener(userPreviewClickListener)
             likers.preview.setOnMoreClickListener(likersMoreClickListener)
 
-            mentioned.setButtonClickListener {
-                mentionedMoreClickListener()
+            participants.setButtonClickListener() {
+                event.let(interactionListener::onParticipate)
             }
-            mentioned.preview.setOnPreviewClickListener(userPreviewClickListener)
-            mentioned.preview.setOnMoreClickListener(mentionedMoreClickListener)
-
-            commentsAdapter = CommentsAdapter(commentInteractionListener).apply {
-                setHasStableIds(true)
-            }
-
-            commentListView.adapter = commentsAdapter
-
-            commentLogInText.makeLinks(getString(R.string.link_log_in) to OnClickListener {
-                navigateToLogIn()
-            }, getString(R.string.link_sign_up) to OnClickListener {
-                navigateToSignUp()
-            }, textPaintModifier = {
-                it.color = it.linkColor
-                it.typeface = Typeface.DEFAULT_BOLD
-            })
-
-            buttonSendComment.setOnClickListener {
-                viewModel.sendComment(commentEditText.text.toString())
-            }
+            participants.preview.setOnPreviewClickListener(userPreviewClickListener)
+            participants.preview.setOnMoreClickListener(participantsMoreClickListener)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -248,7 +202,6 @@ class PostFragment : Fragment(R.layout.fragment_post) {
 
     override fun onDestroyView() {
         snackbar = null
-        commentsAdapter = null
         super.onDestroyView()
     }
 
@@ -267,7 +220,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
     private fun setupResultListeners() {
         with(DeleteConfirmationDialogFragment) {
             setFragmentResultListener(
-                getRequestKey(DeleteElementType.POST)
+                getRequestKey(DeleteElementType.EVENT)
             ) { _, bundle ->
                 val clickedButton = bundle.getInt(RESULT_CLICKED_BUTTON)
                 if (clickedButton == DialogInterface.BUTTON_POSITIVE) {
@@ -275,48 +228,16 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                 }
             }
         }
-
-        setFragmentResultListener(
-            SuggestAuthDialogFragment.REQUEST_KEY
-        ) { _, bundle ->
-            val positive = bundle.getBoolean(SuggestAuthDialogFragment.RESULT_POSITIVE)
-            if (positive) {
-                navigateToLogIn()
-            }
-        }
     }
 
-    private fun handleState(state: PostUiState) {
-        post = state.post?.also {
-            bindPost(it)
-            commentsAdapter?.submitList(state.comments)
+    private fun handleState(state: EventUiState) {
+        event = state.event?.also {
+            bindEvent(it)
         } ?: return
 
         with(binding) {
-            toolbar.menu.setGroupVisible(R.id.owned_by_me, post.ownedByMe)
+            toolbar.menu.setGroupVisible(R.id.owned_by_me, event.ownedByMe)
             swipeRefresh.isRefreshing = state.state == State.Loading
-
-            if (state.commentsState == State.Loading) {
-                commentsTitle.text = ""
-                commentsProgress.show()
-            } else {
-                val commentCount = state.comments.size
-                commentsTitle.text = resources.getQuantityString(
-                    R.plurals.comments, commentCount, commentCount
-                )
-                commentsProgress.hide()
-            }
-
-            groupCommentInput.isVisible = state.isLoggedIn
-            commentLogInText.isVisible = !state.isLoggedIn
-
-            if (state.isCommentSending) {
-                buttonSendComment.isVisible = false
-                sendCommentProgress.show()
-            } else {
-                buttonSendComment.isVisible = true
-                sendCommentProgress.hide()
-            }
         }
 
         if (state.state == State.Error) {
@@ -324,63 +245,38 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                 viewModel.refresh()
             }
         }
-
-        if (state.commentsState == State.Error) {
-            showErrorSnackbar(R.string.error_loading_comments) {
-                viewModel.refreshComments()
-            }
-        }
     }
 
     private fun handleEvent(event: UiEvent) {
         when (event) {
-            UiEvent.ErrorLikingPost -> {
+            UiEvent.ErrorLikingEvent -> {
                 showErrorSnackbar(R.string.error_liking) {
                     viewModel.toggleLike()
                 }
             }
 
-            UiEvent.ErrorRemovingPost -> {
+            UiEvent.ErrorRemovingEvent -> {
                 showErrorSnackbar(R.string.error_deleting) {
                     viewModel.delete()
                 }
             }
 
-            UiEvent.PostDeleted -> {
+            UiEvent.ErrorParticipatingEvent -> {
+                showErrorSnackbar(R.string.error_participating) {
+                    viewModel.toggleParticipation()
+                }
+            }
+
+            UiEvent.EventDeleted -> {
                 findNavController().popBackStack()
                 lifecycleScope.cancel()
-            }
-
-            is UiEvent.ErrorLikingComment -> {
-                showErrorSnackbar(R.string.error_liking_comment) {
-                    viewModel.toggleCommentLikeById(event.commentId)
-                }
-            }
-
-            UiEvent.ErrorSendingComment -> {
-                showErrorSnackbar(R.string.error_sending_comment)
-            }
-
-            is UiEvent.ErrorDeletingComment -> {
-                showErrorSnackbar(R.string.error_deleting_comment) {
-                    viewModel.deleteCommentById(event.commentId)
-                }
-            }
-
-            UiEvent.CommentSent -> {
-                with(binding) {
-                    commentEditText.text?.clear()
-                    commentEditText.hideKeyboard()
-                    nestedScrollView.smoothScrollTo(0, Int.MAX_VALUE)
-                }
-                viewModel.refreshComments(false)
             }
         }
     }
 
-    private fun bindPost(post: Post) {
+    private fun bindEvent(event: Event) {
         with(binding) {
-            val publishedMillis = post.published?.toEpochMilli() ?: 0
+            val publishedMillis = event.published?.toEpochMilli() ?: 0
 
             val publishedDate = TimeUtils.getRelativeDate(
                 requireContext(),
@@ -389,13 +285,22 @@ class PostFragment : Fragment(R.layout.fragment_post) {
 
             published.isVisible = publishedMillis > 0
 
-            author.text = post.author
-            job.text = post.authorJob ?: getString(R.string.open_to_work)
+            author.text = event.author
+            job.text = event.authorJob ?: getString(R.string.open_to_work)
             published.text = publishedDate
-            content.text = post.content
+            type.setText(when(event.type) {
+                EventType.OFFLINE -> R.string.event_type_offline
+                EventType.ONLINE -> R.string.event_type_online
+            })
+            val dateMillis = event.datetime?.toEpochMilli() ?: 0
+            date.text = TimeUtils.getRelativeDate(
+                requireContext(),
+                dateMillis
+            )
+            content.text = event.content
 
             // Avatar
-            post.authorAvatar?.let {
+            event.authorAvatar?.let {
                 avatar.load(it) {
                     placeholder(R.drawable.avatar_placeholder)
                     transformations(CircleCropTransformation())
@@ -404,29 +309,32 @@ class PostFragment : Fragment(R.layout.fragment_post) {
 
             // Likers
             likers.button.setIconResource(
-                if (post.likedByMe) {
+                if (event.likedByMe) {
                     R.drawable.ic_like
                 } else {
                     R.drawable.ic_like_border
                 }
             )
-            likers.button.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
+            likers.button.text = StringUtils.getCompactNumber(event.likeOwnerIds.size)
 
-            val likerList = post.users.filterKeys { post.likeOwnerIds.contains(it) }
+            val likerList = event.users.filterKeys { event.likeOwnerIds.contains(it) }
             likers.preview.setPreviews(likerList)
 
-            // Mentioned
-            val mentionedCount = post.mentionIds.size
-            if (mentionedCount > 0) {
-                mentioned.button.text = StringUtils.getCompactNumber(post.mentionIds.size)
-            }
-            mentioned.isVisible = mentionedCount > 0
+            // Participants
+            participants.button.setIconResource(
+                if (event.participatedByMe) {
+                    R.drawable.ic_person_check
+                } else {
+                    R.drawable.ic_people_outline
+                }
+            )
+            participants.button.text = StringUtils.getCompactNumber(event.participantsIds.size)
 
-            val mentionList = post.users.filterKeys { post.mentionIds.contains(it) }
-            mentioned.preview.setPreviews(mentionList)
+            val participantList = event.users.filterKeys { event.participantsIds.contains(it) }
+            participants.setUserPreviews(participantList)
 
             // Location
-            post.coords?.let { (latitude, longitude) ->
+            event.coords?.let { (latitude, longitude) ->
                 searchManager.submit(
                     Point(latitude, longitude),
                     LOCATION_PREVIEW_DEFAULT_ZOOM.toInt(),
@@ -461,7 +369,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             attachmentPreview.isVisible = false
             buttonPlayVideo.isVisible = false
 
-            post.attachment?.let {
+            event.attachment?.let {
                 when (it.type) {
                     AttachmentType.IMAGE -> {
                         attachmentPreview.load(it.url) {
@@ -510,7 +418,6 @@ class PostFragment : Fragment(R.layout.fragment_post) {
         action: OnClickListener? = null
     ) {
         snackbar = Snackbar.make(requireView(), resId, duration).apply {
-            anchorView = binding.commentInputContainer
             if (action != null) {
                 setAction(R.string.retry, action)
             }

@@ -141,7 +141,7 @@ class EventViewHolder(
                 EventType.ONLINE -> R.string.event_type_online
             })
             val dateMillis = event.datetime?.toEpochMilli() ?: 0
-            binding.date.text = TimeUtils.getRelativeDate(
+            date.text = TimeUtils.getRelativeDate(
                 itemView.context,
                 dateMillis
             )

@@ -97,6 +97,24 @@
             app:argType="long" />
     </action>
 
+    <fragment
+        android:id="@+id/event_fragment"
+        android:name="com.obrekht.neowork.events.ui.event.EventFragment"
+        android:label="@string/title_event"
+        tools:layout="@layout/fragment_event">
+        <argument
+            android:name="eventId"
+            app:argType="long" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_openEvent"
+        app:destination="@id/event_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
     <include app:graph="@navigation/nav_user_profile" />
 
     <action

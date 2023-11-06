@@ -9,9 +9,8 @@ import com.obrekht.neowork.editor.ui.editor.EditableType
 import com.obrekht.neowork.events.model.Event
 
 fun Fragment.navigateToEvent(eventId: Long) {
-    // TODO: Open screen with event details
-//    val action = NavGraphDirections.actionOpenEvent(eventId)
-//    findRootNavController().navigate(action)
+    val action = NavGraphDirections.actionOpenEvent(eventId)
+    findRootNavController().navigate(action)
 }
 
 fun Fragment.navigateToEventEditor(eventId: Long = 0) {

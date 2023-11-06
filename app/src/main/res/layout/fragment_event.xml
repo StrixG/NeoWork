@@ -1,6 +1,274 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        app:liftOnScroll="true"
+        app:liftOnScrollTargetViewId="@id/nested_scroll_view">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            app:menu="@menu/menu_post_details"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="@string/title_event" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nested_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/common_spacing">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/avatar"
+                    android:layout_width="@dimen/avatar_size"
+                    android:layout_height="@dimen/avatar_size"
+                    android:layout_marginStart="@dimen/common_spacing"
+                    android:layout_marginBottom="@dimen/common_spacing"
+                    android:contentDescription="@string/description_post_author_avatar"
+                    android:foreground="?actionBarItemBackground"
+                    app:layout_constraintBottom_toBottomOf="@id/top_barrier"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
+                    tools:srcCompat="@drawable/avatar_placeholder" />
+
+                <TextView
+                    android:id="@+id/author"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/common_spacing"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    app:layout_constraintBottom_toTopOf="@+id/job"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/avatar"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    tools:text="@sample/posts.json/data/author" />
+
+                <TextView
+                    android:id="@+id/job"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/common_spacing"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    app:layout_constraintBottom_toTopOf="@id/published"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/avatar"
+                    app:layout_constraintTop_toBottomOf="@id/author"
+                    tools:text="Neo Work" />
+
+                <TextView
+                    android:id="@+id/published"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/common_spacing"
+                    android:layout_marginBottom="@dimen/common_spacing"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="@id/top_barrier"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/avatar"
+                    app:layout_constraintTop_toBottomOf="@id/job"
+                    tools:text="@sample/posts.json/data/published"
+                    tools:visibility="visible" />
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/top_barrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="avatar,published" />
+
+                <ImageView
+                    android:id="@+id/attachment_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/common_spacing"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/content_description_attached_photo"
+                    android:maxHeight="@dimen/max_image_height"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toTopOf="@id/media_barrier"
+                    app:layout_constraintTop_toBottomOf="@id/top_barrier"
+                    tools:src="@tools:sample/backgrounds/scenic"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/button_play_video"
+                    android:layout_width="@dimen/video_play_button_size"
+                    android:layout_height="@dimen/video_play_button_size"
+                    android:contentDescription="@string/content_description_play_video"
+                    android:src="@drawable/ic_play_circle"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/attachment_preview"
+                    app:layout_constraintEnd_toEndOf="@id/attachment_preview"
+                    app:layout_constraintStart_toStartOf="@id/attachment_preview"
+                    app:layout_constraintTop_toTopOf="@id/attachment_preview"
+                    tools:visibility="visible" />
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/media_barrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="top"
+                    app:constraint_referenced_ids="type" />
+
+                <TextView
+                    android:id="@+id/type"
+                    style="@style/TextAppearance.Material3.BodyLarge"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/common_spacing"
+                    android:autoLink="web"
+                    android:ellipsize="end"
+                    android:maxLines="3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/media_barrier"
+                    tools:text="Онлайн" />
+
+                <TextView
+                    android:id="@+id/date"
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/common_spacing"
+                    android:autoLink="web"
+                    android:ellipsize="end"
+                    android:maxLines="3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/type"
+                    tools:text="28 июня, 19:00" />
+
+                <TextView
+                    android:id="@+id/content"
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/common_spacing"
+                    android:layout_marginTop="@dimen/common_spacing"
+                    android:autoLink="web"
+                    android:ellipsize="end"
+                    android:maxLines="3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/date"
+                    tools:text="@sample/posts.json/data/content" />
+
+                <androidx.constraintlayout.widget.Barrier
+                    android:id="@+id/content_barrier"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:barrierDirection="bottom"
+                    app:constraint_referenced_ids="content" />
+
+                <com.obrekht.neowork.core.ui.iteminteraction.ItemInteractionLayout
+                    android:id="@+id/likers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/common_spacing"
+                    android:layout_marginTop="@dimen/common_spacing"
+                    android:layout_marginBottom="@dimen/small_spacing"
+                    app:buttonIcon="@drawable/ic_like"
+                    app:layout_constraintBottom_toTopOf="@id/participants"
+                    app:layout_constraintTop_toBottomOf="@id/content_barrier"
+                    app:title="@string/likers" />
+
+                <com.obrekht.neowork.core.ui.iteminteraction.ItemInteractionLayout
+                    android:id="@+id/participants"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/common_spacing"
+                    android:layout_marginBottom="@dimen/small_spacing"
+                    app:buttonIcon="@drawable/ic_people_outline"
+                    app:layout_constraintBottom_toTopOf="@id/location_preview"
+                    app:layout_constraintTop_toBottomOf="@id/likers"
+                    app:title="@string/participants" />
+
+                <com.yandex.mapkit.mapview.MapView
+                    android:id="@+id/location_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/preview_map_height"
+                    android:foreground="?selectableItemBackground"
+                    app:layout_constraintBottom_toTopOf="@id/location_address"
+                    app:layout_constraintTop_toBottomOf="@id/participants" />
+
+                <ImageView
+                    android:id="@+id/pin_shadow"
+                    android:layout_width="@dimen/pin_shadow_size_preview"
+                    android:layout_height="@dimen/pin_shadow_size_preview"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_pin_shadow"
+                    app:layout_constraintBottom_toBottomOf="@id/location_preview"
+                    app:layout_constraintEnd_toEndOf="@id/location_preview"
+                    app:layout_constraintStart_toStartOf="@id/location_preview"
+                    app:layout_constraintTop_toTopOf="@id/location_preview" />
+
+                <ImageView
+                    android:id="@+id/pin"
+                    android:layout_width="@dimen/pin_size_preview"
+                    android:layout_height="@dimen/pin_size_preview"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_place"
+                    app:layout_constraintBottom_toBottomOf="@id/location_preview"
+                    app:layout_constraintEnd_toEndOf="@id/location_preview"
+                    app:layout_constraintStart_toStartOf="@id/location_preview"
+                    app:layout_constraintTop_toTopOf="@id/location_preview"
+                    app:tint="?attr/colorPrimary"
+                    tools:translationY="-32dp" />
+
+                <TextView
+                    android:id="@+id/location_address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/small_spacing"
+                    android:background="?colorSurfaceContainer"
+                    android:drawablePadding="@dimen/small_spacing"
+                    android:foreground="?selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="@dimen/common_spacing"
+                    android:paddingVertical="@dimen/small_spacing"
+                    app:drawableStartCompat="@drawable/ic_place"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/location_preview"
+                    tools:text="Калининград, площадь Победы, 1" />
+
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/location_preview_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="location_preview,location_address,pin,pin_shadow" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
