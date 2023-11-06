@@ -195,6 +195,21 @@
         app:popEnterAnim="@anim/nav_default_pop_enter_anim"
         app:popExitAnim="@anim/nav_default_pop_exit_anim" />
 
+    <dialog
+        android:id="@+id/delete_confirmation_dialog"
+        android:name="com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment">
+        <argument
+            android:name="elementId"
+            app:argType="long" />
+        <argument
+            android:name="elementType"
+            app:argType="com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType" />
+    </dialog>
+
+    <action
+        android:id="@+id/action_openDeleteConfirmation"
+        app:destination="@id/delete_confirmation_dialog" />
+
     <fragment
         android:id="@+id/location_picker_fragment"
         android:name="com.obrekht.neowork.map.ui.LocationPickerFragment"

@@ -404,10 +404,10 @@ class EventFragment : Fragment(R.layout.fragment_event) {
         startActivity(intent)
     }
 
-    private fun showDeleteConfirmation(postId: Long) {
-        val action = PostFragmentDirections.actionOpenDeleteConfirmation(
-            postId,
-            DeleteElementType.POST
+    private fun showDeleteConfirmation(eventId: Long) {
+        val action = EventFragmentDirections.actionOpenDeleteConfirmation(
+            eventId,
+            DeleteElementType.EVENT
         )
         findNavController().navigate(action)
     }

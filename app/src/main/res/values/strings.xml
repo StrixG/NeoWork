@@ -149,4 +149,5 @@
     <string name="error_invalid_datetime">Invalid date and time format</string>
     <string name="title_event">Event</string>
     <string name="participants">Participants</string>
+    <string name="error_loading_event">Something went wrong. Failed to load the event.</string>
 </resources>
