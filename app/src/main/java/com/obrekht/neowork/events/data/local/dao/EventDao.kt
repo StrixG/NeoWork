@@ -13,23 +13,18 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface EventDao {
 
-    @Transaction
     @Query("SELECT * FROM event ORDER BY eventId DESC")
     fun pagingSource(): PagingSource<Int, EventEntity>
 
-    @Transaction
     @Query("SELECT * FROM event ORDER BY eventId DESC LIMIT :count")
     fun observeLatest(count: Long = 1): Flow<List<EventEntity>>
 
-    @Transaction
     @Query("SELECT * FROM event WHERE eventId = :id")
     fun observeById(id: Long): Flow<EventEntity?>
 
-    @Transaction
     @Query("SELECT * FROM event ORDER BY eventId DESC LIMIT :count")
     suspend fun getLatest(count: Long = 1): List<EventEntity>
 
-    @Transaction
     @Query("SELECT * FROM event WHERE eventId = :id")
     suspend fun getById(id: Long): EventEntity?
 
