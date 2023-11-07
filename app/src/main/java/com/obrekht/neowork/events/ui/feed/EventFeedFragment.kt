@@ -20,8 +20,8 @@ import com.obrekht.neowork.R
 import com.obrekht.neowork.auth.ui.navigateToLogIn
 import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
 import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
-import com.obrekht.neowork.core.ui.mainscreen.MainScreenFragment
 import com.obrekht.neowork.core.ui.findRootNavController
+import com.obrekht.neowork.core.ui.mainscreen.MainScreenFragment
 import com.obrekht.neowork.databinding.FragmentEventFeedBinding
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType
@@ -309,7 +309,7 @@ class EventFeedFragment : Fragment(R.layout.fragment_event_feed) {
     private fun showDeleteConfirmation(eventId: Long) {
         val action = EventFeedFragmentDirections.actionOpenDeleteConfirmation(
             eventId,
-            DeleteElementType.POST
+            DeleteElementType.EVENT
         )
         findNavController().navigate(action)
     }
