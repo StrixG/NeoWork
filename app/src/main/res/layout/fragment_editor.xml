@@ -72,7 +72,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/small_spacing"
                 android:adjustViewBounds="true"
-                android:contentDescription="@string/attached_photo_description"
                 android:maxHeight="@dimen/max_image_height"
                 android:scaleType="centerCrop"
                 app:layout_constraintTop_toBottomOf="@id/input_field"
