@@ -331,6 +331,7 @@ class EventFragment : Fragment(R.layout.fragment_event) {
             speakers.isVisible = speakerCount > 0
 
             // Likers
+            likers.button.isChecked = event.likedByMe
             likers.button.setIconResource(
                 if (event.likedByMe) {
                     R.drawable.ic_like
@@ -344,6 +345,7 @@ class EventFragment : Fragment(R.layout.fragment_event) {
             likers.setUserPreviews(likerPreviewList)
 
             // Participants
+            participants.button.isChecked = event.participatedByMe
             participants.button.setIconResource(
                 if (event.participatedByMe) {
                     R.drawable.ic_person_check

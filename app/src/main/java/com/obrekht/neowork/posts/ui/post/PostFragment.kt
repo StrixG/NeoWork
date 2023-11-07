@@ -403,6 +403,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             } ?: avatar.load(R.drawable.avatar_placeholder)
 
             // Likers
+            likers.button.isChecked = post.likedByMe
             likers.button.setIconResource(
                 if (post.likedByMe) {
                     R.drawable.ic_like
