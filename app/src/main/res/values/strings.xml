@@ -6,7 +6,7 @@
     <string name="post_feed_label">Posts</string>
     <string name="event_feed_label">Events</string>
     <string name="users_label">Users</string>
-    <string name="description_post_author_avatar">Avatar</string>
+    <string name="description_author_avatar">Author avatar</string>
     <string name="description_like">Like</string>
     <string name="description_share">Share</string>
     <string name="description_post_menu">Post menu</string>
@@ -153,4 +153,5 @@
     <string name="speakers">Speakers</string>
     <string name="do_not_participate">Don\'t participate</string>
     <string name="participate">Participate</string>
+    <string name="description_job_menu">Job menu</string>
 </resources>

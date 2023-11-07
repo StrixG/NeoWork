@@ -19,7 +19,7 @@
             android:layout_height="@dimen/avatar_size"
             android:layout_marginVertical="@dimen/common_spacing"
             android:layout_marginStart="@dimen/common_spacing"
-            android:contentDescription="@string/description_post_author_avatar"
+            android:contentDescription="@string/description_author_avatar"
             android:foreground="?actionBarItemBackground"
             app:layout_constraintBottom_toBottomOf="@id/top_barrier"
             app:layout_constraintStart_toStartOf="parent"

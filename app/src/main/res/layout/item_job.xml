@@ -50,10 +50,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/common_spacing"
             android:layout_marginEnd="@dimen/common_spacing"
-            android:contentDescription="@string/description_post_menu"
+            android:contentDescription="@string/description_job_menu"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tooltipText="@string/description_post_menu" />
+            app:tooltipText="@string/description_job_menu" />
 
         <TextView
             android:id="@+id/position"
