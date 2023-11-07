@@ -4,5 +4,6 @@
         <attr name="title" format="string" />
         <attr name="showButton" format="boolean" />
         <attr name="buttonIcon" format="reference" />
+        <attr name="buttonCheckable" format="boolean" />
     </declare-styleable>
 </resources>

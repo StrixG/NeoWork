@@ -39,10 +39,10 @@ data class EventEntity(
     }
 }
 
-fun EventEntity.toModel(users: Map<Long, UserPreview> = emptyMap()) = Event(
+fun EventEntity.toModel(users: Map<Long, UserPreview> = emptyMap(), ownedByMe: Boolean = false) = Event(
     eventId, authorId, author, authorJob, authorAvatar, content, datetime, published, coords, type,
     likeOwnerIds, likedByMe, speakerIds, participantIds, participatedByMe, attachment, link,
-    users
+    users, false
 )
 
 fun Event.toEntity() = EventEntity(

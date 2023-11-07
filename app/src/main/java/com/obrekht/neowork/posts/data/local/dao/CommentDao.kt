@@ -41,24 +41,18 @@ interface CommentDao {
     @Transaction
     suspend fun likeById(commentId: Long, userId: Long) {
         getById(commentId)?.let {
-            val likeOwnerIds = it.likeOwnerIds.toMutableSet().apply {
-                add(userId)
-            }
-            upsert(it.copy(
-                likeOwnerIds = likeOwnerIds
-            ))
+            val likeOwnerIds = it.likeOwnerIds.toMutableSet()
+            likeOwnerIds.add(userId)
+            upsert(it.copy(likeOwnerIds = likeOwnerIds))
         }
     }
 
     @Transaction
     suspend fun unlikeById(commentId: Long, userId: Long) {
         getById(commentId)?.let {
-            val likeOwnerIds = it.likeOwnerIds.toMutableSet().apply {
-                remove(userId)
-            }
-            upsert(it.copy(
-                likeOwnerIds = likeOwnerIds
-            ))
+            val likeOwnerIds = it.likeOwnerIds.toMutableSet()
+            likeOwnerIds.remove(userId)
+            upsert(it.copy(likeOwnerIds = likeOwnerIds))
         }
     }
 }

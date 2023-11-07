@@ -7,37 +7,28 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
-import com.obrekht.neowork.posts.data.local.entity.MentionEntity
-import com.obrekht.neowork.posts.data.local.entity.PostData
 import com.obrekht.neowork.posts.data.local.entity.PostEntity
-import com.obrekht.neowork.posts.data.local.entity.PostLikeOwnerEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostDao {
-    @Transaction
     @Query("SELECT * FROM post WHERE isShown = 1 ORDER BY postId DESC")
-    fun pagingSource(): PagingSource<Int, PostData>
+    fun pagingSource(): PagingSource<Int, PostEntity>
 
-    @Transaction
     @Query("SELECT * FROM post WHERE authorId = :userId ORDER BY postId DESC")
-    fun userWallPagingSource(userId: Long): PagingSource<Int, PostData>
+    fun userWallPagingSource(userId: Long): PagingSource<Int, PostEntity>
 
-    @Transaction
     @Query("SELECT * FROM post ORDER BY postId DESC LIMIT :count")
-    fun observeLatest(count: Long = 1): Flow<List<PostData>>
+    fun observeLatest(count: Long = 1): Flow<List<PostEntity>>
 
-    @Transaction
     @Query("SELECT * FROM post WHERE postId = :id")
-    fun observeById(id: Long): Flow<PostData?>
+    fun observeById(id: Long): Flow<PostEntity?>
 
-    @Transaction
     @Query("SELECT * FROM post ORDER BY postId DESC LIMIT :count")
-    suspend fun getLatest(count: Long = 1): List<PostData>
+    suspend fun getLatest(count: Long = 1): List<PostEntity>
 
-    @Transaction
     @Query("SELECT * FROM post WHERE postId = :id")
-    suspend fun getById(id: Long): PostData?
+    suspend fun getById(id: Long): PostEntity?
 
     @Query("SELECT COUNT(*) FROM post WHERE isShown = 0 ")
     suspend fun getNewerCount(): Int
@@ -70,42 +61,22 @@ interface PostDao {
     suspend fun setLikedByMe(postId: Long, isLiked: Boolean)
 
     @Transaction
-    @Upsert
-    suspend fun like(likeOwner: PostLikeOwnerEntity) {
-        setLikedByMe(likeOwner.postId, true)
+    suspend fun likeById(postId: Long, userId: Long) {
+        getById(postId)?.let {
+            val likeOwnerIds = it.likeOwnerIds.toMutableSet()
+            likeOwnerIds.add(userId)
+            upsert(it.copy(likeOwnerIds = likeOwnerIds))
+            setLikedByMe(postId, true)
+        }
     }
 
     @Transaction
-    @Delete
-    suspend fun unlike(likeOwner: PostLikeOwnerEntity) {
-        setLikedByMe(likeOwner.postId, false)
-    }
-
-    @Upsert
-    suspend fun upsertLikeOwner(likeOwnerList: List<PostLikeOwnerEntity>)
-
-    @Upsert
-    suspend fun upsertMention(mentionList: List<MentionEntity>)
-
-    @Query("DELETE FROM post_like_owner WHERE postId = :postId")
-    suspend fun deletePostLikeOwners(postId: Long)
-
-    @Query("DELETE FROM mention WHERE postId = :postId")
-    suspend fun deletePostMentions(postId: Long)
-
-    @Transaction
-    suspend fun upsertWithData(postData: PostData) {
-        val postId = postData.post.postId
-
-        deletePostLikeOwners(postId)
-        deletePostMentions(postId)
-        upsert(postData.post)
-        upsertLikeOwner(postData.likeOwnerIds.map { PostLikeOwnerEntity(postId, it) })
-        upsertMention(postData.mentionIds.map { MentionEntity(postId, it) })
-    }
-
-    @Transaction
-    suspend fun upsertWithData(postDataList: List<PostData>) = postDataList.forEach {
-        upsertWithData(it)
+    suspend fun unlikeById(postId: Long, userId: Long) {
+        getById(postId)?.let {
+            val likeOwnerIds = it.likeOwnerIds.toMutableSet()
+            likeOwnerIds.remove(userId)
+            upsert(it.copy(likeOwnerIds = likeOwnerIds))
+            setLikedByMe(postId, false)
+        }
     }
 }

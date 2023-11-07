@@ -22,6 +22,7 @@ import com.obrekht.neowork.userpreview.data.local.dao.UserPreviewDao
 import com.obrekht.neowork.userpreview.data.local.entity.toEntity
 import com.obrekht.neowork.userpreview.data.local.entity.toModelMap
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -55,6 +56,10 @@ class CachedEventRepository @Inject constructor(
         pagingSourceFactory = pagingSourceFactory
     ).flow.map {
         it.map(EventEntity::toModel)
+    }.combine(auth.state) { pagingData, authState ->
+        pagingData.map {
+            it.copy(ownedByMe = (it.authorId == authState.id))
+        }
     }
 
     override fun invalidatePagingSource() = pagingSourceFactory.invalidate()
@@ -76,7 +81,7 @@ class CachedEventRepository @Inject constructor(
     override suspend fun getEvent(eventId: Long): Event? = eventDao.getById(eventId)?.run {
         val userIds = getUserIds()
         val users = userPreviewDao.getByIds(userIds)
-        toModel(users.toModelMap())
+        toModel(users.toModelMap(), authorId == auth.state.value.id)
     }
 
     override fun getEventStream(eventId: Long): Flow<Event?> =
@@ -87,6 +92,8 @@ class CachedEventRepository @Inject constructor(
                     event.toModel(users = previewList.toModelMap())
                 }
             } ?: emptyFlow()
+        }.combine(auth.state) { event, authState ->
+            event.copy(ownedByMe = (event.authorId == authState.id))
         }
 
     override suspend fun participate(eventId: Long): Event = runCatching {

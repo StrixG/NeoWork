@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -62,14 +61,11 @@ class WallViewModel @Inject constructor(
                 initialLoadSize = POSTS_PER_PAGE * 2
             )
         )
+        .map {
+            it.map(::PostItem).insertDateSeparators()
+        }
         .cachedIn(viewModelScope)
-        .combine(appAuth.state) { pagingData, authState ->
-            pagingData.map {
-                PostItem(it.copy(ownedByMe = it.authorId == authState.id))
-            }
-        }.map {
-            it.insertDateSeparators()
-        }.flowOn(Dispatchers.Default)
+        .flowOn(Dispatchers.Default)
 
     init {
         viewModelScope.launch {

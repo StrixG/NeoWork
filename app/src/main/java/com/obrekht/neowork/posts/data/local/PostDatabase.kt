@@ -8,17 +8,13 @@ import com.obrekht.neowork.core.data.typeconverter.SetOfLongTypeConverter
 import com.obrekht.neowork.posts.data.local.dao.CommentDao
 import com.obrekht.neowork.posts.data.local.dao.PostDao
 import com.obrekht.neowork.posts.data.local.entity.CommentEntity
-import com.obrekht.neowork.posts.data.local.entity.MentionEntity
 import com.obrekht.neowork.posts.data.local.entity.PostEntity
-import com.obrekht.neowork.posts.data.local.entity.PostLikeOwnerEntity
 
 @Database(
     entities = [
         PostEntity::class,
-        CommentEntity::class,
-        PostLikeOwnerEntity::class,
-        MentionEntity::class
-    ], version = 2
+        CommentEntity::class
+    ], version = 3
 )
 @TypeConverters(InstantTypeConverter::class, SetOfLongTypeConverter::class)
 abstract class PostDatabase : RoomDatabase() {

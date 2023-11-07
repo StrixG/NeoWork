@@ -36,15 +36,18 @@ interface WallApiService {
         @Query("count") count: Int
     ): Response<List<Post>>
 
-    @POST("{userId}/wall/{id}/likes")
+    @POST("0/wall/{id}/likes")
     suspend fun likeById(
-        @Path("userId") userId: Long,
         @Path("id") postId: Long
     ): Response<Post>
 
-    @DELETE("{userId}/wall/{id}/likes")
+    @DELETE("0/wall/{id}/likes")
     suspend fun unlikeById(
-        @Path("userId") userId: Long,
+        @Path("id") postId: Long
+    ): Response<Post>
+
+    @DELETE("posts/{id}")
+    suspend fun deleteById(
         @Path("id") postId: Long
     ): Response<Post>
 }

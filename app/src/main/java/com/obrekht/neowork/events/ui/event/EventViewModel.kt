@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -35,8 +34,8 @@ class EventViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(EventUiState())
     val uiState: StateFlow<EventUiState> = _uiState.asStateFlow()
 
-    private val _event = Channel<UiEvent>()
-    val event: Flow<UiEvent> = _event.receiveAsFlow()
+    private val _uiEvent = Channel<UiEvent>()
+    val uiEvent: Flow<UiEvent> = _uiEvent.receiveAsFlow()
 
     val isLoggedIn: Boolean
         get() = uiState.value.isLoggedIn
@@ -51,10 +50,8 @@ class EventViewModel @Inject constructor(
             }.launchIn(this)
 
             eventRepository.getEventStream(eventId).onEach {
-                if (it == null) _event.send(UiEvent.EventDeleted)
-            }.filterNotNull().combine(appAuth.state) { event, authState ->
-                event.copy(ownedByMe = event.authorId == authState.id)
-            }.onEach { event ->
+                if (it == null) _uiEvent.send(UiEvent.EventDeleted)
+            }.filterNotNull().onEach { event ->
                 _uiState.update { it.copy(event = event, state = State.Success) }
             }.launchIn(this)
         }
@@ -67,7 +64,7 @@ class EventViewModel @Inject constructor(
         }.onFailure { exception ->
             when (exception) {
                 is HttpException -> {
-                    _event.send(UiEvent.EventDeleted)
+                    _uiEvent.send(UiEvent.EventDeleted)
                 }
 
                 else -> {
@@ -87,7 +84,7 @@ class EventViewModel @Inject constructor(
                     eventRepository.likeById(eventId)
                 }
             }?.onFailure {
-                _event.send(UiEvent.ErrorLikingEvent)
+                _uiEvent.send(UiEvent.ErrorLikingEvent)
             }
 
             likeJob = null
@@ -104,7 +101,7 @@ class EventViewModel @Inject constructor(
                     eventRepository.participate(eventId)
                 }
             }?.onFailure {
-                _event.send(UiEvent.ErrorParticipatingEvent)
+                _uiEvent.send(UiEvent.ErrorParticipatingEvent)
             }
 
             participateJob = null
@@ -114,9 +111,9 @@ class EventViewModel @Inject constructor(
     fun delete() = viewModelScope.launch {
         runCatching {
             eventRepository.deleteById(eventId)
-            _event.send(UiEvent.EventDeleted)
+            _uiEvent.send(UiEvent.EventDeleted)
         }.onFailure {
-            _event.send(UiEvent.ErrorRemovingEvent)
+            _uiEvent.send(UiEvent.ErrorRemovingEvent)
         }
     }
 }

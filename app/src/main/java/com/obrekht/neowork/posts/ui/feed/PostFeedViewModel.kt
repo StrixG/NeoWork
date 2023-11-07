@@ -20,7 +20,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -48,13 +47,8 @@ class PostFeedViewModel @Inject constructor(
                 initialLoadSize = POSTS_PER_PAGE * 2
             )
         )
-        .combine(appAuth.state) { pagingData, authState ->
-            pagingData.map {
-                PostItem(it.copy(ownedByMe = it.authorId == authState.id))
-            }
-        }
         .map {
-            it.insertDateSeparators()
+            it.map(::PostItem).insertDateSeparators()
         }
         .cachedIn(viewModelScope)
         .flowOn(Dispatchers.Default)

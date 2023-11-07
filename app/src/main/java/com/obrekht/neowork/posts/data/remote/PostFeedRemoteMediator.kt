@@ -7,8 +7,8 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.obrekht.neowork.posts.data.local.PostDatabase
 import com.obrekht.neowork.posts.data.local.dao.PostDao
-import com.obrekht.neowork.posts.data.local.entity.PostData
-import com.obrekht.neowork.posts.data.local.entity.toEntityData
+import com.obrekht.neowork.posts.data.local.entity.PostEntity
+import com.obrekht.neowork.posts.data.local.entity.toEntity
 import com.obrekht.neowork.userpreview.data.local.dao.UserPreviewDao
 import com.obrekht.neowork.userpreview.data.local.entity.toEntity
 import com.obrekht.neowork.userpreview.model.UserPreview
@@ -23,10 +23,10 @@ class PostFeedRemoteMediator @Inject constructor(
     private val postDao: PostDao,
     private val userPreviewDao: UserPreviewDao,
     private val postApi: PostApiService
-) : RemoteMediator<Int, PostData>() {
+) : RemoteMediator<Int, PostEntity>() {
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, PostData>
+        state: PagingState<Int, PostEntity>
     ): MediatorResult {
         return runCatching {
             state.firstItemOrNull()
@@ -40,7 +40,7 @@ class PostFeedRemoteMediator @Inject constructor(
                 }
 
                 LoadType.APPEND -> {
-                    val id = state.lastItemOrNull()?.post?.postId ?: return MediatorResult.Success(
+                    val id = state.lastItemOrNull()?.postId ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
                     postApi.getBefore(id, state.config.pageSize)
@@ -56,7 +56,7 @@ class PostFeedRemoteMediator @Inject constructor(
                 if (loadType == LoadType.REFRESH) {
                     postDao.deleteAll()
                 }
-                postDao.upsertWithData(posts.toEntityData())
+                postDao.upsert(posts.toEntity())
 
                 val previewMap = posts.fold(mutableMapOf<Long, UserPreview>()) { acc, value ->
                     acc.apply { putAll(value.users) }

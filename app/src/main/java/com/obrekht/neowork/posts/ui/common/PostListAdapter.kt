@@ -143,13 +143,7 @@ class PostViewHolder(
             } ?: avatar.load(R.drawable.avatar_placeholder)
 
             // Like
-            like.setIconResource(
-                if (post.likedByMe) {
-                    R.drawable.ic_like
-                } else {
-                    R.drawable.ic_like_border
-                }
-            )
+            like.isChecked = post.likedByMe
             like.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
 
             // Attachment

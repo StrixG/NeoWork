@@ -56,12 +56,14 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/like"
-        style="@style/Widget.App.CommentButton.Like"
+        style="@style/Widget.App.CommentButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/common_spacing"
         android:layout_marginBottom="8dp"
+        android:checkable="true"
         android:contentDescription="@string/description_like"
+        app:icon="@drawable/checkable_like"
         app:layout_constraintEnd_toEndOf="@id/author"
         app:layout_constraintTop_toTopOf="@id/published"
         tools:text="10" />

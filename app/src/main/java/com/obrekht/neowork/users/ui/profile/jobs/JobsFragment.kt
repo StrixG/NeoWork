@@ -129,8 +129,7 @@ class JobsFragment : Fragment(R.layout.fragment_jobs) {
 
     private fun handleLoadState(state: CombinedLoadStates): Unit = with(binding) {
         adapter?.let { adapter ->
-            if (state.refresh is LoadState.NotLoading
-                && viewModel.uiState.value.dataState != DataState.Loading) {
+            if (state.refresh is LoadState.NotLoading) {
                 if (state.append.endOfPaginationReached) {
                     emptyText.isVisible = adapter.itemCount == 0
                 }

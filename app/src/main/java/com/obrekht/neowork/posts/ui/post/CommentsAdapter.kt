@@ -62,13 +62,6 @@ class CommentsAdapter(
                 published.text = publishedString
                 content.text = comment.content
 
-                like.setIconResource(
-                    if (comment.likedByMe) {
-                        R.drawable.ic_like
-                    } else {
-                        R.drawable.ic_like_border
-                    }
-                )
                 like.text = StringUtils.getCompactNumber(comment.likeOwnerIds.size)
 
                 comment.authorAvatar?.let {

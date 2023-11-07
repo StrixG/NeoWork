@@ -186,6 +186,7 @@
                         android:layout_marginStart="@dimen/common_spacing"
                         android:layout_marginBottom="@dimen/small_spacing"
                         android:visibility="gone"
+                        app:buttonCheckable="false"
                         app:buttonIcon="@drawable/ic_people_outline"
                         app:layout_constraintBottom_toTopOf="@id/location_preview"
                         app:layout_constraintTop_toBottomOf="@id/likers"

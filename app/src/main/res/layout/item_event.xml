@@ -157,12 +157,14 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/like"
-            style="@style/Widget.App.ItemButton.TextIcon.Like"
+            style="@style/Widget.App.ItemButton.TextIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/small_spacing"
             android:layout_marginStart="@dimen/common_spacing"
+            android:checkable="true"
             android:contentDescription="@string/description_like"
+            app:icon="@drawable/checkable_like"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/content"
@@ -170,25 +172,28 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/share"
-            style="@style/Widget.App.ItemButton.Icon.Share"
+            style="@style/Widget.App.ItemButton.Icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/small_spacing"
             android:layout_marginStart="@dimen/button_spacing"
             android:contentDescription="@string/description_share"
+            app:icon="@drawable/ic_share"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/like"
             app:layout_constraintTop_toBottomOf="@id/content" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/participate"
-            style="@style/Widget.App.ItemButton.TextIcon.Participants"
+            style="@style/Widget.App.ItemButton.TextIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/small_spacing"
             android:layout_marginStart="@dimen/small_spacing"
             android:layout_marginEnd="@dimen/common_spacing"
+            android:checkable="true"
             android:contentDescription="@string/description_participants"
+            app:icon="@drawable/checkable_participate"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/content"

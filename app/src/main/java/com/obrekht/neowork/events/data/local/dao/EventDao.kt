@@ -49,12 +49,19 @@ interface EventDao {
     @Query("DELETE FROM event WHERE eventId = :id")
     suspend fun deleteById(id: Long)
 
+    @Query("UPDATE event SET likedByMe = :isLiked WHERE eventId = :eventId")
+    suspend fun setLikedByMe(eventId: Long, isLiked: Boolean)
+
+    @Query("UPDATE event SET participatedByMe = :isParticipating WHERE eventId = :eventId")
+    suspend fun setParticipatedByMe(eventId: Long, isParticipating: Boolean)
+
     @Transaction
     suspend fun addParticipant(eventId: Long, userId: Long) {
         getById(eventId)?.let {
             val participantIds = it.participantIds.toMutableSet()
             participantIds.add(userId)
             upsert(it.copy(participantIds = participantIds))
+            setParticipatedByMe(eventId, true)
         }
     }
 
@@ -64,6 +71,7 @@ interface EventDao {
             val participantIds = it.participantIds.toMutableSet()
             participantIds.remove(userId)
             upsert(it.copy(participantIds = participantIds))
+            setParticipatedByMe(eventId, false)
         }
     }
 
@@ -73,6 +81,7 @@ interface EventDao {
             val likeOwnerIds = it.likeOwnerIds.toMutableSet()
             likeOwnerIds.add(userId)
             upsert(it.copy(likeOwnerIds = likeOwnerIds))
+            setLikedByMe(eventId, true)
         }
     }
 
@@ -82,6 +91,7 @@ interface EventDao {
             val likeOwnerIds = it.likeOwnerIds.toMutableSet()
             likeOwnerIds.remove(userId)
             upsert(it.copy(likeOwnerIds = likeOwnerIds))
+            setLikedByMe(eventId, false)
         }
     }
 }

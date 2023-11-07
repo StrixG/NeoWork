@@ -404,13 +404,6 @@ class PostFragment : Fragment(R.layout.fragment_post) {
 
             // Likers
             likers.button.isChecked = post.likedByMe
-            likers.button.setIconResource(
-                if (post.likedByMe) {
-                    R.drawable.ic_like
-                } else {
-                    R.drawable.ic_like_border
-                }
-            )
             likers.button.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
 
             val likerList = post.users.filterKeys { post.likeOwnerIds.contains(it) }

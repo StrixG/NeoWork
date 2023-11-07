@@ -210,7 +210,7 @@ class EventFragment : Fragment(R.layout.fragment_event) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnStarted {
                 viewModel.uiState.onEach(::handleState).launchIn(this)
-                viewModel.event.onEach(::handleEvent).launchIn(this)
+                viewModel.uiEvent.onEach(::handleEvent).launchIn(this)
             }
         }
     }
@@ -332,13 +332,6 @@ class EventFragment : Fragment(R.layout.fragment_event) {
 
             // Likers
             likers.button.isChecked = event.likedByMe
-            likers.button.setIconResource(
-                if (event.likedByMe) {
-                    R.drawable.ic_like
-                } else {
-                    R.drawable.ic_like_border
-                }
-            )
             likers.button.text = StringUtils.getCompactNumber(event.likeOwnerIds.size)
 
             val likerPreviewList = event.users.filterKeys { event.likeOwnerIds.contains(it) }
@@ -346,13 +339,6 @@ class EventFragment : Fragment(R.layout.fragment_event) {
 
             // Participants
             participants.button.isChecked = event.participatedByMe
-            participants.button.setIconResource(
-                if (event.participatedByMe) {
-                    R.drawable.ic_person_check
-                } else {
-                    R.drawable.ic_people_outline
-                }
-            )
             TooltipCompat.setTooltipText(participants.button, getString(
                 if (event.participatedByMe) {
                     R.string.do_not_participate

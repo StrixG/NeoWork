@@ -157,23 +157,10 @@ class EventViewHolder(
             } ?: avatar.load(R.drawable.avatar_placeholder)
 
             // Like
-            like.setIconResource(
-                if (event.likedByMe) {
-                    R.drawable.ic_like
-                } else {
-                    R.drawable.ic_like_border
-                }
-            )
+            like.isChecked = event.likedByMe
             like.text = StringUtils.getCompactNumber(event.likeOwnerIds.size)
 
             // Participation
-            participate.setIconResource(
-                if (event.participatedByMe) {
-                    R.drawable.ic_person_check
-                } else {
-                    R.drawable.ic_people_outline
-                }
-            )
             TooltipCompat.setTooltipText(participate, participate.resources.getString(
                 if (event.participatedByMe) {
                     R.string.do_not_participate
@@ -181,6 +168,7 @@ class EventViewHolder(
                     R.string.participate
                 }
             ))
+            participate.isChecked = event.participatedByMe
             participate.text = StringUtils.getCompactNumber(event.participantsIds.size)
 
             // Attachment

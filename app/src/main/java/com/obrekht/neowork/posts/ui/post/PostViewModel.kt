@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -50,24 +49,17 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             refreshComments()
 
-            appAuth.state.onEach { authState ->
-                _uiState.update { it.copy(isLoggedIn = authState.id > 0L) }
+            appAuth.loggedInState.onEach { isLoggedIn ->
+                _uiState.update { it.copy(isLoggedIn = isLoggedIn) }
             }.launchIn(this)
 
             postRepository.getPostStream(postId).onEach {
                 if (it == null) _event.send(UiEvent.PostDeleted)
-            }.filterNotNull().combine(appAuth.state) { post, authState ->
-                post.copy(ownedByMe = post.authorId == authState.id)
-            }.onEach { post ->
+            }.filterNotNull().onEach { post ->
                 _uiState.update { it.copy(post = post, state = State.Success) }
             }.launchIn(this)
 
-            commentRepository.getCommentListStream(postId).combine(appAuth.state) { comments, authState ->
-                comments.map { it.copy(
-                    likedByMe = it.likeOwnerIds.contains(authState.id),
-                    ownedByMe = it.authorId == authState.id
-                ) }
-            }.onEach { comments ->
+            commentRepository.getCommentListStream(postId).onEach { comments ->
                 _uiState.update {
                     it.copy(
                         comments = comments,

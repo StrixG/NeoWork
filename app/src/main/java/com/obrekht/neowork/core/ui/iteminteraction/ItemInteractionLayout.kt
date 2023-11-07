@@ -23,6 +23,7 @@ class ItemInteractionLayout @JvmOverloads constructor(
 
     init {
         context.withStyledAttributes(attrs, R.styleable.ItemInteractionLayout) {
+            binding.button.isCheckable = getBoolean(R.styleable.ItemInteractionLayout_buttonCheckable, true)
             binding.button.isVisible = getBoolean(R.styleable.ItemInteractionLayout_showButton, true)
             binding.title.text = getString(R.styleable.ItemInteractionLayout_title)
             val iconId = getResourceId(R.styleable.ItemInteractionLayout_buttonIcon, 0)

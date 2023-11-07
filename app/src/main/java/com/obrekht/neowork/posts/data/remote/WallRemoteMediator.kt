@@ -7,8 +7,8 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.obrekht.neowork.posts.data.local.PostDatabase
 import com.obrekht.neowork.posts.data.local.dao.PostDao
-import com.obrekht.neowork.posts.data.local.entity.PostData
-import com.obrekht.neowork.posts.data.local.entity.toEntityData
+import com.obrekht.neowork.posts.data.local.entity.PostEntity
+import com.obrekht.neowork.posts.data.local.entity.toEntity
 import com.obrekht.neowork.userpreview.data.local.dao.UserPreviewDao
 import com.obrekht.neowork.userpreview.data.local.entity.toEntity
 import com.obrekht.neowork.userpreview.model.UserPreview
@@ -26,7 +26,7 @@ class WallRemoteMediator @AssistedInject constructor(
     private val postDao: PostDao,
     private val userPreviewDao: UserPreviewDao,
     private val wallApi: WallApiService
-) : RemoteMediator<Int, PostData>() {
+) : RemoteMediator<Int, PostEntity>() {
 
     @AssistedFactory
     interface Factory {
@@ -35,7 +35,7 @@ class WallRemoteMediator @AssistedInject constructor(
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, PostData>
+        state: PagingState<Int, PostEntity>
     ): MediatorResult {
         return runCatching {
             state.firstItemOrNull()
@@ -49,7 +49,7 @@ class WallRemoteMediator @AssistedInject constructor(
                 }
 
                 LoadType.APPEND -> {
-                    val id = state.lastItemOrNull()?.post?.postId ?: return MediatorResult.Success(
+                    val id = state.lastItemOrNull()?.postId ?: return MediatorResult.Success(
                         endOfPaginationReached = false
                     )
                     wallApi.getBefore(userId, id, state.config.pageSize)
@@ -65,7 +65,7 @@ class WallRemoteMediator @AssistedInject constructor(
                 if (loadType == LoadType.REFRESH) {
                     postDao.deleteAllByAuthorId(userId)
                 }
-                postDao.upsertWithData(post.toEntityData())
+                postDao.upsert(post.toEntity())
 
                 val previewMap = post.fold(mutableMapOf<Long, UserPreview>()) { acc, value ->
                     acc.apply { putAll(value.users) }
