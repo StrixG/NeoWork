@@ -174,7 +174,7 @@
                         android:layout_marginStart="@dimen/common_spacing"
                         android:layout_marginTop="@dimen/common_spacing"
                         android:layout_marginBottom="@dimen/small_spacing"
-                        app:buttonIcon="@drawable/ic_like"
+                        app:buttonIcon="@drawable/checkable_like"
                         app:layout_constraintBottom_toTopOf="@id/mentioned"
                         app:layout_constraintTop_toBottomOf="@id/content_barrier"
                         app:title="@string/likers" />
