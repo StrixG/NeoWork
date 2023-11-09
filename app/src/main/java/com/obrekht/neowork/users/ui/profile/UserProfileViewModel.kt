@@ -43,6 +43,8 @@ class UserProfileViewModel @Inject constructor(
     val event: Flow<UiEvent> = _event.receiveAsFlow()
 
     init {
+        refresh()
+
         viewModelScope.launch {
             appAuth.state.onEach { authState ->
                 _uiState.update {
