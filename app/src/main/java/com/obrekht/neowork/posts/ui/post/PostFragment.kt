@@ -492,9 +492,9 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                         attachmentPreview.isVisible = true
                     }
 
-                    AttachmentType.AUDIO -> {}
+                    else -> startPostponedEnterTransition()
                 }
-            }
+            } ?: startPostponedEnterTransition()
         }
 
         binding.content.maxLines = Int.MAX_VALUE

@@ -316,10 +316,12 @@ class EventFragment : Fragment(R.layout.fragment_event) {
             author.text = event.author
             job.text = event.authorJob ?: getString(R.string.open_to_work)
             published.text = publishedDate
-            type.setText(when(event.type) {
-                EventType.OFFLINE -> R.string.event_type_offline
-                EventType.ONLINE -> R.string.event_type_online
-            })
+            type.setText(
+                when (event.type) {
+                    EventType.OFFLINE -> R.string.event_type_offline
+                    EventType.ONLINE -> R.string.event_type_online
+                }
+            )
             val dateMillis = event.datetime?.toEpochMilli() ?: 0
             date.text = TimeUtils.getRelativeDate(
                 requireContext(),
@@ -352,16 +354,19 @@ class EventFragment : Fragment(R.layout.fragment_event) {
 
             // Participants
             participants.button.isChecked = event.participatedByMe
-            TooltipCompat.setTooltipText(participants.button, getString(
-                if (event.participatedByMe) {
-                    R.string.do_not_participate
-                } else {
-                    R.string.participate
-                }
-            ))
+            TooltipCompat.setTooltipText(
+                participants.button, getString(
+                    if (event.participatedByMe) {
+                        R.string.do_not_participate
+                    } else {
+                        R.string.participate
+                    }
+                )
+            )
             participants.button.text = StringUtils.getCompactNumber(event.participantsIds.size)
 
-            val participantPreviewList = event.users.filterKeys { event.participantsIds.contains(it) }
+            val participantPreviewList =
+                event.users.filterKeys { event.participantsIds.contains(it) }
             participants.setUserPreviews(participantPreviewList)
 
             // Location
@@ -427,7 +432,7 @@ class EventFragment : Fragment(R.layout.fragment_event) {
 
                     else -> startPostponedEnterTransition()
                 }
-            }
+            } ?: startPostponedEnterTransition()
         }
 
         binding.content.maxLines = Int.MAX_VALUE
