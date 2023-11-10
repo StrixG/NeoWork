@@ -2,7 +2,9 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.NeoWork" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges</item>
-        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="Theme.NeoWork" parent="Base.Theme.NeoWork">
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
@@ -31,8 +33,6 @@
         <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
     </style>
-
-    <style name="Theme.NeoWork" parent="Base.Theme.NeoWork" />
 
     <style name="Theme.NeoWork.Media" >
         <item name="android:background">@color/black</item>
