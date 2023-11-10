@@ -63,6 +63,7 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
     }
 
     override fun onStop() {
+        insetsController?.show(WindowInsetsCompat.Type.systemBars())
         if (resources.configuration.isLightTheme) {
             insetsController?.isAppearanceLightStatusBars = true
         }
