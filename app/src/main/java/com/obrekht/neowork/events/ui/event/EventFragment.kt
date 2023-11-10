@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.View.OnClickListener
+import android.widget.ImageView
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.widget.TooltipCompat
@@ -31,6 +32,7 @@ import com.obrekht.neowork.events.model.EventType
 import com.obrekht.neowork.events.ui.common.EventInteractionListener
 import com.obrekht.neowork.events.ui.navigateToEventEditor
 import com.obrekht.neowork.events.ui.shareEvent
+import com.obrekht.neowork.media.ui.navigateToMediaView
 import com.obrekht.neowork.userlist.ui.navigateToUserList
 import com.obrekht.neowork.userpreview.ui.UserPreviewClickListener
 import com.obrekht.neowork.userpreview.ui.UserPreviewMoreClickListener
@@ -93,6 +95,12 @@ class EventFragment : Fragment(R.layout.fragment_event) {
     private val interactionListener = object : EventInteractionListener {
         override fun onAvatarClick(event: Event) {
             navigateToUserProfile(event.authorId)
+        }
+
+        override fun onAttachmentClick(event: Event, view: ImageView) {
+            event.attachment?.let {
+                navigateToMediaView(it.type, it.url, view)
+            }
         }
 
         override fun onLike(event: Event) {
@@ -166,6 +174,7 @@ class EventFragment : Fragment(R.layout.fragment_event) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        postponeEnterTransition()
         setupResultListeners()
 
         with(binding) {
@@ -188,7 +197,11 @@ class EventFragment : Fragment(R.layout.fragment_event) {
             }
 
             avatar.setOnClickListener {
-                event.let(interactionListener::onAvatarClick)
+                interactionListener.onAvatarClick(event)
+            }
+
+            attachmentPreview.setOnClickListener {
+                interactionListener.onAttachmentClick(event, attachmentPreview)
             }
 
             speakers.preview.setOnPreviewClickListener(userPreviewClickListener)
@@ -388,10 +401,15 @@ class EventFragment : Fragment(R.layout.fragment_event) {
             buttonPlayVideo.isVisible = false
 
             event.attachment?.let {
+                attachmentPreview.transitionName = it.url
+
                 when (it.type) {
                     AttachmentType.IMAGE -> {
                         attachmentPreview.load(it.url) {
                             crossfade(true)
+                            listener { _, _ ->
+                                startPostponedEnterTransition()
+                            }
                         }
                         attachmentPreview.isVisible = true
                     }
@@ -401,12 +419,13 @@ class EventFragment : Fragment(R.layout.fragment_event) {
                             crossfade(true)
                             listener { _, _ ->
                                 buttonPlayVideo.isVisible = true
+                                startPostponedEnterTransition()
                             }
                         }
                         attachmentPreview.isVisible = true
                     }
 
-                    AttachmentType.AUDIO -> {}
+                    else -> startPostponedEnterTransition()
                 }
             }
         }

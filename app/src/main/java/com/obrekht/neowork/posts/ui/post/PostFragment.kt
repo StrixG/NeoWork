@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.View.OnClickListener
+import android.widget.ImageView
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
@@ -29,6 +30,7 @@ import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.databinding.FragmentPostBinding
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType
+import com.obrekht.neowork.media.ui.navigateToMediaView
 import com.obrekht.neowork.posts.model.Comment
 import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.posts.ui.common.PostInteractionListener
@@ -113,6 +115,12 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             sharePost(post)
         }
 
+        override fun onAttachmentClick(post: Post, view: ImageView) {
+            post.attachment?.let {
+                navigateToMediaView(it.type, it.url, view)
+            }
+        }
+
         override fun onEdit(post: Post) {
             if (viewModel.isLoggedIn) {
                 navigateToPostEditor(post.id)
@@ -181,6 +189,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        postponeEnterTransition()
         setupResultListeners()
 
         with(binding) {
@@ -203,11 +212,15 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             }
 
             avatar.setOnClickListener {
-                post.let(interactionListener::onAvatarClick)
+                interactionListener.onAvatarClick(post)
+            }
+
+            attachmentPreview.setOnClickListener {
+                interactionListener.onAttachmentClick(post, attachmentPreview)
             }
 
             likers.setButtonClickListener {
-                post.let(interactionListener::onLike)
+                interactionListener.onLike(post)
             }
             likers.preview.setOnPreviewClickListener(userPreviewClickListener)
             likers.preview.setOnMoreClickListener(likersMoreClickListener)
@@ -455,10 +468,15 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             buttonPlayVideo.isVisible = false
 
             post.attachment?.let {
+                attachmentPreview.transitionName = it.url
+
                 when (it.type) {
                     AttachmentType.IMAGE -> {
                         attachmentPreview.load(it.url) {
                             crossfade(true)
+                            listener { _, _ ->
+                                startPostponedEnterTransition()
+                            }
                         }
                         attachmentPreview.isVisible = true
                     }
@@ -468,6 +486,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                             crossfade(true)
                             listener { _, _ ->
                                 buttonPlayVideo.isVisible = true
+                                startPostponedEnterTransition()
                             }
                         }
                         attachmentPreview.isVisible = true

@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -35,6 +36,7 @@ import com.obrekht.neowork.events.ui.common.EventViewHolder
 import com.obrekht.neowork.events.ui.navigateToEvent
 import com.obrekht.neowork.events.ui.navigateToEventEditor
 import com.obrekht.neowork.events.ui.shareEvent
+import com.obrekht.neowork.media.ui.navigateToMediaView
 import com.obrekht.neowork.users.ui.navigateToUserProfile
 import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.setBarsInsetsListener
@@ -71,6 +73,12 @@ class EventFeedFragment : Fragment(R.layout.fragment_event_feed) {
             navigateToUserProfile(event.authorId)
         }
 
+        override fun onAttachmentClick(event: Event, view: ImageView) {
+            event.attachment?.let {
+                navigateToMediaView(it.type, it.url, view)
+            }
+        }
+
         override fun onLike(event: Event) {
             if (viewModel.isLoggedIn) {
                 viewModel.toggleLike(event)
@@ -82,6 +90,7 @@ class EventFeedFragment : Fragment(R.layout.fragment_event_feed) {
         override fun onShare(event: Event) {
             shareEvent(event)
         }
+
 
         override fun onParticipate(event: Event) {
             if (viewModel.isLoggedIn) {
@@ -324,4 +333,3 @@ class EventFeedFragment : Fragment(R.layout.fragment_event_feed) {
         }
     }
 }
-

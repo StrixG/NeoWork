@@ -118,6 +118,9 @@ class EventViewHolder(
             share.setOnClickListener {
                 event?.let(interactionListener::onShare)
             }
+            attachmentPreview.setOnClickListener {
+                event?.let { interactionListener.onAttachmentClick(it, attachmentPreview) }
+            }
             participate.setOnClickListener {
                 event?.let(interactionListener::onParticipate)
             }
@@ -183,6 +186,7 @@ class EventViewHolder(
                             crossfade(true)
                         }
                         attachmentPreview.isVisible = true
+                        attachmentPreview.transitionName = "${it.url}_$absoluteAdapterPosition"
                     }
                     AttachmentType.VIDEO -> {
                         attachmentPreview.load(it.url) {
@@ -192,6 +196,7 @@ class EventViewHolder(
                             }
                         }
                         attachmentPreview.isVisible = true
+                        attachmentPreview.transitionName = "${it.url}_$absoluteAdapterPosition"
                     }
                     AttachmentType.AUDIO -> {}
                 }

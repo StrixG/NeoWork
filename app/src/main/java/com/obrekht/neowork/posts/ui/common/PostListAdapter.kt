@@ -110,6 +110,9 @@ class PostViewHolder(
             avatar.setOnClickListener {
                 post?.let(interactionListener::onAvatarClick)
             }
+            attachmentPreview.setOnClickListener {
+                post?.let { interactionListener.onAttachmentClick(it, attachmentPreview) }
+            }
             like.setOnClickListener {
                 post?.let(interactionListener::onLike)
             }
@@ -147,6 +150,7 @@ class PostViewHolder(
             like.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
 
             // Attachment
+            attachmentPreview.transitionName = null
             attachmentPreview.load(null)
             attachmentPreview.isVisible = false
             buttonPlayVideo.isVisible = false
@@ -158,6 +162,7 @@ class PostViewHolder(
                             crossfade(true)
                         }
                         attachmentPreview.isVisible = true
+                        attachmentPreview.transitionName = "${it.url}_$absoluteAdapterPosition"
                     }
                     AttachmentType.VIDEO -> {
                         attachmentPreview.load(it.url) {
@@ -167,6 +172,7 @@ class PostViewHolder(
                             }
                         }
                         attachmentPreview.isVisible = true
+                        attachmentPreview.transitionName = "${it.url}_$absoluteAdapterPosition"
                     }
                     AttachmentType.AUDIO -> {}
                 }

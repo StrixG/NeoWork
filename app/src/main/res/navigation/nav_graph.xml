@@ -224,6 +224,26 @@
     <action
         android:id="@+id/action_openLocationPicker"
         app:destination="@id/location_picker_fragment"
+        app:launchSingleTop="true" />
+
+    <fragment
+        android:id="@+id/media_view_fragment"
+        android:name="com.obrekht.neowork.media.ui.MediaViewFragment">
+        <argument
+            android:name="mediaType"
+            app:argType="com.obrekht.neowork.core.model.AttachmentType" />
+        <argument
+            android:name="url"
+            app:argType="string" />
+        <argument
+            android:name="memoryCacheKey"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+
+    <action
+        android:id="@+id/action_openMediaView"
+        app:destination="@id/media_view_fragment"
         app:enterAnim="@anim/nav_default_enter_anim"
         app:exitAnim="@anim/nav_default_exit_anim"
         app:launchSingleTop="true"

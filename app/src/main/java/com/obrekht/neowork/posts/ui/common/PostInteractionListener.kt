@@ -1,10 +1,12 @@
 package com.obrekht.neowork.posts.ui.common
 
+import android.widget.ImageView
 import com.obrekht.neowork.posts.model.Post
 
 interface PostInteractionListener {
     fun onClick(post: Post) {}
     fun onAvatarClick(post: Post) {}
+    fun onAttachmentClick(post: Post, view: ImageView) {}
     fun onLike(post: Post) {}
     fun onShare(post: Post) {}
     fun onEdit(post: Post) {}

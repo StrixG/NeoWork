@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
+import android.widget.ImageView
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -21,12 +22,13 @@ import com.obrekht.neowork.R
 import com.obrekht.neowork.auth.ui.navigateToLogIn
 import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
 import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
-import com.obrekht.neowork.core.ui.mainscreen.MainScreenFragment
 import com.obrekht.neowork.core.ui.findRootNavController
+import com.obrekht.neowork.core.ui.mainscreen.MainScreenFragment
 import com.obrekht.neowork.databinding.FragmentPostFeedBinding
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType
 import com.obrekht.neowork.editor.ui.editor.EditorFragment
+import com.obrekht.neowork.media.ui.navigateToMediaView
 import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.posts.ui.common.PostInteractionListener
 import com.obrekht.neowork.posts.ui.common.PostItem
@@ -73,6 +75,12 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
 
         override fun onAvatarClick(post: Post) {
             navigateToUserProfile(post.authorId)
+        }
+
+        override fun onAttachmentClick(post: Post, view: ImageView) {
+            post.attachment?.let {
+                navigateToMediaView(it.type, it.url, view)
+            }
         }
 
         override fun onLike(post: Post) {
@@ -156,10 +164,10 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     if (dy > 0 && buttonNewPosts.isShown) {
                         buttonNewPosts.hide()
-                    } else if (dy < 0 && !buttonNewPosts.isShown &&
-                        !swipeRefresh.isRefreshing && uiState.newerCount > 0
-                    ) {
-                        buttonNewPosts.show()
+                    } else if (dy < 0 && !buttonNewPosts.isShown) {
+                        if (!swipeRefresh.isRefreshing && uiState.newerCount > 0) {
+                            buttonNewPosts.show()
+                        }
                     }
                 }
             })
