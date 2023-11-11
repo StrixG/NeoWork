@@ -1,9 +1,11 @@
 package com.obrekht.neowork.media.ui
 
 import android.os.Bundle
+import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.Window
+import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -29,6 +31,22 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
     private val args: MediaViewFragmentArgs by navArgs()
 
     private var insetsController: WindowInsetsControllerCompat? = null
+    private var systemBarsVisible: Boolean = true
+
+    private val gestureListener = object : GestureDetector.SimpleOnGestureListener() {
+        override fun onDown(e: MotionEvent): Boolean = true
+
+        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            if (systemBarsVisible) {
+                insetsController?.hide(WindowInsetsCompat.Type.systemBars())
+                binding.toolbar.isVisible = false
+            } else {
+                insetsController?.show(WindowInsetsCompat.Type.systemBars())
+                binding.toolbar.isVisible = true
+            }
+            return true
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,24 +94,15 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
     }
 
     private fun setupHideUiListener(window: Window) {
+        val gestureDetector = GestureDetectorCompat(requireContext(), gestureListener)
+
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { decorView, windowInsets ->
-            val isSystemBarsVisible =
-                (windowInsets.isVisible(WindowInsetsCompat.Type.navigationBars())
+            systemBarsVisible = (windowInsets.isVisible(WindowInsetsCompat.Type.navigationBars())
                         || windowInsets.isVisible(WindowInsetsCompat.Type.statusBars()))
 
-            decorView.setOnTouchListener { v, event ->
-                if (event.action == MotionEvent.ACTION_UP) {
-                    if (isSystemBarsVisible) {
-                        insetsController?.hide(WindowInsetsCompat.Type.systemBars())
-                        binding.toolbar.isVisible = false
-                    } else {
-                        insetsController?.show(WindowInsetsCompat.Type.systemBars())
-                        binding.toolbar.isVisible = true
-                    }
-                    v.performClick()
-                } else {
-                    false
-                }
+            decorView.setOnTouchListener { view, event ->
+                gestureDetector.onTouchEvent(event)
+                view.performClick()
             }
 
             windowInsets
