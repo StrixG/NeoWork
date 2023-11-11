@@ -103,11 +103,13 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             navigateToUserProfile(post.authorId)
         }
 
-        override fun onLike(post: Post) {
-            if (viewModel.isLoggedIn) {
+        override fun onLike(post: Post): Boolean {
+            return if (viewModel.isLoggedIn) {
                 viewModel.toggleLike()
+                true
             } else {
                 showSuggestAuthDialog()
+                false
             }
         }
 

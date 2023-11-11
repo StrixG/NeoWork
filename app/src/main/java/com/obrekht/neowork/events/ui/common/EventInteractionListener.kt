@@ -7,9 +7,9 @@ interface EventInteractionListener {
     fun onClick(event: Event) {}
     fun onAvatarClick(event: Event) {}
     fun onAttachmentClick(event: Event, view: ImageView) {}
-    fun onLike(event: Event) {}
+    fun onLike(event: Event): Boolean = false
     fun onShare(event: Event) {}
-    fun onParticipate(event: Event) {}
+    fun onParticipate(event: Event): Boolean = false
     fun onEdit(event: Event) {}
     fun onDelete(event: Event) {}
 }

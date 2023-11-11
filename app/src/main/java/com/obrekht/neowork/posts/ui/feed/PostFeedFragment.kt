@@ -83,11 +83,13 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
             }
         }
 
-        override fun onLike(post: Post) {
-            if (viewModel.isLoggedIn) {
+        override fun onLike(post: Post): Boolean {
+            return if (viewModel.isLoggedIn) {
                 viewModel.toggleLike(post)
+                true
             } else {
                 showSuggestAuthDialog()
+                false
             }
         }
 

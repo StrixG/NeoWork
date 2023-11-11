@@ -114,7 +114,13 @@ class PostViewHolder(
                 post?.let { interactionListener.onAttachmentClick(it, attachmentPreview) }
             }
             like.setOnClickListener {
-                post?.let(interactionListener::onLike)
+                var success = false
+                post?.let {
+                    success = interactionListener.onLike(it)
+                }
+                if (!success) {
+                    like.toggle()
+                }
             }
             share.setOnClickListener {
                 post?.let(interactionListener::onShare)

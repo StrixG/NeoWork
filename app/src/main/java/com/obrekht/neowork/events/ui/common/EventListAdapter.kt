@@ -113,7 +113,13 @@ class EventViewHolder(
                 event?.let(interactionListener::onAvatarClick)
             }
             like.setOnClickListener {
-                event?.let(interactionListener::onLike)
+                var success = false
+                event?.let {
+                    success = interactionListener.onLike(it)
+                }
+                if (!success) {
+                    like.toggle()
+                }
             }
             share.setOnClickListener {
                 event?.let(interactionListener::onShare)
@@ -122,7 +128,13 @@ class EventViewHolder(
                 event?.let { interactionListener.onAttachmentClick(it, attachmentPreview) }
             }
             participate.setOnClickListener {
-                event?.let(interactionListener::onParticipate)
+                var success = false
+                event?.let {
+                    success = interactionListener.onParticipate(it)
+                }
+                if (!success) {
+                    like.toggle()
+                }
             }
 
             menu.setOnClickListener {

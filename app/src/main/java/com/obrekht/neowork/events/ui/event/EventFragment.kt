@@ -103,11 +103,13 @@ class EventFragment : Fragment(R.layout.fragment_event) {
             }
         }
 
-        override fun onLike(event: Event) {
-            if (viewModel.isLoggedIn) {
+        override fun onLike(event: Event): Boolean {
+            return if (viewModel.isLoggedIn) {
                 viewModel.toggleLike()
+                true
             } else {
                 showSuggestAuthDialog()
+                false
             }
         }
 
@@ -115,11 +117,13 @@ class EventFragment : Fragment(R.layout.fragment_event) {
             shareEvent(event)
         }
 
-        override fun onParticipate(event: Event) {
-            if (viewModel.isLoggedIn) {
+        override fun onParticipate(event: Event): Boolean {
+            return if (viewModel.isLoggedIn) {
                 viewModel.toggleParticipation()
+                true
             } else {
                 showSuggestAuthDialog()
+                false
             }
         }
 
