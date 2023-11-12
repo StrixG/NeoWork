@@ -65,11 +65,13 @@ class WallFragment : Fragment(R.layout.fragment_wall) {
             }
         }
 
-        override fun onLike(post: Post) {
-            if (userProfileViewModel.isLoggedIn) {
+        override fun onLike(post: Post): Boolean {
+            return if (userProfileViewModel.isLoggedIn) {
                 viewModel.togglePostLike(post)
+                true
             } else {
                 showSuggestAuthDialog()
+                false
             }
         }
 
