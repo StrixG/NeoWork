@@ -11,7 +11,7 @@ data class Attachment(
 enum class AttachmentType(val supportedTypes: List<String>) {
     IMAGE(listOf("image/jpeg", "image/png")),
     VIDEO(listOf("video/mp4")),
-    AUDIO(listOf("audio/mp3"));
+    AUDIO(listOf("audio/mp3", "audio/mpeg"));
 
     companion object {
         fun getFromMimeType(mimeType: String): AttachmentType? =
