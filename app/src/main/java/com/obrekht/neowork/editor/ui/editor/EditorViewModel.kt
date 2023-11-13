@@ -11,7 +11,7 @@ import com.obrekht.neowork.events.data.repository.EventRepository
 import com.obrekht.neowork.events.model.Event
 import com.obrekht.neowork.events.model.EventType
 import com.obrekht.neowork.map.model.LocationPoint
-import com.obrekht.neowork.media.data.MediaCache
+import com.obrekht.neowork.media.data.local.MediaCache
 import com.obrekht.neowork.media.model.MediaUpload
 import com.obrekht.neowork.posts.data.repository.CommentRepository
 import com.obrekht.neowork.posts.data.repository.PostRepository

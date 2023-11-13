@@ -8,7 +8,7 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.obrekht.neowork.auth.data.local.AppAuth
 import com.obrekht.neowork.core.model.Attachment
-import com.obrekht.neowork.media.data.MediaApiService
+import com.obrekht.neowork.media.data.remote.MediaApiService
 import com.obrekht.neowork.media.model.Media
 import com.obrekht.neowork.media.model.MediaUpload
 import com.obrekht.neowork.posts.data.local.dao.PostDao

@@ -15,7 +15,7 @@ import com.obrekht.neowork.events.data.local.entity.toModel
 import com.obrekht.neowork.events.data.remote.EventApiService
 import com.obrekht.neowork.events.data.remote.EventFeedRemoteMediator
 import com.obrekht.neowork.events.model.Event
-import com.obrekht.neowork.media.data.MediaApiService
+import com.obrekht.neowork.media.data.remote.MediaApiService
 import com.obrekht.neowork.media.model.Media
 import com.obrekht.neowork.media.model.MediaUpload
 import com.obrekht.neowork.userpreview.data.local.dao.UserPreviewDao

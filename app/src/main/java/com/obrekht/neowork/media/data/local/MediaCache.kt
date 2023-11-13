@@ -1,4 +1,4 @@
-package com.obrekht.neowork.media.data
+package com.obrekht.neowork.media.data.local
 
 import android.content.ContentResolver
 import android.content.Context

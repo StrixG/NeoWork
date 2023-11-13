@@ -1,4 +1,4 @@
-package com.obrekht.neowork.media.data
+package com.obrekht.neowork.media.data.remote
 
 import com.obrekht.neowork.media.model.Media
 import okhttp3.MultipartBody

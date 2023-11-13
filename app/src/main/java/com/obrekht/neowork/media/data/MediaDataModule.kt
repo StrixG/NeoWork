@@ -1,5 +1,6 @@
 package com.obrekht.neowork.media.data
 
+import com.obrekht.neowork.media.data.remote.MediaApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
