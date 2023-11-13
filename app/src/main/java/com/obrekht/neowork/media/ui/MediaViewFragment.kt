@@ -46,11 +46,9 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
 
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
             if (systemBarsVisible) {
-                insetsController?.hide(WindowInsetsCompat.Type.systemBars())
-                binding.toolbar.isVisible = false
+                hideUi()
             } else {
-                insetsController?.show(WindowInsetsCompat.Type.systemBars())
-                binding.toolbar.isVisible = true
+                showUi()
             }
             return true
         }
@@ -190,12 +188,22 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
             binding.videoPlayer.player = mediaController
             binding.videoPlayer.setControllerVisibilityListener(PlayerView.ControllerVisibilityListener {
                 if (it == View.VISIBLE) {
-                    insetsController?.show(WindowInsetsCompat.Type.systemBars())
+                    showUi()
                 } else {
-                    insetsController?.hide(WindowInsetsCompat.Type.systemBars())
+                    hideUi()
                 }
             })
             loadVideo(args.url)
         }
+    }
+
+    private fun showUi() {
+        insetsController?.show(WindowInsetsCompat.Type.systemBars())
+        binding.toolbar.isVisible = true
+    }
+
+    private fun hideUi() {
+        insetsController?.hide(WindowInsetsCompat.Type.systemBars())
+        binding.toolbar.isVisible = false
     }
 }
