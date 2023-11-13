@@ -1,5 +1,6 @@
 package com.obrekht.neowork.core.ui
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +15,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         enableEdgeToEdge()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
         MapKitFactory.initialize(this)
     }
 }
