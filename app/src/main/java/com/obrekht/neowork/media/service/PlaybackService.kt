@@ -22,6 +22,7 @@ class PlaybackService : MediaSessionService() {
     override fun onTaskRemoved(rootIntent: Intent?) {
         mediaSession?.player?.let {
             if (!it.playWhenReady || it.mediaItemCount == 0) {
+                stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
             }
         }

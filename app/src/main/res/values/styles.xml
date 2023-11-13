@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Widget.App.Toolbar.Media" parent="Widget.Material3.Toolbar.Surface">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Toolbar.Media</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Toolbar.Media" parent="">
+        <item name="colorSurface">@android:color/transparent</item>
+        <item name="colorOnSurface">@color/white</item>
+    </style>
 
     <style name="Widget.App.Button.Menu" parent="@style/Widget.Material3.Button.IconButton">
         <item name="iconTint">?colorControlNormal</item>

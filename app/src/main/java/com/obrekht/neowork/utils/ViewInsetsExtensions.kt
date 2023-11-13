@@ -11,8 +11,7 @@ fun View.setBarsInsetsListener(insetIme: Boolean = true, listener: View.(insets:
         if (insetIme) {
             mask = mask or WindowInsetsCompat.Type.ime()
         }
-        val insets =
-            windowInsets.getInsets(mask)
+        val insets = windowInsets.getInsets(mask)
 
         listener(insets)
 

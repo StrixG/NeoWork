@@ -1,13 +1,13 @@
 package com.obrekht.neowork.media.util
 
 import android.content.Context
+import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.exoplayer.MetadataRetriever
 import androidx.media3.exoplayer.source.TrackGroupArray
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
-import com.google.common.util.concurrent.MoreExecutors
 
 typealias GetMetadataCallback = (mediaMetadata: MediaMetadata?) -> Unit
 
@@ -36,6 +36,6 @@ fun MediaItem.retrieveMediaMetadata(context: Context, callback: GetMetadataCallb
     Futures.addCallback(
         metadataFuture,
         audioTitleCallback,
-        MoreExecutors.directExecutor()
+        ContextCompat.getMainExecutor(context)
     )
 }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/Theme.NeoWork.Media"
+    android:background="@color/black"
     tools:context=".media.ui.MediaViewFragment">
 
     <ImageView
@@ -24,11 +24,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:fitsSystemWindows="true"
+        android:clipToPadding="false"
         android:visibility="gone"
         app:repeat_toggle_modes="one"
+        app:show_buffering="when_playing"
         app:show_next_button="false"
-        app:show_previous_button="false" />
+        app:show_previous_button="false"
+        app:show_timeout="@integer/video_show_timeout">
+
+        <androidx.media3.ui.PlayerControlView
+            android:id="@+id/exo_controller"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+    </androidx.media3.ui.PlayerView>
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
@@ -41,6 +52,7 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
+            style="@style/Widget.App.Toolbar.Media"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@null"

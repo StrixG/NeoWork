@@ -28,6 +28,7 @@ import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.databinding.FragmentMediaViewBinding
 import com.obrekht.neowork.media.service.PlaybackService
 import com.obrekht.neowork.utils.isLightTheme
+import com.obrekht.neowork.utils.setBarsInsetsListener
 import com.obrekht.neowork.utils.viewBinding
 import java.util.concurrent.Future
 
@@ -78,6 +79,13 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
                 findNavController().navigateUp()
             }
 
+            exoController.setBarsInsetsListener {
+                setPadding(
+                    paddingLeft, paddingTop, paddingRight,
+                    it.bottom
+                )
+            }
+
             image.transitionName = args.url
 
             loadAttachment()
@@ -99,6 +107,10 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
 
     override fun onDestroyView() {
         insetsController = null
+        binding.videoPlayer.setControllerVisibilityListener(
+            null as PlayerView.ControllerVisibilityListener?
+        )
+        mediaController?.pause()
         releaseMediaController()
         super.onDestroyView()
     }
@@ -185,7 +197,6 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
             prepare()
         }
         if (args.mediaType == AttachmentType.VIDEO) {
-            binding.videoPlayer.player = mediaController
             binding.videoPlayer.setControllerVisibilityListener(PlayerView.ControllerVisibilityListener {
                 if (it == View.VISIBLE) {
                     showUi()
