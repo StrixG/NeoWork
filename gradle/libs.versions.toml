@@ -25,9 +25,10 @@ retrofit = "2.10.0-SNAPSHOT"
 coil = "2.5.0"
 hilt = "2.48.1"
 jetpack-hilt = "1.1.0"
-timber = "5.0.1"
+media3="1.1.1"
 yandex-mapkit = "4.4.0-full"
 play-services = "21.0.1"
+timber = "5.0.1"
 leakcanary = "2.12"
 
 # Tests
@@ -70,9 +71,13 @@ hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.re
 jetpack-hilt-navigation = { module = "androidx.hilt:hilt-navigation-fragment", version.ref = "jetpack-hilt" }
 jetpack-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "jetpack-hilt" }
 jetpack-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "jetpack-hilt" }
-timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+media3-common = { module = "androidx.media3:media3-common", version.ref = "media3" }
+media3-session = { module = "androidx.media3:media3-session", version.ref = "media3" }
+media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
+media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 yandex-mapkit = { module = "com.yandex.android:maps.mobile", version.ref = "yandex-mapkit" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 
 # Tests
@@ -93,3 +98,4 @@ navigation = ["navigation.fragment", "navigation.ui"]
 room = ["room.runtime", "room.ktx", "room.paging"]
 retrofit = ["retrofit", "retrofit-kotlinx-serialization"]
 hilt = ["hilt", "jetpack.hilt.navigation", "jetpack.hilt.work"]
+media3 = ["media3.common", "media3.session", "media3.exoplayer", "media3.ui"]

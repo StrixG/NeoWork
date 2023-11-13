@@ -15,7 +15,20 @@
         android:adjustViewBounds="true"
         android:contentDescription="@string/content_description_attached_photo"
         android:scaleType="fitCenter"
-        tools:src="@tools:sample/backgrounds/scenic" />
+        android:visibility="gone"
+        tools:src="@tools:sample/backgrounds/scenic"
+        tools:visibility="visible" />
+
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/video_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:fitsSystemWindows="true"
+        android:visibility="gone"
+        app:repeat_toggle_modes="one"
+        app:show_next_button="false"
+        app:show_previous_button="false" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"

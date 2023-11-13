@@ -1,5 +1,6 @@
 package com.obrekht.neowork.media.ui
 
+import android.content.ComponentName
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -13,15 +14,22 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.media3.common.MediaItem
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
+import androidx.media3.ui.PlayerView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.transition.TransitionInflater
 import coil.load
+import com.google.common.util.concurrent.MoreExecutors
 import com.obrekht.neowork.R
 import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.databinding.FragmentMediaViewBinding
+import com.obrekht.neowork.media.service.PlaybackService
 import com.obrekht.neowork.utils.isLightTheme
 import com.obrekht.neowork.utils.viewBinding
+import java.util.concurrent.Future
 
 class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
 
@@ -47,6 +55,9 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
             return true
         }
     }
+
+    private var mediaControllerFuture: Future<MediaController>? = null
+    private var mediaController: MediaController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,6 +101,7 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
 
     override fun onDestroyView() {
         insetsController = null
+        releaseMediaController()
         super.onDestroyView()
     }
 
@@ -98,7 +110,7 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
 
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { decorView, windowInsets ->
             systemBarsVisible = (windowInsets.isVisible(WindowInsetsCompat.Type.navigationBars())
-                        || windowInsets.isVisible(WindowInsetsCompat.Type.statusBars()))
+                    || windowInsets.isVisible(WindowInsetsCompat.Type.statusBars()))
 
             decorView.setOnTouchListener { view, event ->
                 gestureDetector.onTouchEvent(event)
@@ -109,28 +121,81 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
         }
     }
 
-    private fun loadAttachment() = with(binding) {
+    private fun loadAttachment() {
         when (args.mediaType) {
-            AttachmentType.IMAGE -> {
-                image.load(args.url) {
-                    placeholderMemoryCacheKey(args.memoryCacheKey)
-                    listener(
-                        onError = { _, _ ->
-                            startPostponedEnterTransition()
-                        },
-                        onSuccess = { _, _ ->
-                            startPostponedEnterTransition()
-                        }
-                    )
-                }
-            }
-
-            else -> {
-                // TODO: Load video
-                startPostponedEnterTransition()
-            }
+            AttachmentType.IMAGE -> loadImage(args.url)
+            else -> initializeMediaController()
         }
+    }
 
-        Unit
+    private fun loadImage(url: String) = with(binding) {
+        image.isVisible = true
+        image.load(url) {
+            placeholderMemoryCacheKey(args.memoryCacheKey)
+            listener(
+                onError = { _, _ ->
+                    startPostponedEnterTransition()
+                },
+                onSuccess = { _, _ ->
+                    startPostponedEnterTransition()
+                }
+            )
+        }
+    }
+
+    private fun loadVideo(url: String) = with(binding) {
+        videoPlayer.isVisible = true
+        videoPlayer.player = mediaController
+
+        val mediaItem = MediaItem.fromUri(url)
+
+        mediaController?.run {
+            setMediaItem(mediaItem)
+            play()
+        }
+        startPostponedEnterTransition()
+    }
+
+    private fun initializeMediaController() {
+        if (mediaController != null) return
+
+        val context = requireContext()
+        val sessionToken =
+            SessionToken(context, ComponentName(context, PlaybackService::class.java))
+        mediaControllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
+            .apply {
+                addListener(
+                    {
+                        val mediaController = get()
+                        this@MediaViewFragment.mediaController = mediaController
+                        onMediaControllerReady(mediaController)
+                    },
+                    MoreExecutors.directExecutor()
+                )
+            }
+    }
+
+    private fun releaseMediaController() {
+        mediaControllerFuture?.let(MediaController::releaseFuture)
+        mediaController?.release()
+        mediaControllerFuture = null
+        mediaController = null
+    }
+
+    private fun onMediaControllerReady(mediaController: MediaController) {
+        mediaController.run {
+            prepare()
+        }
+        if (args.mediaType == AttachmentType.VIDEO) {
+            binding.videoPlayer.player = mediaController
+            binding.videoPlayer.setControllerVisibilityListener(PlayerView.ControllerVisibilityListener {
+                if (it == View.VISIBLE) {
+                    insetsController?.show(WindowInsetsCompat.Type.systemBars())
+                } else {
+                    insetsController?.hide(WindowInsetsCompat.Type.systemBars())
+                }
+            })
+            loadVideo(args.url)
+        }
     }
 }

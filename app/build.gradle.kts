@@ -92,6 +92,8 @@ dependencies {
     ksp(libs.hilt.compiler)
     ksp(libs.jetpack.hilt.compiler)
 
+    implementation(libs.bundles.media3)
+
     implementation(libs.timber)
     implementation(libs.yandex.mapkit)
     implementation(libs.play.services.location)
