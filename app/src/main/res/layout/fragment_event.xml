@@ -114,6 +114,7 @@
                     android:layout_marginBottom="@dimen/common_spacing"
                     android:adjustViewBounds="true"
                     android:contentDescription="@string/content_description_attached_photo"
+                    android:foreground="?attr/selectableItemBackground"
                     android:maxHeight="@dimen/max_image_height"
                     android:scaleType="centerCrop"
                     android:visibility="gone"
