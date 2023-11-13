@@ -22,8 +22,11 @@ jobs:
 
     - name: Decode secrets.properties
       env:
-        SECRETS: ${{ secrets.SECRETS }}
-      run: echo $SECRETS > ./secrets.properties
+        API_KEY: ${{ secrets.API_KEY }}
+        MAPKIT_API_KEY: ${{ secrets.MAPKIT_API_KEY }}
+      run: |
+        echo API_KEY=\"$API_KEY\" >> ./secrets.properties
+        echo MAPKIT_API_KEY=\"$MAPKIT_API_KEY\" >> ./secrets.properties
     
     - name: Build with Gradle
       run: |
