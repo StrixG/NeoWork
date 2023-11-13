@@ -157,11 +157,16 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
         videoPlayer.isVisible = true
         videoPlayer.player = mediaController
 
-        val mediaItem = MediaItem.fromUri(url)
-
         mediaController?.run {
-            setMediaItem(mediaItem)
-            play()
+            val mediaItem = MediaItem.Builder()
+                .setMediaId(url)
+                .setUri(url)
+                .build()
+
+            if (currentMediaItem?.mediaId != url) {
+                setMediaItem(mediaItem)
+                play()
+            }
         }
         startPostponedEnterTransition()
     }
