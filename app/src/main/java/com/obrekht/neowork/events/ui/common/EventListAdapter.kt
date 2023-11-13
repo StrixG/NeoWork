@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.view.isVisible
+import androidx.media3.common.MediaItem
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +17,7 @@ import com.obrekht.neowork.databinding.ItemDateSeparatorBinding
 import com.obrekht.neowork.databinding.ItemEventBinding
 import com.obrekht.neowork.events.model.Event
 import com.obrekht.neowork.events.model.EventType
+import com.obrekht.neowork.media.util.retrieveMediaMetadata
 import com.obrekht.neowork.utils.StringUtils
 import com.obrekht.neowork.utils.TimeUtils
 import java.time.LocalDate
@@ -190,28 +192,52 @@ class EventViewHolder(
             attachmentPreview.load(null)
             attachmentPreview.isVisible = false
             buttonPlayVideo.isVisible = false
+            audioGroup.isVisible = false
 
             event.attachment?.let {
                 when (it.type) {
-                    AttachmentType.IMAGE -> {
-                        attachmentPreview.load(it.url) {
-                            crossfade(true)
-                        }
-                        attachmentPreview.isVisible = true
-                        attachmentPreview.transitionName = "${it.url}_$absoluteAdapterPosition"
-                    }
-                    AttachmentType.VIDEO -> {
-                        attachmentPreview.load(it.url) {
-                            crossfade(true)
-                            listener { _, _ ->
-                                buttonPlayVideo.isVisible = true
-                            }
-                        }
-                        attachmentPreview.isVisible = true
-                        attachmentPreview.transitionName = "${it.url}_$absoluteAdapterPosition"
-                    }
-                    AttachmentType.AUDIO -> {}
+                    AttachmentType.IMAGE -> loadImage(it.url)
+                    AttachmentType.VIDEO -> loadVideo(it.url)
+                    AttachmentType.AUDIO -> loadAudio(it.url)
                 }
+            }
+        }
+    }
+
+    private fun loadImage(url: String) = with(binding) {
+        attachmentPreview.load(url) {
+            crossfade(true)
+        }
+        attachmentPreview.isVisible = true
+        attachmentPreview.transitionName = "${url}_$absoluteAdapterPosition"
+    }
+
+    private fun loadVideo(url: String) = with(binding) {
+        attachmentPreview.load(url) {
+            crossfade(true)
+            listener { _, _ ->
+                buttonPlayVideo.isVisible = true
+            }
+        }
+        attachmentPreview.isVisible = true
+        attachmentPreview.transitionName = "${url}_$absoluteAdapterPosition"
+    }
+
+    private fun loadAudio(url: String) = with(binding) {
+        audioGroup.isVisible = true
+        audioTitle.setText(R.string.loading)
+        audioArtist.text = null
+
+        val context = audioGroup.context
+        val mediaItem = MediaItem.fromUri(url)
+        mediaItem.retrieveMediaMetadata(context) { mediaMetadata ->
+            mediaMetadata?.let {
+                audioTitle.text = mediaMetadata.title
+                    ?: context.getString(R.string.audio_untitled)
+                audioArtist.text = mediaMetadata.artist
+                    ?: context.getString(R.string.audio_unknown_artist)
+            } ?: run {
+                audioTitle.text = context.getString(R.string.audio_unknown)
             }
         }
     }

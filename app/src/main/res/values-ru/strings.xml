@@ -154,4 +154,7 @@
     <string name="do_not_participate">Не участвовать</string>
     <string name="participate">Участвовать</string>
     <string name="description_job_menu">Меню работы</string>
+    <string name="audio_unknown">Неизвестно</string>
+    <string name="audio_unknown_artist">Неизвсетный исполнитель</string>
+    <string name="audio_untitled">Без названия</string>
 </resources>

@@ -102,7 +102,42 @@
                 android:id="@+id/attachment_preview_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="attachment_preview,button_remove_attachment,button_play_video" />
+                app:constraint_referenced_ids="attachment_preview,button_remove_attachment" />
+
+            <TextView
+                android:id="@+id/audio"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/small_spacing"
+                android:layout_marginTop="@dimen/small_spacing"
+                android:drawablePadding="@dimen/small_spacing"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/common_spacing"
+                android:paddingVertical="@dimen/small_spacing"
+                app:drawableStartCompat="@drawable/ic_music_note"
+                app:layout_constraintBottom_toTopOf="@id/chosen_users"
+                app:layout_constraintEnd_toStartOf="@id/button_remove_audio"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/attachment_preview"
+                tools:text="The Weeknd" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_remove_audio"
+                style="?materialIconButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/small_spacing"
+                app:icon="@drawable/ic_close"
+                app:layout_constraintBottom_toBottomOf="@id/audio"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/audio"
+                app:layout_constraintTop_toTopOf="@id/audio" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/audio_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="audio,button_remove_audio" />
 
             <TextView
                 android:id="@+id/chosen_users"
@@ -118,7 +153,7 @@
                 app:layout_constraintBottom_toTopOf="@id/location_address"
                 app:layout_constraintEnd_toStartOf="@id/button_remove_chosen_users"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/attachment_preview"
+                app:layout_constraintTop_toBottomOf="@id/audio"
                 tools:text="10 mentions" />
 
             <com.google.android.material.button.MaterialButton

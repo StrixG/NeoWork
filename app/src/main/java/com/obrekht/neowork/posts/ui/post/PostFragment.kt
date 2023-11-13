@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.MediaItem
 import androidx.navigation.fragment.findNavController
 import coil.load
 import coil.transform.CircleCropTransformation
@@ -31,6 +32,7 @@ import com.obrekht.neowork.databinding.FragmentPostBinding
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType
 import com.obrekht.neowork.media.ui.navigateToMediaView
+import com.obrekht.neowork.media.util.retrieveMediaMetadata
 import com.obrekht.neowork.posts.model.Comment
 import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.posts.ui.common.PostInteractionListener
@@ -468,6 +470,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             // Attachments
             attachmentPreview.isVisible = false
             buttonPlayVideo.isVisible = false
+            audioGroup.isVisible = false
 
             post.attachment?.let {
                 attachmentPreview.transitionName = it.url
@@ -494,7 +497,25 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                         attachmentPreview.isVisible = true
                     }
 
-                    else -> startPostponedEnterTransition()
+                    AttachmentType.AUDIO -> {
+                        audioGroup.isVisible = true
+                        audioTitle.setText(R.string.loading)
+                        audioArtist.text = null
+
+                        val context = audioGroup.context
+                        val mediaItem = MediaItem.fromUri(it.url)
+                        mediaItem.retrieveMediaMetadata(context) { mediaMetadata ->
+                            mediaMetadata?.let {
+                                audioTitle.text = mediaMetadata.title
+                                    ?: context.getString(R.string.audio_untitled)
+                                audioArtist.text = mediaMetadata.artist
+                                    ?: context.getString(R.string.audio_unknown_artist)
+                            } ?: run {
+                                audioTitle.text = context.getString(R.string.audio_unknown)
+                            }
+                        }
+                        startPostponedEnterTransition()
+                    }
                 }
             } ?: startPostponedEnterTransition()
         }

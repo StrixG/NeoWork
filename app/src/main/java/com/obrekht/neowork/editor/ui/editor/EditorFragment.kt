@@ -14,6 +14,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.media3.common.MediaItem
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import coil.load
@@ -29,6 +30,8 @@ import com.obrekht.neowork.databinding.FragmentEditorBinding
 import com.obrekht.neowork.events.model.Event
 import com.obrekht.neowork.map.navigateToLocationPicker
 import com.obrekht.neowork.map.ui.LocationPickerFragment
+import com.obrekht.neowork.media.util.GetMetadataCallback
+import com.obrekht.neowork.media.util.retrieveMediaMetadata
 import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.userchooser.ui.UserChooserFragment
 import com.obrekht.neowork.userchooser.ui.navigateToUserChooser
@@ -107,6 +110,14 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                 }
             }
         }
+
+    private val audioTitleCallback: GetMetadataCallback = { mediaMetadata ->
+        binding.audio.text = mediaMetadata?.let {
+            val artist = mediaMetadata.artist ?: getString(R.string.audio_unknown)
+            val title = mediaMetadata.title ?: getString(R.string.audio_unknown)
+            getString(R.string.audio_title, artist, title)
+        } ?: getString(R.string.audio_unknown)
+    }
 
     private val attachMediaLauncher =
         registerForActivityResult(GetMediaContract()) { uri ->
@@ -227,6 +238,9 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
             buttonRemoveAttachment.setOnClickListener {
                 viewModel.removeAttachment()
             }
+            buttonRemoveAudio.setOnClickListener {
+                viewModel.removeAttachment()
+            }
             buttonRemoveChosenUsers.setOnClickListener {
                 viewModel.setChosenUserIds(emptySet())
             }
@@ -250,16 +264,17 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
             viewLifecycleOwner.repeatOnStarted {
                 viewModel.attachment.onEach { attachment ->
                     attachmentPreviewGroup.isVisible = false
+                    buttonPlayVideo.isVisible = false
+                    audioGroup.isVisible = false
 
                     attachment?.let {
-                        val uri = attachment.uri ?: attachment.file?.toUri()
+                        val uri = attachment.uri ?: attachment.file?.toUri() ?: return@let
                         when (attachment.type) {
                             AttachmentType.IMAGE -> {
                                 attachmentPreview.load(uri) {
                                     crossfade(true)
                                 }
                                 attachmentPreviewGroup.isVisible = true
-                                buttonPlayVideo.isVisible = false
                             }
 
                             AttachmentType.VIDEO -> {
@@ -270,9 +285,19 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                                     }
                                 }
                                 attachmentPreviewGroup.isVisible = true
+                                buttonPlayVideo.isVisible = true
                             }
 
-                            AttachmentType.AUDIO -> {}
+                            AttachmentType.AUDIO -> {
+                                audioGroup.isVisible = true
+                                audio.setText(R.string.loading)
+
+                                val mediaItem = MediaItem.fromUri(uri)
+                                mediaItem.retrieveMediaMetadata(
+                                    requireContext(),
+                                    audioTitleCallback
+                                )
+                            }
                         }
                     }
                 }.launchIn(this)

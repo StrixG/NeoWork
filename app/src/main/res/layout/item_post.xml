@@ -105,6 +105,59 @@
             app:layout_constraintTop_toTopOf="@id/attachment_preview"
             tools:visibility="visible" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_play_audio"
+            style="?materialIconButtonFilledStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/common_spacing"
+            android:layout_marginStart="@dimen/common_spacing"
+            app:icon="@drawable/ic_play_arrow"
+            app:layout_constraintBottom_toTopOf="@id/content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/top_barrier" />
+
+        <TextView
+            android:id="@+id/audio_title"
+            style="@style/TextAppearance.Material3.LabelLarge"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small_spacing"
+            android:layout_marginEnd="@dimen/common_spacing"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintBottom_toTopOf="@id/audio_artist"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/button_play_audio"
+            app:layout_constraintTop_toTopOf="@id/button_play_audio"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Enjoy the Silence" />
+
+        <TextView
+            android:id="@+id/audio_artist"
+            style="@style/TextAppearance.Material3.BodyMedium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/small_spacing"
+            android:layout_marginEnd="@dimen/common_spacing"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintBottom_toBottomOf="@id/button_play_audio"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/button_play_audio"
+            app:layout_constraintTop_toBottomOf="@id/audio_title"
+            tools:text="Depeche Mode" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/audio_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="button_play_audio,audio_title,audio_artist"
+            tools:visibility="visible" />
+
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/media_barrier"
             android:layout_width="wrap_content"

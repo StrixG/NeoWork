@@ -153,4 +153,8 @@
     <string name="do_not_participate">Don\'t participate</string>
     <string name="participate">Participate</string>
     <string name="description_job_menu">Job menu</string>
+    <string name="audio_unknown">Unknown</string>
+    <string name="audio_unknown_artist">Unknown artist</string>
+    <string name="audio_untitled">Untitled</string>
+    <string name="audio_title" translatable="false">%1$s — %2$s"</string>
 </resources>
