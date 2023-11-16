@@ -3,6 +3,7 @@ package com.obrekht.neowork.users.ui.profile.wall
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -17,9 +18,11 @@ import com.google.android.material.snackbar.Snackbar
 import com.obrekht.neowork.R
 import com.obrekht.neowork.UserProfileGraphDirections
 import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
+import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.databinding.FragmentWallBinding
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType
+import com.obrekht.neowork.media.ui.navigateToMediaView
 import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.posts.ui.common.PostInteractionListener
 import com.obrekht.neowork.posts.ui.common.PostListAdapter
@@ -62,6 +65,20 @@ class WallFragment : Fragment(R.layout.fragment_wall) {
         override fun onAvatarClick(post: Post) {
             if (post.authorId != userId) {
                 navigateToUserProfile(post.authorId)
+            }
+        }
+
+        override fun onAttachmentClick(post: Post, view: ImageView) {
+            post.attachment?.let {
+                navigateToMediaView(it.type, it.url, view)
+            }
+        }
+
+        override fun onPlayAudioButtonClick(post: Post) {
+            post.attachment?.let {
+                if (it.type == AttachmentType.AUDIO) {
+                    viewModel.playAudio(it.url)
+                }
             }
         }
 
