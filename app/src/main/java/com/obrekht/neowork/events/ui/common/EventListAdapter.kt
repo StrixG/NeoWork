@@ -24,7 +24,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
@@ -33,6 +35,9 @@ class EventListAdapter(
 ) : PagingDataAdapter<EventListItem, RecyclerView.ViewHolder>(DiffCallback()) {
 
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val dateTimeFormatter =
+        DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
+            .withZone(ZoneId.systemDefault())
 
     override fun getItemViewType(position: Int): Int = when (peek(position)) {
         is EventItem, null -> R.layout.item_event
@@ -44,7 +49,7 @@ class EventListAdapter(
             R.layout.item_event -> {
                 val binding =
                     ItemEventBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                EventViewHolder(binding, interactionListener, scope)
+                EventViewHolder(binding, interactionListener, scope, dateTimeFormatter)
             }
 
             R.layout.item_date_separator -> {
@@ -140,7 +145,8 @@ class EventListAdapter(
 class EventViewHolder(
     private val binding: ItemEventBinding,
     private val interactionListener: EventInteractionListener,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
+    private val dateTimeFormatter: DateTimeFormatter
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var event: Event? = null
@@ -221,10 +227,7 @@ class EventViewHolder(
                 }
             )
             val dateMillis = event.datetime?.toEpochMilli() ?: 0
-            date.text = TimeUtils.getRelativeDate(
-                itemView.context,
-                dateMillis
-            )
+            date.text = dateTimeFormatter.format(Instant.ofEpochMilli(dateMillis))
             content.text = event.content
 
             // Avatar

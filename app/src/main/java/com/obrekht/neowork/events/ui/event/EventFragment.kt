@@ -62,6 +62,10 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 private const val LOCATION_PREVIEW_DEFAULT_ZOOM = 15f
 
@@ -73,6 +77,10 @@ class EventFragment : Fragment(R.layout.fragment_event) {
 
     private lateinit var event: Event
     private var snackbar: Snackbar? = null
+
+    private val dateTimeFormatter =
+        DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT)
+            .withZone(ZoneId.systemDefault())
 
     private val searchManager = SearchFactory.getInstance()
         .createSearchManager(SearchManagerType.ONLINE)
@@ -343,10 +351,7 @@ class EventFragment : Fragment(R.layout.fragment_event) {
                 }
             )
             val dateMillis = event.datetime?.toEpochMilli() ?: 0
-            date.text = TimeUtils.getRelativeDate(
-                requireContext(),
-                dateMillis
-            )
+            date.text = dateTimeFormatter.format(Instant.ofEpochMilli(dateMillis))
             content.text = event.content
 
             // Avatar
