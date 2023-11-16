@@ -107,6 +107,9 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
 
     override fun onDestroyView() {
         insetsController = null
+
+        val window = requireActivity().window
+        ViewCompat.setOnApplyWindowInsetsListener(window.decorView, null)
         binding.videoPlayer.setControllerVisibilityListener(
             null as PlayerView.ControllerVisibilityListener?
         )
