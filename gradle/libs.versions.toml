@@ -40,6 +40,7 @@ espresso-core = "3.5.1"
 desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutines" }
+coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "coroutines" }
 serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 jetpack-core = { module = "androidx.core:core-ktx", version.ref = "jetpack-core" }
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
