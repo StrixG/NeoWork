@@ -5,5 +5,8 @@ import java.time.LocalDate
 
 sealed interface EventListItem
 
-data class EventItem(val event: Event) : EventListItem
+data class EventItem(
+    val event: Event = Event(),
+    val isAudioPlaying: Boolean = false
+) : EventListItem
 data class DateSeparatorItem(val date: LocalDate) : EventListItem

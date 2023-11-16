@@ -4,8 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.obrekht.neowork.auth.data.local.AppAuth
+import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.events.data.repository.EventRepository
 import com.obrekht.neowork.events.model.Event
+import com.obrekht.neowork.media.data.local.AudioPlaybackManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -26,6 +29,7 @@ import javax.inject.Inject
 class EventViewModel @Inject constructor(
     private val appAuth: AppAuth,
     private val eventRepository: EventRepository,
+    private val audioPlaybackManager: AudioPlaybackManager,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -54,6 +58,22 @@ class EventViewModel @Inject constructor(
             }.filterNotNull().onEach { event ->
                 _uiState.update { it.copy(event = event, state = State.Success) }
             }.launchIn(this)
+
+            combine(
+                eventRepository.getEventStream(eventId),
+                audioPlaybackManager.playbackState,
+                audioPlaybackManager.nowPlaying
+            ) { event, playbackState, nowPlaying ->
+                val attachment = event?.attachment
+                if (attachment != null && attachment.type == AttachmentType.AUDIO) {
+                    _uiState.update {
+                        it.copy(
+                            isAudioPlaying = nowPlaying.mediaId == attachment.url
+                                    && playbackState.isPlaying
+                        )
+                    }
+                }
+            }.launchIn(this)
         }
     }
 
@@ -73,6 +93,8 @@ class EventViewModel @Inject constructor(
             }
         }
     }
+
+    fun playAudio(url: String) = audioPlaybackManager.playUrl(url)
 
     fun toggleLike() {
         likeJob?.cancel()
@@ -127,6 +149,7 @@ sealed interface State {
 data class EventUiState(
     val isLoggedIn: Boolean = false,
     val event: Event? = null,
+    val isAudioPlaying: Boolean = false,
     val state: State = State.Success
 )
 

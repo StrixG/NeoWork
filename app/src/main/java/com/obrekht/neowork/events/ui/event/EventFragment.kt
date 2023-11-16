@@ -46,6 +46,7 @@ import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.setAllOnClickListener
 import com.obrekht.neowork.utils.setBarsInsetsListener
 import com.obrekht.neowork.utils.viewBinding
+import com.obrekht.neowork.utils.viewLifecycleScope
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
@@ -102,6 +103,14 @@ class EventFragment : Fragment(R.layout.fragment_event) {
         override fun onAttachmentClick(event: Event, view: ImageView) {
             event.attachment?.let {
                 navigateToMediaView(it.type, it.url, view)
+            }
+        }
+
+        override fun onPlayAudioButtonClick(event: Event) {
+            event.attachment?.let {
+                if (it.type == AttachmentType.AUDIO) {
+                    viewModel.playAudio(it.url)
+                }
             }
         }
 
@@ -210,6 +219,10 @@ class EventFragment : Fragment(R.layout.fragment_event) {
                 interactionListener.onAttachmentClick(event, attachmentPreview)
             }
 
+            buttonPlayAudio.setOnClickListener {
+                interactionListener.onPlayAudioButtonClick(event)
+            }
+
             speakers.preview.setOnPreviewClickListener(userPreviewClickListener)
             speakers.preview.setOnMoreClickListener(speakersMoreClickListener)
 
@@ -265,13 +278,14 @@ class EventFragment : Fragment(R.layout.fragment_event) {
     }
 
     private fun handleState(state: EventUiState) {
-        event = state.event?.also {
-            bindEvent(it)
-        } ?: return
+        event = state.event ?: return
+
+        bindEvent(event)
 
         with(binding) {
             toolbar.menu.setGroupVisible(R.id.owned_by_me, event.ownedByMe)
             swipeRefresh.isRefreshing = state.state == State.Loading
+            updateAudioPlayButton(state.isAudioPlaying)
         }
 
         if (state.state == State.Error) {
@@ -442,9 +456,11 @@ class EventFragment : Fragment(R.layout.fragment_event) {
                         audioTitle.setText(R.string.loading)
                         audioArtist.text = null
 
-                        val context = audioGroup.context
-                        val mediaItem = MediaItem.fromUri(it.url)
-                        mediaItem.retrieveMediaMetadata(context) { mediaMetadata ->
+                        viewLifecycleScope.launch {
+                            val context = audioGroup.context
+                            val mediaItem = MediaItem.fromUri(it.url)
+
+                            val mediaMetadata = mediaItem.retrieveMediaMetadata(context)
                             mediaMetadata?.let {
                                 audioTitle.text = mediaMetadata.title
                                     ?: context.getString(R.string.audio_untitled)
@@ -469,6 +485,15 @@ class EventFragment : Fragment(R.layout.fragment_event) {
             Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude")
         )
         startActivity(intent)
+    }
+
+    private fun updateAudioPlayButton(isPlaying: Boolean) {
+        val iconId = if (isPlaying) {
+            R.drawable.ic_pause
+        } else {
+            R.drawable.ic_play_arrow
+        }
+        binding.buttonPlayAudio.setIconResource(iconId)
     }
 
     private fun showDeleteConfirmation(eventId: Long) {

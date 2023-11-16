@@ -18,6 +18,10 @@ import com.obrekht.neowork.media.util.retrieveMediaMetadata
 import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.utils.StringUtils
 import com.obrekht.neowork.utils.TimeUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -25,6 +29,8 @@ import java.time.format.FormatStyle
 class PostListAdapter(
     private val interactionListener: PostInteractionListener
 ) : PagingDataAdapter<PostListItem, RecyclerView.ViewHolder>(DiffCallback()) {
+
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun getItemViewType(position: Int): Int = when (peek(position)) {
         is PostItem, null -> R.layout.item_post
@@ -36,7 +42,7 @@ class PostListAdapter(
             R.layout.item_post -> {
                 val binding =
                     ItemPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                PostViewHolder(binding, interactionListener)
+                PostViewHolder(binding, interactionListener, scope)
             }
 
             R.layout.item_date_separator -> {
@@ -53,8 +59,27 @@ class PostListAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        onBindViewHolder(holder, position, emptyList())
+    }
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: List<Any>
+    ) {
         when (val item = getItem(position)) {
-            is PostItem? -> (holder as PostViewHolder).bind(item ?: PostItem(Post()))
+            is PostItem? -> {
+                val postItem = item ?: PostItem()
+                val postHolder = holder as PostViewHolder
+
+                if (payloads.isEmpty()) {
+                    postHolder.bind(postItem)
+                } else {
+                    val payloadList = payloads.map { it as PostPayload }
+                    postHolder.bind(postItem, payloadList)
+                }
+            }
+
             is DateSeparatorItem -> (holder as DateSeparatorViewHolder).bind(item)
             else -> error("Unknown item type")
         }
@@ -76,12 +101,36 @@ class PostListAdapter(
         override fun areContentsTheSame(oldItem: PostListItem, newItem: PostListItem): Boolean {
             return oldItem == newItem
         }
+
+        override fun getChangePayload(oldItem: PostListItem, newItem: PostListItem): PostPayload? {
+            if (oldItem !is PostItem || newItem !is PostItem) return null
+
+            val payload = PostPayload(
+                likedByMe = newItem.post.likedByMe.takeIf {
+                    oldItem.post.likedByMe != it
+                },
+                isPlaying = newItem.isAudioPlaying.takeIf {
+                    oldItem.isAudioPlaying != it
+                }
+            )
+            return payload.takeIf { it != PostPayload.EMPTY }
+        }
+    }
+
+    data class PostPayload(
+        val likedByMe: Boolean? = null,
+        val isPlaying: Boolean? = null
+    ) {
+        companion object {
+            val EMPTY = PostPayload()
+        }
     }
 }
 
 class PostViewHolder(
     private val binding: ItemPostBinding,
-    private val interactionListener: PostInteractionListener
+    private val interactionListener: PostInteractionListener,
+    private val scope: CoroutineScope
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var post: Post? = null
@@ -114,6 +163,9 @@ class PostViewHolder(
             }
             attachmentPreview.setOnClickListener {
                 post?.let { interactionListener.onAttachmentClick(it, attachmentPreview) }
+            }
+            buttonPlayAudio.setOnClickListener {
+                post?.let(interactionListener::onPlayAudioButtonClick)
             }
             like.setOnClickListener {
                 var success = false
@@ -168,7 +220,27 @@ class PostViewHolder(
                 when (it.type) {
                     AttachmentType.IMAGE -> loadImage(it.url)
                     AttachmentType.VIDEO -> loadVideo(it.url)
-                    AttachmentType.AUDIO -> loadAudio(it.url)
+                    AttachmentType.AUDIO -> loadAudio(it.url, item.isAudioPlaying)
+                }
+            }
+        }
+    }
+
+    fun bind(
+        item: PostItem,
+        payloadList: List<PostListAdapter.PostPayload>
+    ) {
+        val post = item.post
+        this.post = post
+
+        with(binding) {
+            payloadList.forEach { payload ->
+                payload.likedByMe?.let { likedByMe ->
+                    like.isChecked = likedByMe
+                    like.text = StringUtils.getCompactNumber(post.likeOwnerIds.size)
+                }
+                payload.isPlaying?.let {
+                    updatePlayAudioButton(it)
                 }
             }
         }
@@ -193,14 +265,18 @@ class PostViewHolder(
         attachmentPreview.transitionName = "${url}_$absoluteAdapterPosition"
     }
 
-    private fun loadAudio(url: String) = with(binding) {
+    private fun loadAudio(url: String, isAudioPlaying: Boolean) = with(binding) {
         audioGroup.isVisible = true
         audioTitle.setText(R.string.loading)
         audioArtist.text = null
 
-        val context = audioGroup.context
-        val mediaItem = MediaItem.fromUri(url)
-        mediaItem.retrieveMediaMetadata(context) { mediaMetadata ->
+        updatePlayAudioButton(isAudioPlaying)
+
+        scope.launch {
+            val context = audioGroup.context
+            val mediaItem = MediaItem.fromUri(url)
+
+            val mediaMetadata = mediaItem.retrieveMediaMetadata(context)
             mediaMetadata?.let {
                 audioTitle.text = mediaMetadata.title
                     ?: context.getString(R.string.audio_untitled)
@@ -210,6 +286,15 @@ class PostViewHolder(
                 audioTitle.text = context.getString(R.string.audio_unknown)
             }
         }
+    }
+
+    private fun updatePlayAudioButton(isPlaying: Boolean) {
+        val playIcon = if (isPlaying) {
+            R.drawable.ic_pause
+        } else {
+            R.drawable.ic_play_arrow
+        }
+        binding.buttonPlayAudio.setIconResource(playIcon)
     }
 
     fun refreshPublishedDate() = post?.let {

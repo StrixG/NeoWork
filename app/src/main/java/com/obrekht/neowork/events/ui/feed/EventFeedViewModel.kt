@@ -8,11 +8,13 @@ import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
 import com.obrekht.neowork.auth.data.local.AppAuth
+import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.events.data.repository.EventRepository
 import com.obrekht.neowork.events.model.Event
 import com.obrekht.neowork.events.ui.common.DateSeparatorItem
 import com.obrekht.neowork.events.ui.common.EventItem
 import com.obrekht.neowork.events.ui.common.EventListItem
+import com.obrekht.neowork.media.data.local.AudioPlaybackManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -20,6 +22,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -37,7 +40,8 @@ private const val EVENTS_PER_PAGE = 10
 @HiltViewModel
 class EventFeedViewModel @Inject constructor(
     private val appAuth: AppAuth,
-    private val repository: EventRepository
+    private val repository: EventRepository,
+    private val audioPlaybackManager: AudioPlaybackManager
 ) : ViewModel() {
 
     val data: Flow<PagingData<EventListItem>> = repository
@@ -46,9 +50,22 @@ class EventFeedViewModel @Inject constructor(
                 pageSize = EVENTS_PER_PAGE,
                 initialLoadSize = EVENTS_PER_PAGE * 2
             )
-        )
+        ).map { pagingData ->
+            val player = audioPlaybackManager.mediaController
+            val currentMediaId = player?.currentMediaItem?.mediaId
+            pagingData.map { event ->
+                val attachment = event.attachment
+                val isAudioPlaying = player != null
+                        && attachment != null
+                        && attachment.type == AttachmentType.AUDIO
+                        && attachment.url == currentMediaId
+                        && audioPlaybackManager.playbackState.value.isPlaying
+
+                EventItem(event, isAudioPlaying)
+            }
+        }
         .map {
-            it.map(::EventItem).insertDateSeparators()
+            it.insertDateSeparators()
         }
         .cachedIn(viewModelScope)
         .flowOn(Dispatchers.Default)
@@ -71,10 +88,19 @@ class EventFeedViewModel @Inject constructor(
                 repository.invalidatePagingSource()
                 _uiState.update { it.copy(isLoggedIn = authState.id > 0L) }
             }.launchIn(this)
+
+            combine(
+                audioPlaybackManager.playbackState,
+                audioPlaybackManager.nowPlaying
+            ) { _, _ ->
+                repository.invalidatePagingSource()
+            }.launchIn(this)
         }
     }
 
     fun updateDataState(state: DataState) = _uiState.update { it.copy(dataState = state) }
+
+    fun playAudio(url: String) = audioPlaybackManager.playUrl(url)
 
     fun toggleLike(event: Event) {
         likeJobs[event.id]?.cancel()

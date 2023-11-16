@@ -20,6 +20,10 @@ import com.obrekht.neowork.events.model.EventType
 import com.obrekht.neowork.media.util.retrieveMediaMetadata
 import com.obrekht.neowork.utils.StringUtils
 import com.obrekht.neowork.utils.TimeUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -27,6 +31,8 @@ import java.time.format.FormatStyle
 class EventListAdapter(
     private val interactionListener: EventInteractionListener
 ) : PagingDataAdapter<EventListItem, RecyclerView.ViewHolder>(DiffCallback()) {
+
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     override fun getItemViewType(position: Int): Int = when (peek(position)) {
         is EventItem, null -> R.layout.item_event
@@ -38,7 +44,7 @@ class EventListAdapter(
             R.layout.item_event -> {
                 val binding =
                     ItemEventBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                EventViewHolder(binding, interactionListener)
+                EventViewHolder(binding, interactionListener, scope)
             }
 
             R.layout.item_date_separator -> {
@@ -55,35 +61,86 @@ class EventListAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        onBindViewHolder(holder, position, emptyList())
+    }
+
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: List<Any>
+    ) {
         when (val item = getItem(position)) {
-            is EventItem? -> (holder as EventViewHolder).bind(item ?: EventItem(Event()))
+            is EventItem? -> {
+                val eventItem = item ?: EventItem()
+                val eventHolder = holder as EventViewHolder
+
+                if (payloads.isEmpty()) {
+                    eventHolder.bind(eventItem)
+                } else {
+                    val payloadList = payloads.map { it as EventPayload }
+                    eventHolder.bind(eventItem, payloadList)
+                }
+            }
+
             is DateSeparatorItem -> (holder as DateSeparatorViewHolder).bind(item)
             else -> error("Unknown item type")
         }
     }
 
     class DiffCallback : DiffUtil.ItemCallback<EventListItem>() {
-        override fun areItemsTheSame(oldItem: EventListItem, newItem: EventListItem): Boolean = when {
-            oldItem is EventItem && newItem is EventItem -> {
-                oldItem.event.id == newItem.event.id
-            }
+        override fun areItemsTheSame(oldItem: EventListItem, newItem: EventListItem): Boolean =
+            when {
+                oldItem is EventItem && newItem is EventItem -> {
+                    oldItem.event.id == newItem.event.id
+                }
 
-            oldItem is DateSeparatorItem && newItem is DateSeparatorItem -> {
-                oldItem.date == newItem.date
-            }
+                oldItem is DateSeparatorItem && newItem is DateSeparatorItem -> {
+                    oldItem.date == newItem.date
+                }
 
-            else -> false
-        }
+                else -> false
+            }
 
         override fun areContentsTheSame(oldItem: EventListItem, newItem: EventListItem): Boolean {
             return oldItem == newItem
+        }
+
+        override fun getChangePayload(
+            oldItem: EventListItem,
+            newItem: EventListItem
+        ): EventPayload? {
+            if (oldItem !is EventItem || newItem !is EventItem) return null
+
+            val payload = EventPayload(
+                likedByMe = newItem.event.likedByMe.takeIf {
+                    oldItem.event.likedByMe != it
+                },
+                participatedByMe = newItem.event.participatedByMe.takeIf {
+                    oldItem.event.participatedByMe != it
+                },
+                isPlaying = newItem.isAudioPlaying.takeIf {
+                    oldItem.isAudioPlaying != it
+                }
+            )
+            return payload.takeIf { it != EventPayload.EMPTY }
+        }
+    }
+
+    data class EventPayload(
+        val likedByMe: Boolean? = null,
+        val participatedByMe: Boolean? = null,
+        val isPlaying: Boolean? = null
+    ) {
+        companion object {
+            val EMPTY = EventPayload()
         }
     }
 }
 
 class EventViewHolder(
     private val binding: ItemEventBinding,
-    private val interactionListener: EventInteractionListener
+    private val interactionListener: EventInteractionListener,
+    private val scope: CoroutineScope
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var event: Event? = null
@@ -129,6 +186,9 @@ class EventViewHolder(
             attachmentPreview.setOnClickListener {
                 event?.let { interactionListener.onAttachmentClick(it, attachmentPreview) }
             }
+            buttonPlayAudio.setOnClickListener {
+                event?.let(interactionListener::onPlayAudioButtonClick)
+            }
             participate.setOnClickListener {
                 var success = false
                 event?.let {
@@ -154,10 +214,12 @@ class EventViewHolder(
 
             refreshPublishedDate()
             author.text = event.author
-            type.setText(when(event.type) {
-                EventType.OFFLINE -> R.string.event_type_offline
-                EventType.ONLINE -> R.string.event_type_online
-            })
+            type.setText(
+                when (event.type) {
+                    EventType.OFFLINE -> R.string.event_type_offline
+                    EventType.ONLINE -> R.string.event_type_online
+                }
+            )
             val dateMillis = event.datetime?.toEpochMilli() ?: 0
             date.text = TimeUtils.getRelativeDate(
                 itemView.context,
@@ -178,13 +240,15 @@ class EventViewHolder(
             like.text = StringUtils.getCompactNumber(event.likeOwnerIds.size)
 
             // Participation
-            TooltipCompat.setTooltipText(participate, participate.resources.getString(
-                if (event.participatedByMe) {
-                    R.string.do_not_participate
-                } else {
-                    R.string.participate
-                }
-            ))
+            TooltipCompat.setTooltipText(
+                participate, participate.resources.getString(
+                    if (event.participatedByMe) {
+                        R.string.do_not_participate
+                    } else {
+                        R.string.participate
+                    }
+                )
+            )
             participate.isChecked = event.participatedByMe
             participate.text = StringUtils.getCompactNumber(event.participantsIds.size)
 
@@ -198,7 +262,40 @@ class EventViewHolder(
                 when (it.type) {
                     AttachmentType.IMAGE -> loadImage(it.url)
                     AttachmentType.VIDEO -> loadVideo(it.url)
-                    AttachmentType.AUDIO -> loadAudio(it.url)
+                    AttachmentType.AUDIO -> loadAudio(it.url, item.isAudioPlaying)
+                }
+            }
+        }
+    }
+
+    fun bind(
+        item: EventItem,
+        payloadList: List<EventListAdapter.EventPayload>
+    ) {
+        val event = item.event
+        this.event = event
+
+        with(binding) {
+            payloadList.forEach { payload ->
+                payload.likedByMe?.let { likedByMe ->
+                    like.isChecked = likedByMe
+                    like.text = StringUtils.getCompactNumber(event.likeOwnerIds.size)
+                }
+                payload.participatedByMe?.let { participatedByMe ->
+                    TooltipCompat.setTooltipText(
+                        participate, participate.resources.getString(
+                            if (participatedByMe) {
+                                R.string.do_not_participate
+                            } else {
+                                R.string.participate
+                            }
+                        )
+                    )
+                    participate.isChecked = participatedByMe
+                    participate.text = StringUtils.getCompactNumber(event.participantsIds.size)
+                }
+                payload.isPlaying?.let {
+                    updatePlayAudioButton(it)
                 }
             }
         }
@@ -223,14 +320,18 @@ class EventViewHolder(
         attachmentPreview.transitionName = "${url}_$absoluteAdapterPosition"
     }
 
-    private fun loadAudio(url: String) = with(binding) {
+    private fun loadAudio(url: String, isAudioPlaying: Boolean) = with(binding) {
         audioGroup.isVisible = true
         audioTitle.setText(R.string.loading)
         audioArtist.text = null
 
-        val context = audioGroup.context
-        val mediaItem = MediaItem.fromUri(url)
-        mediaItem.retrieveMediaMetadata(context) { mediaMetadata ->
+        updatePlayAudioButton(isAudioPlaying)
+
+        scope.launch {
+            val context = audioGroup.context
+            val mediaItem = MediaItem.fromUri(url)
+
+            val mediaMetadata = mediaItem.retrieveMediaMetadata(context)
             mediaMetadata?.let {
                 audioTitle.text = mediaMetadata.title
                     ?: context.getString(R.string.audio_untitled)
@@ -240,6 +341,15 @@ class EventViewHolder(
                 audioTitle.text = context.getString(R.string.audio_unknown)
             }
         }
+    }
+
+    private fun updatePlayAudioButton(isPlaying: Boolean) {
+        val playIcon = if (isPlaying) {
+            R.drawable.ic_pause
+        } else {
+            R.drawable.ic_play_arrow
+        }
+        binding.buttonPlayAudio.setIconResource(playIcon)
     }
 
     fun refreshPublishedDate() = event?.let {

@@ -7,6 +7,7 @@ interface PostInteractionListener {
     fun onClick(post: Post) {}
     fun onAvatarClick(post: Post) {}
     fun onAttachmentClick(post: Post, view: ImageView) {}
+    fun onPlayAudioButtonClick(post: Post) {}
     fun onLike(post: Post): Boolean = false
     fun onShare(post: Post) {}
     fun onEdit(post: Post) {}

@@ -5,5 +5,9 @@ import java.time.LocalDate
 
 sealed interface PostListItem
 
-data class PostItem(val post: Post) : PostListItem
+data class PostItem(
+    val post: Post = Post(),
+    val isAudioPlaying: Boolean = false
+) : PostListItem
+
 data class DateSeparatorItem(val date: LocalDate) : PostListItem

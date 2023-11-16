@@ -22,6 +22,7 @@ import com.obrekht.neowork.R
 import com.obrekht.neowork.auth.ui.navigateToLogIn
 import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
 import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
+import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.core.ui.findRootNavController
 import com.obrekht.neowork.core.ui.mainscreen.MainScreenFragment
 import com.obrekht.neowork.databinding.FragmentPostFeedBinding
@@ -80,6 +81,14 @@ class PostFeedFragment : Fragment(R.layout.fragment_post_feed) {
         override fun onAttachmentClick(post: Post, view: ImageView) {
             post.attachment?.let {
                 navigateToMediaView(it.type, it.url, view)
+            }
+        }
+
+        override fun onPlayAudioButtonClick(post: Post) {
+            post.attachment?.let {
+                if (it.type == AttachmentType.AUDIO) {
+                    viewModel.playAudio(it.url)
+                }
             }
         }
 

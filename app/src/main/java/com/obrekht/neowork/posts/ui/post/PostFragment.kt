@@ -51,6 +51,7 @@ import com.obrekht.neowork.utils.repeatOnStarted
 import com.obrekht.neowork.utils.setAllOnClickListener
 import com.obrekht.neowork.utils.setBarsInsetsListener
 import com.obrekht.neowork.utils.viewBinding
+import com.obrekht.neowork.utils.viewLifecycleScope
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
@@ -105,6 +106,20 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             navigateToUserProfile(post.authorId)
         }
 
+        override fun onAttachmentClick(post: Post, view: ImageView) {
+            post.attachment?.let {
+                navigateToMediaView(it.type, it.url, view)
+            }
+        }
+
+        override fun onPlayAudioButtonClick(post: Post) {
+            post.attachment?.let {
+                if (it.type == AttachmentType.AUDIO) {
+                    viewModel.playAudio(it.url)
+                }
+            }
+        }
+
         override fun onLike(post: Post): Boolean {
             return if (viewModel.isLoggedIn) {
                 viewModel.toggleLike()
@@ -117,12 +132,6 @@ class PostFragment : Fragment(R.layout.fragment_post) {
 
         override fun onShare(post: Post) {
             sharePost(post)
-        }
-
-        override fun onAttachmentClick(post: Post, view: ImageView) {
-            post.attachment?.let {
-                navigateToMediaView(it.type, it.url, view)
-            }
         }
 
         override fun onEdit(post: Post) {
@@ -223,6 +232,10 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                 interactionListener.onAttachmentClick(post, attachmentPreview)
             }
 
+            buttonPlayAudio.setOnClickListener {
+                interactionListener.onPlayAudioButtonClick(post)
+            }
+
             likers.setButtonClickListener {
                 interactionListener.onLike(post)
             }
@@ -304,10 +317,10 @@ class PostFragment : Fragment(R.layout.fragment_post) {
     }
 
     private fun handleState(state: PostUiState) {
-        post = state.post?.also {
-            bindPost(it)
-            commentsAdapter?.submitList(state.comments)
-        } ?: return
+        post = state.post ?: return
+
+        bindPost(post)
+        commentsAdapter?.submitList(state.comments)
 
         with(binding) {
             toolbar.menu.setGroupVisible(R.id.owned_by_me, post.ownedByMe)
@@ -334,6 +347,7 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                 buttonSendComment.isVisible = true
                 sendCommentProgress.hide()
             }
+            updateAudioPlayButton(state.isAudioPlaying)
         }
 
         if (state.state == State.Error) {
@@ -502,9 +516,11 @@ class PostFragment : Fragment(R.layout.fragment_post) {
                         audioTitle.setText(R.string.loading)
                         audioArtist.text = null
 
-                        val context = audioGroup.context
-                        val mediaItem = MediaItem.fromUri(it.url)
-                        mediaItem.retrieveMediaMetadata(context) { mediaMetadata ->
+                        viewLifecycleScope.launch {
+                            val context = audioGroup.context
+                            val mediaItem = MediaItem.fromUri(it.url)
+
+                            val mediaMetadata = mediaItem.retrieveMediaMetadata(context)
                             mediaMetadata?.let {
                                 audioTitle.text = mediaMetadata.title
                                     ?: context.getString(R.string.audio_untitled)
@@ -529,6 +545,15 @@ class PostFragment : Fragment(R.layout.fragment_post) {
             Uri.parse("geo:$latitude,$longitude?q=$latitude,$longitude")
         )
         startActivity(intent)
+    }
+
+    private fun updateAudioPlayButton(isPlaying: Boolean) {
+        val iconId = if (isPlaying) {
+            R.drawable.ic_pause
+        } else {
+            R.drawable.ic_play_arrow
+        }
+        binding.buttonPlayAudio.setIconResource(iconId)
     }
 
     private fun showDeleteConfirmation(postId: Long) {

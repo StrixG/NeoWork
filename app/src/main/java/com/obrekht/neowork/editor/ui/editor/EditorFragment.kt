@@ -30,7 +30,6 @@ import com.obrekht.neowork.databinding.FragmentEditorBinding
 import com.obrekht.neowork.events.model.Event
 import com.obrekht.neowork.map.navigateToLocationPicker
 import com.obrekht.neowork.map.ui.LocationPickerFragment
-import com.obrekht.neowork.media.util.GetMetadataCallback
 import com.obrekht.neowork.media.util.retrieveMediaMetadata
 import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.userchooser.ui.UserChooserFragment
@@ -110,14 +109,6 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                 }
             }
         }
-
-    private val audioTitleCallback: GetMetadataCallback = { mediaMetadata ->
-        binding.audio.text = mediaMetadata?.let {
-            val artist = mediaMetadata.artist ?: getString(R.string.audio_unknown)
-            val title = mediaMetadata.title ?: getString(R.string.audio_unknown)
-            getString(R.string.audio_title, artist, title)
-        } ?: getString(R.string.audio_unknown)
-    }
 
     private val attachMediaLauncher =
         registerForActivityResult(GetMediaContract()) { uri ->
@@ -292,11 +283,17 @@ class EditorFragment : Fragment(R.layout.fragment_editor) {
                                 audioGroup.isVisible = true
                                 audio.setText(R.string.loading)
 
-                                val mediaItem = MediaItem.fromUri(uri)
-                                mediaItem.retrieveMediaMetadata(
-                                    requireContext(),
-                                    audioTitleCallback
-                                )
+                                val mediaMetadata =
+                                    MediaItem.fromUri(uri).retrieveMediaMetadata(requireContext())
+
+                                audio.text = mediaMetadata?.let {
+                                    val artist = mediaMetadata.artist
+                                        ?: getString(R.string.audio_unknown)
+                                    val title = mediaMetadata.title
+                                        ?: getString(R.string.audio_unknown)
+
+                                    getString(R.string.audio_title, artist, title)
+                                } ?: getString(R.string.audio_unknown)
                             }
                         }
                     }

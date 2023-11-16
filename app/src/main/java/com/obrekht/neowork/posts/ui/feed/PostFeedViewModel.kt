@@ -8,6 +8,8 @@ import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
 import com.obrekht.neowork.auth.data.local.AppAuth
+import com.obrekht.neowork.core.model.AttachmentType
+import com.obrekht.neowork.media.data.local.AudioPlaybackManager
 import com.obrekht.neowork.posts.data.repository.PostRepository
 import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.posts.ui.common.DateSeparatorItem
@@ -20,6 +22,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -37,7 +40,8 @@ private const val POSTS_PER_PAGE = 10
 @HiltViewModel
 class PostFeedViewModel @Inject constructor(
     private val appAuth: AppAuth,
-    private val repository: PostRepository
+    private val repository: PostRepository,
+    private val audioPlaybackManager: AudioPlaybackManager
 ) : ViewModel() {
 
     val data: Flow<PagingData<PostListItem>> = repository
@@ -47,8 +51,22 @@ class PostFeedViewModel @Inject constructor(
                 initialLoadSize = POSTS_PER_PAGE * 2
             )
         )
+        .map { pagingData ->
+            val player = audioPlaybackManager.mediaController
+            val currentMediaId = player?.currentMediaItem?.mediaId
+            pagingData.map { post ->
+                val attachment = post.attachment
+                val isAudioPlaying = player != null
+                        && attachment != null
+                        && attachment.type == AttachmentType.AUDIO
+                        && attachment.url == currentMediaId
+                        && audioPlaybackManager.playbackState.value.isPlaying
+
+                PostItem(post, isAudioPlaying)
+            }
+        }
         .map {
-            it.map(::PostItem).insertDateSeparators()
+            it.insertDateSeparators()
         }
         .cachedIn(viewModelScope)
         .flowOn(Dispatchers.Default)
@@ -70,10 +88,19 @@ class PostFeedViewModel @Inject constructor(
                 repository.invalidatePagingSource()
                 _uiState.update { it.copy(isLoggedIn = authState.id > 0L) }
             }.launchIn(this)
+
+            combine(
+                audioPlaybackManager.playbackState,
+                audioPlaybackManager.nowPlaying
+            ) { _, _ ->
+                repository.invalidatePagingSource()
+            }.launchIn(this)
         }
     }
 
     fun updateDataState(state: DataState) = _uiState.update { it.copy(dataState = state) }
+
+    fun playAudio(url: String) = audioPlaybackManager.playUrl(url)
 
     fun showNewPosts() = viewModelScope.launch {
         repository.showNewPosts()

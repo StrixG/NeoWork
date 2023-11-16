@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.obrekht.neowork.auth.data.local.AppAuth
+import com.obrekht.neowork.core.model.AttachmentType
+import com.obrekht.neowork.media.data.local.AudioPlaybackManager
 import com.obrekht.neowork.posts.data.repository.CommentRepository
 import com.obrekht.neowork.posts.data.repository.PostRepository
 import com.obrekht.neowork.posts.model.Comment
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -29,6 +32,7 @@ class PostViewModel @Inject constructor(
     private val appAuth: AppAuth,
     private val postRepository: PostRepository,
     private val commentRepository: CommentRepository,
+    private val audioPlaybackManager: AudioPlaybackManager,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -67,6 +71,22 @@ class PostViewModel @Inject constructor(
                     )
                 }
             }.launchIn(this)
+
+            combine(
+                postRepository.getPostStream(postId),
+                audioPlaybackManager.playbackState,
+                audioPlaybackManager.nowPlaying
+            ) { post, playbackState, nowPlaying ->
+                val attachment = post?.attachment
+                if (attachment != null && attachment.type == AttachmentType.AUDIO) {
+                    _uiState.update {
+                        it.copy(
+                            isAudioPlaying = nowPlaying.mediaId == attachment.url
+                                    && playbackState.isPlaying
+                        )
+                    }
+                }
+            }.launchIn(this)
         }
     }
 
@@ -102,6 +122,8 @@ class PostViewModel @Inject constructor(
             _uiState.update { it.copy(commentsState = State.Error) }
         }
     }
+
+    fun playAudio(url: String) = audioPlaybackManager.playUrl(url)
 
     fun toggleLike() {
         likeJob?.cancel()
@@ -193,6 +215,7 @@ sealed interface State {
 data class PostUiState(
     val isLoggedIn: Boolean = false,
     val post: Post? = null,
+    val isAudioPlaying: Boolean = false,
     val state: State = State.Success,
     val comments: List<Comment> = emptyList(),
     val commentsState: State = State.Success,

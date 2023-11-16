@@ -8,34 +8,38 @@ import androidx.media3.exoplayer.MetadataRetriever
 import androidx.media3.exoplayer.source.TrackGroupArray
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
+import kotlinx.coroutines.cancelFutureOnCancellation
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
-typealias GetMetadataCallback = (mediaMetadata: MediaMetadata?) -> Unit
+suspend fun MediaItem.retrieveMediaMetadata(context: Context): MediaMetadata? =
+    suspendCancellableCoroutine { continuation ->
+        val metadataFuture =
+            MetadataRetriever.retrieveMetadata(context, this)
 
-fun MediaItem.retrieveMediaMetadata(context: Context, callback: GetMetadataCallback) {
-    val audioTitleCallback = object : FutureCallback<TrackGroupArray?> {
-        override fun onSuccess(trackGroups: TrackGroupArray?) {
-            trackGroups?.get(0)?.let { trackGroup ->
-                val mediaMetadataBuilder = MediaMetadata.Builder()
-                trackGroup.getFormat(0).metadata?.let {
-                    for (entryIndex in 0..<it.length()) {
-                        it.get(entryIndex).populateMediaMetadata(mediaMetadataBuilder)
+        val audioTitleCallback = object : FutureCallback<TrackGroupArray?> {
+            override fun onSuccess(trackGroups: TrackGroupArray?) {
+                val mediaMetadata = trackGroups?.get(0)?.let { trackGroup ->
+                    val mediaMetadataBuilder = MediaMetadata.Builder()
+                    trackGroup.getFormat(0).metadata?.let { metadata ->
+                        for (entryIndex in 0..<metadata.length()) {
+                            metadata.get(entryIndex).populateMediaMetadata(mediaMetadataBuilder)
+                        }
                     }
+                    mediaMetadataBuilder.build()
                 }
-                val mediaMetadata = mediaMetadataBuilder.build()
-                callback(mediaMetadata)
-            } ?: callback(null)
+                continuation.resume(mediaMetadata)
+            }
+
+            override fun onFailure(t: Throwable) {
+                continuation.resume(null)
+            }
         }
 
-        override fun onFailure(t: Throwable) {
-            callback(null)
-        }
+        Futures.addCallback(
+            metadataFuture,
+            audioTitleCallback,
+            ContextCompat.getMainExecutor(context)
+        )
+        continuation.cancelFutureOnCancellation(metadataFuture)
     }
-
-    val metadataFuture =
-        MetadataRetriever.retrieveMetadata(context, this)
-    Futures.addCallback(
-        metadataFuture,
-        audioTitleCallback,
-        ContextCompat.getMainExecutor(context)
-    )
-}

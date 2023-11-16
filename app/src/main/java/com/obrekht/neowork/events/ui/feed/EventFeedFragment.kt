@@ -21,6 +21,7 @@ import com.obrekht.neowork.R
 import com.obrekht.neowork.auth.ui.navigateToLogIn
 import com.obrekht.neowork.auth.ui.showSuggestAuthDialog
 import com.obrekht.neowork.auth.ui.suggestauth.SuggestAuthDialogFragment
+import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.core.ui.findRootNavController
 import com.obrekht.neowork.core.ui.mainscreen.MainScreenFragment
 import com.obrekht.neowork.databinding.FragmentEventFeedBinding
@@ -76,6 +77,14 @@ class EventFeedFragment : Fragment(R.layout.fragment_event_feed) {
         override fun onAttachmentClick(event: Event, view: ImageView) {
             event.attachment?.let {
                 navigateToMediaView(it.type, it.url, view)
+            }
+        }
+
+        override fun onPlayAudioButtonClick(event: Event) {
+            event.attachment?.let {
+                if (it.type == AttachmentType.AUDIO) {
+                    viewModel.playAudio(it.url)
+                }
             }
         }
 

@@ -31,7 +31,8 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 class AppAuth @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private val _state = MutableStateFlow(AuthState())
     val state: StateFlow<AuthState> = _state.asStateFlow()
