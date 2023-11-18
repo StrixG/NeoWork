@@ -7,6 +7,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.obrekht.neowork.auth.data.local.AppAuth
+import com.obrekht.neowork.core.di.DefaultDispatcher
 import com.obrekht.neowork.core.model.Attachment
 import com.obrekht.neowork.media.data.remote.MediaApiService
 import com.obrekht.neowork.media.model.Media
@@ -21,7 +22,7 @@ import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.userpreview.data.local.dao.UserPreviewDao
 import com.obrekht.neowork.userpreview.data.local.entity.toEntity
 import com.obrekht.neowork.userpreview.data.local.entity.toModelMap
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -44,6 +45,7 @@ private const val GET_NEW_POSTS_INTERVAL = 10_000L
 
 @Singleton
 class CachedPostRepository @Inject constructor(
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val auth: AppAuth,
     private val postFeedRemoteMediator: PostFeedRemoteMediator,
     private val postDao: PostDao,
@@ -91,7 +93,7 @@ class CachedPostRepository @Inject constructor(
             emit(postDao.getNewerCount())
         }
     }
-        .flowOn(Dispatchers.Default)
+        .flowOn(defaultDispatcher)
 
     override suspend fun showNewPosts() {
         postDao.showNewPosts()

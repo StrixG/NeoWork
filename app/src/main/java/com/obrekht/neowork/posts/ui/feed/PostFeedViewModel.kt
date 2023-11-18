@@ -8,6 +8,7 @@ import androidx.paging.cachedIn
 import androidx.paging.insertSeparators
 import androidx.paging.map
 import com.obrekht.neowork.auth.data.local.AppAuth
+import com.obrekht.neowork.core.di.DefaultDispatcher
 import com.obrekht.neowork.core.model.AttachmentType
 import com.obrekht.neowork.media.data.local.AudioPlaybackManager
 import com.obrekht.neowork.posts.data.repository.PostRepository
@@ -16,7 +17,7 @@ import com.obrekht.neowork.posts.ui.common.DateSeparatorItem
 import com.obrekht.neowork.posts.ui.common.PostItem
 import com.obrekht.neowork.posts.ui.common.PostListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +40,7 @@ private const val POSTS_PER_PAGE = 10
 
 @HiltViewModel
 class PostFeedViewModel @Inject constructor(
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val appAuth: AppAuth,
     private val repository: PostRepository,
     private val audioPlaybackManager: AudioPlaybackManager
@@ -69,7 +71,7 @@ class PostFeedViewModel @Inject constructor(
             it.insertDateSeparators()
         }
         .cachedIn(viewModelScope)
-        .flowOn(Dispatchers.Default)
+        .flowOn(defaultDispatcher)
 
     private val _uiState = MutableStateFlow(PostFeedUiState())
     val uiState: StateFlow<PostFeedUiState> = _uiState

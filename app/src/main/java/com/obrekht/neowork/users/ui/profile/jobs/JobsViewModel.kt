@@ -6,10 +6,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.obrekht.neowork.core.di.DefaultDispatcher
 import com.obrekht.neowork.jobs.data.repository.JobRepository
 import com.obrekht.neowork.jobs.model.Job
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +26,7 @@ private const val JOBS_PER_PAGE = 5
 
 @HiltViewModel
 class JobsViewModel @Inject constructor(
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val jobRepository: JobRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -50,7 +52,7 @@ class JobsViewModel @Inject constructor(
             )
         )
         .cachedIn(viewModelScope)
-        .flowOn(Dispatchers.Default)
+        .flowOn(defaultDispatcher)
 
     fun refresh() = viewModelScope.launch {
         _uiState.update { it.copy(dataState = DataState.Loading) }
