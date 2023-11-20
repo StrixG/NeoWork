@@ -75,7 +75,7 @@ class PostListAdapter(
                 if (payloads.isEmpty()) {
                     postHolder.bind(postItem)
                 } else {
-                    val payloadList = payloads.map { it as PostPayload }
+                    val payloadList = payloads.filterIsInstance<PostPayload>()
                     postHolder.bind(postItem, payloadList)
                 }
             }

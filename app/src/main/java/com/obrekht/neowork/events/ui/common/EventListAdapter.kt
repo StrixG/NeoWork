@@ -82,7 +82,7 @@ class EventListAdapter(
                 if (payloads.isEmpty()) {
                     eventHolder.bind(eventItem)
                 } else {
-                    val payloadList = payloads.map { it as EventPayload }
+                    val payloadList = payloads.filterIsInstance<EventPayload>()
                     eventHolder.bind(eventItem, payloadList)
                 }
             }
