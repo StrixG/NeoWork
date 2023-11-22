@@ -32,7 +32,7 @@ import com.obrekht.neowork.databinding.FragmentPostBinding
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteConfirmationDialogFragment
 import com.obrekht.neowork.deleteconfirmation.ui.DeleteElementType
 import com.obrekht.neowork.media.ui.navigateToMediaView
-import com.obrekht.neowork.media.util.retrieveMediaMetadata
+import com.obrekht.neowork.media.usecase.retrieveMediaMetadata
 import com.obrekht.neowork.posts.model.Comment
 import com.obrekht.neowork.posts.model.Post
 import com.obrekht.neowork.posts.ui.common.PostInteractionListener
@@ -279,6 +279,8 @@ class PostFragment : Fragment(R.layout.fragment_post) {
     override fun onDestroyView() {
         snackbar = null
         commentsAdapter = null
+        binding.commentLogInText.text = null
+
         super.onDestroyView()
     }
 

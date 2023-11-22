@@ -110,11 +110,14 @@ class MediaViewFragment : Fragment(R.layout.fragment_media_view) {
 
         val window = requireActivity().window
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView, null)
+        window.decorView.setOnTouchListener(null)
+
         binding.videoPlayer.setControllerVisibilityListener(
             null as PlayerView.ControllerVisibilityListener?
         )
         mediaController?.pause()
         releaseMediaController()
+
         super.onDestroyView()
     }
 
