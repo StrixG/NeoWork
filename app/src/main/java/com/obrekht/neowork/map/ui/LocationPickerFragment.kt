@@ -77,7 +77,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import timber.log.Timber
 import java.util.concurrent.CancellationException
 
 
@@ -152,9 +151,6 @@ class LocationPickerFragment : Fragment(R.layout.fragment_location_picker) {
 
         if (cameraUpdateReason == CameraUpdateReason.GESTURES) {
             cancelMoveCameraToMe()
-            binding.mapView.mapWindow.focusRect?.let {
-                Timber.d("${it.bottomRight.x} ${it.bottomRight.y}")
-            }
             if (finished) {
                 tryStickToNorth()
             }
