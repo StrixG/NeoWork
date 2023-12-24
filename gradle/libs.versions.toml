@@ -12,7 +12,7 @@ material = "1.10.0"
 activity = "1.8.1"
 fragment = "1.6.2"
 lifecycle = "2.6.2"
-navigation = "2.7.5"
+navigation = "2.7.6"
 workmanager = "2.8.1"
 datastore = "1.0.0"
 constraintlayout = "2.1.4"
@@ -91,7 +91,7 @@ android-application = { id = "com.android.application", version.ref = "android-p
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
-navigation-safeargs = { id = "androidx.navigation.safeargs", version.ref = "navigation" }
+navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 [bundles]
