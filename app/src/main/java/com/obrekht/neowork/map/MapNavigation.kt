@@ -6,8 +6,6 @@ import com.obrekht.neowork.core.ui.findRootNavController
 import com.obrekht.neowork.map.model.LocationPoint
 
 fun Fragment.navigateToLocationPicker(point: LocationPoint? = null) {
-    val action = NavGraphDirections.actionOpenLocationPicker().apply {
-        position = point
-    }
+    val action = NavGraphDirections.actionOpenLocationPicker(point)
     findRootNavController().navigate(action)
 }

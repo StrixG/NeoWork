@@ -14,18 +14,17 @@ fun Fragment.navigateToPost(postId: Long) {
 }
 
 fun Fragment.navigateToPostEditor(postId: Long = 0) {
-    val action = NavGraphDirections.actionOpenEditor().apply {
-        this.id = postId
-        this.editableType = EditableType.POST
-    }
+    val action = NavGraphDirections.actionOpenEditor(
+        id = postId, editableType = EditableType.POST
+    )
     findRootNavController().navigate(action)
 }
 
 fun Fragment.navigateToCommentEditor(commentId: Long) {
-    val action = NavGraphDirections.actionOpenEditor().apply {
-        this.id = commentId
-        this.editableType = EditableType.COMMENT
-    }
+    val action = NavGraphDirections.actionOpenEditor(
+        id = commentId,
+        editableType = EditableType.COMMENT
+    )
     findRootNavController().navigate(action)
 }
 

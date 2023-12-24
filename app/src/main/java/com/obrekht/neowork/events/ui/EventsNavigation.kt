@@ -14,10 +14,9 @@ fun Fragment.navigateToEvent(eventId: Long) {
 }
 
 fun Fragment.navigateToEventEditor(eventId: Long = 0) {
-    val action = NavGraphDirections.actionOpenEditor().apply {
-        this.id = eventId
-        this.editableType = EditableType.EVENT
-    }
+    val action = NavGraphDirections.actionOpenEditor(
+        id = eventId, editableType = EditableType.EVENT
+    )
     findRootNavController().navigate(action)
 }
 
