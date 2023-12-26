@@ -27,7 +27,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField("String", "API_KEY", "\"${secrets.getProperty("API_KEY", "")}\"")
-        buildConfigField("String", "BASE_URL", "\"http://94.228.125.136:8080\"")
+        buildConfigField("String", "BASE_URL", "\"https://neowork.obrekht.com\"")
         buildConfigField("String", "MAPKIT_API_KEY", "\"${secrets.getProperty("MAPKIT_API_KEY", "")}\"")
     }
 
