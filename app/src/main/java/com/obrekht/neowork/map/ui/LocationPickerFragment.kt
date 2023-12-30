@@ -63,6 +63,7 @@ import com.yandex.mapkit.search.SearchType
 import com.yandex.mapkit.search.Session
 import com.yandex.mapkit.search.SuggestItem
 import com.yandex.mapkit.search.SuggestOptions
+import com.yandex.mapkit.search.SuggestResponse
 import com.yandex.mapkit.search.SuggestSession
 import com.yandex.mapkit.search.SuggestType
 import com.yandex.runtime.Error
@@ -193,8 +194,8 @@ class LocationPickerFragment : Fragment(R.layout.fragment_location_picker) {
     }
 
     private val suggestListener = object : SuggestSession.SuggestListener {
-        override fun onResponse(items: MutableList<SuggestItem>) {
-            adapter?.submitList(items) {
+        override fun onResponse(response: SuggestResponse) {
+            adapter?.submitList(response.items) {
                 binding.suggestList.smoothScrollToPosition(0)
             }
         }
